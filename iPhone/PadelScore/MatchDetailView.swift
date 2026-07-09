@@ -60,6 +60,8 @@ struct MatchDetailView: View {
         switch event.kind {
         case .matchStarted:
             return "Match started"
+        case .serverSelected:
+            return "Server: \(event.side?.displayName ?? "?")"
         case .pointWon:
             return "Point: \(event.side?.displayName ?? "?")"
         case .matchFinished:

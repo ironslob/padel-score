@@ -4,8 +4,8 @@ import XCTest
 final class ScoringEngineTests: XCTestCase {
     private let engine = ScoringEngine()
 
-    private func start() -> MatchState {
-        let initial = engine.startMatch()
+    private func start(settings: MatchSettings = .default) -> MatchState {
+        let initial = engine.startMatch(settings: settings)
         return (try? engine.apply(.selectServer(.left), to: initial)) ?? initial
     }
 
@@ -19,6 +19,9 @@ final class ScoringEngineTests: XCTestCase {
 
     private func winGame(for side: Side, from state: MatchState) throws -> MatchState {
         var s = state
+        if s.needsServerSelection {
+            s = try engine.apply(.selectServer(.left), to: s)
+        }
         // Win four straight points from love.
         for _ in 0..<4 {
             s = try point(side, s)
@@ -123,7 +126,7 @@ final class ScoringEngineTests: XCTestCase {
     func testGoldenPointDisabledFallsBackToRepeatedAdvantage() throws {
         var settings = MatchSettings.default
         settings.goldenPointEnabled = false
-        var s = engine.startMatch(settings: settings)
+        var s = start(settings: settings)
         for _ in 0..<3 {
             s = try point(.left, s)
             s = try point(.right, s)
