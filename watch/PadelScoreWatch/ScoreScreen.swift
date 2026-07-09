@@ -11,7 +11,7 @@ struct ScoreScreen: View {
 
     private var game: (left: String, right: String) { match.currentGame.displayPair }
     private var games: (left: String, right: String) { match.currentSet.displayPair }
-    private var undoTimeout: TimeInterval { match.settings.undoTimeoutSeconds }
+    private var undoTimeout: TimeInterval { MatchSettings.quickUndoTimeoutSeconds }
     private var leftRole: String { match.currentServer == .left ? "Serving" : "Receiving" }
     private var rightRole: String { match.currentServer == .right ? "Serving" : "Receiving" }
 

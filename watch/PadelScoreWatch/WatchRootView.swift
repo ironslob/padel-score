@@ -21,7 +21,7 @@ struct WatchRootView: View {
                             completedSet: gameInterstitialCompletedSet,
                             isTieBreak: gameInterstitialIsTieBreak,
                             startedAt: startedAt,
-                            timeout: match.settings.undoTimeoutSeconds,
+                            timeout: MatchSettings.quickUndoTimeoutSeconds,
                             onNext: clearGameInterstitial
                         )
                     } else if match.needsServerSelection {
@@ -78,7 +78,7 @@ struct WatchRootView: View {
             beginGameInterstitialWindow(
                 completedSet: completedSet,
                 isTieBreak: isTieBreak,
-                timeout: newMatch.settings.undoTimeoutSeconds
+                timeout: MatchSettings.quickUndoTimeoutSeconds
             )
             return
         }
