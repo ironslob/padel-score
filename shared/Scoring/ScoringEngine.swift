@@ -67,14 +67,10 @@ public struct ScoringEngine: Sendable {
         case .finish:
             guard state.status == .inProgress else { throw ScoringError.matchNotInProgress }
             var next = state
-            // Manual finish is only meaningful once a natural winner exists;
-            // otherwise treat as end-early style retention of current score.
             if let winner = naturalWinner(of: state) {
-                next.status = .completed
                 next.winner = winner
-            } else {
-                next.status = .endedEarly
             }
+            next.status = .completed
             next.finishedAt = date
             next.events.append(.matchFinished(at: date))
             return next

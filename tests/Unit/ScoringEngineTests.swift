@@ -343,11 +343,12 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.status, .discarded)
     }
 
-    func testFinishWithoutWinnerEndsEarly() throws {
+    func testFinishWithoutWinnerCompletes() throws {
         var s = start()
         s = try point(.left, s)
         s = try engine.apply(.finish, to: s)
-        XCTAssertEqual(s.status, .endedEarly)
+        XCTAssertEqual(s.status, .completed)
+        XCTAssertNil(s.winner)
     }
 
     func testReplayIsDeterministic() throws {
