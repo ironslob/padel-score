@@ -72,7 +72,7 @@ final class DuringPlayAccessCopyTests: XCTestCase {
     }
 
     func testModeConsequencesMentionExpectedBehavior() {
-        XCTAssertTrue(DuringPlayAccessCopy.scoreOnlyConsequence.contains("Bevel"))
+        XCTAssertTrue(DuringPlayAccessCopy.scoreOnlyConsequence.contains("Health workout"))
         XCTAssertTrue(DuringPlayAccessCopy.trackAsWorkoutConsequence.contains("one workout"))
     }
 }

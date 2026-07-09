@@ -66,12 +66,11 @@ public struct UserDefaultsWorkoutModePreferenceStore: WorkoutModePreferenceStori
 
 public enum DuringPlayAccessCopy {
     public static let firstMatchTip =
-        "Score only works best when another workout app is active. " +
         "Pin Padel Score in your Dock, then swipe up from the watch face to reopen. " +
         "Between points, check the dimmed score on your wrist."
 
     public static let scoreOnlyConsequence =
-        "Best with Bevel or another workout app. Wrist raise may return to that app first."
+        "Scores the match without starting a Health workout."
 
     public static let trackAsWorkoutConsequence =
         "Padel Score owns the workout and usually returns on wrist raise. Only one workout can run at a time."
