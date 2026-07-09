@@ -91,11 +91,6 @@ public enum DuringPlayAccessCopy {
         (
             "Watch face",
             "Add the Padel Score complication to see the score on your watch face."
-        ),
-        (
-            "Track as workout",
-            "Choose Track as workout when starting a match so Padel Score returns on wrist-raise. " +
-            "Only one workout can run at a time on Apple Watch."
         )
     ]
 }

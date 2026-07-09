@@ -197,18 +197,6 @@ struct StartMatchView: View {
                 .font(.headline)
                 .multilineTextAlignment(.center)
 
-            Picker("Mode", selection: workoutModeBinding) {
-                ForEach(MatchSessionCoordinator.WorkoutTrackingMode.allCases) { mode in
-                    Text(mode.label).tag(mode)
-                }
-            }
-            .pickerStyle(.navigationLink)
-
-            Text(sessionCoordinator.workoutTrackingMode.consequenceCopy)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-
             Button {
                 Task { await startMatch() }
             } label: {
@@ -238,13 +226,6 @@ struct StartMatchView: View {
         .sheet(isPresented: $showDuringPlayHelp) {
             DuringPlayHelpView()
         }
-    }
-
-    private var workoutModeBinding: Binding<MatchSessionCoordinator.WorkoutTrackingMode> {
-        Binding(
-            get: { sessionCoordinator.workoutTrackingMode },
-            set: { sessionCoordinator.setWorkoutTrackingMode($0) }
-        )
     }
 
     private func startMatch() async {

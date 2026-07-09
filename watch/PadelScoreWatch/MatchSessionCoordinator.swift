@@ -34,7 +34,7 @@ public final class MatchSessionCoordinator: ObservableObject {
         }
     }
 
-    @Published public private(set) var workoutTrackingMode: WorkoutTrackingMode = .scoreOnly
+    @Published public private(set) var workoutTrackingMode: WorkoutTrackingMode = .trackAsWorkout
     @Published public private(set) var isWorkoutSessionActive = false
     @Published public var workoutErrorMessage: String?
     @Published public var showWristRaiseTip = false
@@ -58,12 +58,6 @@ public final class MatchSessionCoordinator: ObservableObject {
         self.workoutManager = workoutManager ?? HealthKitWorkoutSessionManager(healthStore: healthStore)
         self.tipStore = tipStore
         self.modeStore = modeStore
-        if
-            let rawMode = modeStore.preferredWorkoutTrackingModeRawValue,
-            let savedMode = WorkoutTrackingMode(rawValue: rawMode)
-        {
-            self.workoutTrackingMode = savedMode
-        }
         bindService()
         publishSnapshot(for: service.activeMatch)
     }
@@ -79,9 +73,7 @@ public final class MatchSessionCoordinator: ObservableObject {
         service.startMatch()
         publishSnapshot(for: service.activeMatch)
 
-        if workoutTrackingMode == .trackAsWorkout {
-            await startWorkoutSession()
-        }
+        await startWorkoutSession()
 
         if tipStore.shouldShowTip {
             showWristRaiseTip = true
