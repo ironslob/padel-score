@@ -212,7 +212,7 @@ struct ScoreScreen: View {
 }
 
 /// Draws a rounded-rect stroke that grows clockwise from the top-center.
-private struct ClockwiseRoundedRectOutline: Shape {
+struct ClockwiseRoundedRectOutline: Shape {
     var progress: Double
     var cornerRadius: CGFloat
 

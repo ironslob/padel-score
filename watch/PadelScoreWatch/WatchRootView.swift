@@ -6,17 +6,22 @@ struct WatchRootView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var showGameInterstitial = false
     @State private var gameInterstitialCompletedSet = false
+    @State private var gameInterstitialStartedAt: Date?
     @State private var gameInterstitialTask: Task<Void, Never>?
-
-    private let gameInterstitialSeconds: TimeInterval = 3
 
     var body: some View {
         Group {
             if let match = service.activeMatch {
                 switch match.status {
                 case .inProgress:
-                    if showGameInterstitial {
-                        GameInterstitialView(match: match, completedSet: gameInterstitialCompletedSet)
+                    if showGameInterstitial, let startedAt = gameInterstitialStartedAt {
+                        GameInterstitialView(
+                            match: match,
+                            completedSet: gameInterstitialCompletedSet,
+                            startedAt: startedAt,
+                            timeout: match.settings.undoTimeoutSeconds,
+                            onNext: clearGameInterstitial
+                        )
                     } else if match.needsServerSelection {
                         SelectServerView()
                     } else {
@@ -67,7 +72,10 @@ struct WatchRootView: View {
         }
 
         if let completedSet = didCompleteSet(from: oldMatch, to: newMatch) {
-            beginGameInterstitialWindow(completedSet: completedSet)
+            beginGameInterstitialWindow(
+                completedSet: completedSet,
+                timeout: newMatch.settings.undoTimeoutSeconds
+            )
             return
         }
 
@@ -90,15 +98,15 @@ struct WatchRootView: View {
         return setAdvanced
     }
 
-    private func beginGameInterstitialWindow(completedSet: Bool) {
+    private func beginGameInterstitialWindow(completedSet: Bool, timeout: TimeInterval) {
         gameInterstitialTask?.cancel()
         gameInterstitialCompletedSet = completedSet
+        gameInterstitialStartedAt = Date()
         showGameInterstitial = true
         gameInterstitialTask = Task { @MainActor in
-            try? await Task.sleep(nanoseconds: UInt64(gameInterstitialSeconds * 1_000_000_000))
+            try? await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
             if Task.isCancelled { return }
-            showGameInterstitial = false
-            gameInterstitialTask = nil
+            clearGameInterstitial()
         }
     }
 
@@ -107,6 +115,7 @@ struct WatchRootView: View {
         gameInterstitialTask = nil
         showGameInterstitial = false
         gameInterstitialCompletedSet = false
+        gameInterstitialStartedAt = nil
     }
 
     private var workoutErrorBinding: Binding<Bool> {
@@ -123,8 +132,12 @@ struct WatchRootView: View {
 
 private struct GameInterstitialView: View {
     @EnvironmentObject private var service: MatchService
+    @Environment(\.isLuminanceReduced) private var isLuminanceReduced
     let match: MatchState
     let completedSet: Bool
+    let startedAt: Date
+    let timeout: TimeInterval
+    let onNext: () -> Void
 
     private var sets: (left: String, right: String) { match.matchSetsDisplay }
     private var games: (left: String, right: String) {
@@ -135,28 +148,81 @@ private struct GameInterstitialView: View {
     }
 
     var body: some View {
-        VStack(spacing: 10) {
-            Text(completedSet ? "Set!" : "Game!")
-                .font(.headline.weight(.bold))
+        TimelineView(
+            .animation(
+                minimumInterval: 1.0 / 30.0,
+                paused: isLuminanceReduced
+            )
+        ) { context in
+            let progress = nextProgress(at: context.date)
+
+            VStack(spacing: 10) {
+                Text(completedSet ? "Set!" : "Game!")
+                    .font(.headline.weight(.bold))
+                    .frame(maxWidth: .infinity)
+
+                VStack(spacing: 4) {
+                    Text("Sets \(sets.left) – \(sets.right)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text("Games \(games.left) – \(games.right)")
+                        .font(.title3.weight(.semibold).monospacedDigit())
+                }
                 .frame(maxWidth: .infinity)
 
-            VStack(spacing: 4) {
-                Text("Sets \(sets.left) – \(sets.right)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text("Games \(games.left) – \(games.right)")
-                    .font(.title3.weight(.semibold).monospacedDigit())
-            }
-            .frame(maxWidth: .infinity)
+                HStack(spacing: 8) {
+                    Button("Undo") {
+                        service.undoLastPoint()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.orange)
+                    .disabled(!service.canUndo)
+                    .frame(maxWidth: .infinity)
 
-            Button("Undo") {
-                service.undoLastPoint()
+                    nextButton(progress: isLuminanceReduced ? 0 : progress)
+                }
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.orange)
-            .disabled(!service.canUndo)
+            .padding()
         }
-        .padding()
+    }
+
+    private func nextButton(progress: Double) -> some View {
+        let tint: Color = .green
+
+        return Button(action: onNext) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(tint.opacity(isLuminanceReduced ? 0.12 : 0.22))
+
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(
+                        tint.opacity(isLuminanceReduced ? 0.55 : 0.35),
+                        lineWidth: isLuminanceReduced ? 2.5 : 2
+                    )
+
+                if progress > 0 {
+                    ClockwiseRoundedRectOutline(progress: progress, cornerRadius: 12)
+                        .stroke(
+                            tint,
+                            style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
+                        )
+                }
+
+                Text("Next")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .padding(.vertical, 8)
+            }
+            .frame(maxWidth: .infinity, minHeight: 44)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Next")
+        .accessibilityHint("Continue to the next game")
+    }
+
+    private func nextProgress(at date: Date) -> Double {
+        guard timeout > 0 else { return 0 }
+        return min(1, max(0, date.timeIntervalSince(startedAt) / timeout))
     }
 }
 
