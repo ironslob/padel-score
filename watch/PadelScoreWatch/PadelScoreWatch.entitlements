@@ -4,11 +4,9 @@
 <dict>
 	<key>com.apple.developer.healthkit</key>
 	<true/>
-	<key>com.apple.developer.healthkit.workout-processing</key>
-	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.padelscore.app</string>
+		<string>group.com.matthewwilson.padelscore</string>
 	</array>
 </dict>
 </plist>

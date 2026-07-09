@@ -1,6 +1,6 @@
 name: PadelScore
 options:
-  bundleIdPrefix: com.padelscore
+  bundleIdPrefix: com.matthewwilson.padelscore
   deploymentTarget:
     iOS: "17.0"
     watchOS: "10.0"
@@ -27,16 +27,22 @@ targets:
         excludes:
           - "**/*Tests*"
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.padelscore.app
+      PRODUCT_BUNDLE_IDENTIFIER: com.matthewwilson.padelscore
       GENERATE_INFOPLIST_FILE: YES
       INFOPLIST_KEY_CFBundleDisplayName: Padel Score
       INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
       INFOPLIST_KEY_UILaunchScreen_Generation: YES
       INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+      CODE_SIGN_ENTITLEMENTS: iPhone/PadelScore/PadelScore.entitlements
       CURRENT_PROJECT_VERSION: 1
       MARKETING_VERSION: "1.0"
       SUPPORTS_MACCATALYST: NO
       TARGETED_DEVICE_FAMILY: "1"
+    capabilities:
+      App Groups:
+        enabled: true
+        groups:
+          - group.com.matthewwilson.padelscore
     dependencies:
       - target: PadelScoreWatch
         embed: true
@@ -56,10 +62,10 @@ targets:
         excludes:
           - "**/*Tests*"
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.padelscore.app.watchkitapp
+      PRODUCT_BUNDLE_IDENTIFIER: com.matthewwilson.padelscore.watchkitapp
       GENERATE_INFOPLIST_FILE: YES
       INFOPLIST_KEY_CFBundleDisplayName: Padel Score
-      INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.padelscore.app
+      INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.matthewwilson.padelscore
       INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp: YES
       INFOPLIST_KEY_WKSupportsAlwaysOnDisplay: YES
       INFOPLIST_KEY_WKBackgroundModes:
@@ -76,6 +82,10 @@ targets:
       - target: PadelScoreComplications
         embed: true
     capabilities:
+      App Groups:
+        enabled: true
+        groups:
+          - group.com.matthewwilson.padelscore
       HealthKit:
         enabled: true
     scheme: {}
@@ -94,7 +104,7 @@ targets:
         excludes:
           - "**/*Tests*"
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.padelscore.app.watchkitapp.complications
+      PRODUCT_BUNDLE_IDENTIFIER: com.matthewwilson.padelscore.watchkitapp.complications
       GENERATE_INFOPLIST_FILE: NO
       INFOPLIST_FILE: watch/PadelScoreComplications/Info.plist
       CODE_SIGN_ENTITLEMENTS: watch/PadelScoreComplications/PadelScoreComplications.entitlements
@@ -103,6 +113,11 @@ targets:
       TARGETED_DEVICE_FAMILY: "4"
       SDKROOT: watchos
       SUPPORTED_PLATFORMS: "watchos watchsimulator"
+    capabilities:
+      App Groups:
+        enabled: true
+        groups:
+          - group.com.matthewwilson.padelscore
     scheme: {}
 
   PadelScoreTests:
@@ -118,7 +133,7 @@ targets:
           - "**/*Tests*"
     settings:
       GENERATE_INFOPLIST_FILE: YES
-      PRODUCT_BUNDLE_IDENTIFIER: com.padelscore.app.tests
+      PRODUCT_BUNDLE_IDENTIFIER: com.matthewwilson.padelscore.tests
       TARGETED_DEVICE_FAMILY: "1"
       # Hostless unit tests — shared sources compiled into the test bundle.
       TEST_HOST: ""

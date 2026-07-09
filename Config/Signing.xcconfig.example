@@ -1,6 +1,12 @@
 // Copy to Signing.xcconfig and set your Apple Developer team ID.
 // Find it in Xcode: target → Signing & Capabilities → Team (10-character ID).
 // Or: defaults read com.apple.dt.Xcode IDEProvisioningTeamByIdentifier
+//
+// If Xcode reports the bundle ID is unavailable, change BUNDLE_ID_ROOT and
+// APP_GROUP_ID below to a unique reverse-DNS string for your team.
 
 DEVELOPMENT_TEAM = YOUR_TEAM_ID_HERE
 CODE_SIGN_STYLE = Automatic
+CODE_SIGN_IDENTITY = Apple Development
+BUNDLE_ID_ROOT = com.yourname.padelscore
+APP_GROUP_ID = group.com.yourname.padelscore
