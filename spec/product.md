@@ -268,6 +268,8 @@ Default settings:
 - Best of three sets
 - First to six games
 - Win by two games
+- Tie-break at 6–6 (first to 7 points, win by 2)
+- Tie-break serve rotates every 2 points after the opening point; change sides every 6 points
 - Golden point enabled
 - Standard scoring
 

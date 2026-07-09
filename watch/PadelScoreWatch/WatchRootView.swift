@@ -6,6 +6,7 @@ struct WatchRootView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var showGameInterstitial = false
     @State private var gameInterstitialCompletedSet = false
+    @State private var gameInterstitialIsTieBreak = false
     @State private var gameInterstitialStartedAt: Date?
     @State private var gameInterstitialTask: Task<Void, Never>?
 
@@ -18,6 +19,7 @@ struct WatchRootView: View {
                         GameInterstitialView(
                             match: match,
                             completedSet: gameInterstitialCompletedSet,
+                            isTieBreak: gameInterstitialIsTieBreak,
                             startedAt: startedAt,
                             timeout: match.settings.undoTimeoutSeconds,
                             onNext: clearGameInterstitial
@@ -72,8 +74,10 @@ struct WatchRootView: View {
         }
 
         if let completedSet = didCompleteSet(from: oldMatch, to: newMatch) {
+            let isTieBreak = newMatch.currentGame.isTieBreak && !oldMatch.currentGame.isTieBreak
             beginGameInterstitialWindow(
                 completedSet: completedSet,
+                isTieBreak: isTieBreak,
                 timeout: newMatch.settings.undoTimeoutSeconds
             )
             return
@@ -98,9 +102,10 @@ struct WatchRootView: View {
         return setAdvanced
     }
 
-    private func beginGameInterstitialWindow(completedSet: Bool, timeout: TimeInterval) {
+    private func beginGameInterstitialWindow(completedSet: Bool, isTieBreak: Bool, timeout: TimeInterval) {
         gameInterstitialTask?.cancel()
         gameInterstitialCompletedSet = completedSet
+        gameInterstitialIsTieBreak = isTieBreak
         gameInterstitialStartedAt = Date()
         showGameInterstitial = true
         gameInterstitialTask = Task { @MainActor in
@@ -115,6 +120,7 @@ struct WatchRootView: View {
         gameInterstitialTask = nil
         showGameInterstitial = false
         gameInterstitialCompletedSet = false
+        gameInterstitialIsTieBreak = false
         gameInterstitialStartedAt = nil
     }
 
@@ -135,6 +141,7 @@ private struct GameInterstitialView: View {
     @Environment(\.isLuminanceReduced) private var isLuminanceReduced
     let match: MatchState
     let completedSet: Bool
+    let isTieBreak: Bool
     let startedAt: Date
     let timeout: TimeInterval
     let onNext: () -> Void
@@ -147,6 +154,12 @@ private struct GameInterstitialView: View {
         return match.currentSet.displayPair
     }
 
+    private var headline: String {
+        if completedSet { return "Set!" }
+        if isTieBreak { return "Tie-break" }
+        return "Game!"
+    }
+
     var body: some View {
         TimelineView(
             .animation(
@@ -157,14 +170,20 @@ private struct GameInterstitialView: View {
             let progress = nextProgress(at: context.date)
 
             VStack(spacing: 10) {
-                Text(completedSet ? "Set!" : "Game!")
+                Text(headline)
                     .font(.headline.weight(.bold))
                     .frame(maxWidth: .infinity)
 
                 VStack(spacing: 4) {
-                    Text("Sets \(sets.left) – \(sets.right)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    if isTieBreak {
+                        Text("First to 7, win by 2")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("Sets \(sets.left) – \(sets.right)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Text("Games \(games.left) – \(games.right)")
                         .font(.title3.weight(.semibold).monospacedDigit())
                 }

@@ -23,13 +23,20 @@ public enum PointDisplay: Equatable, Sendable {
     }
 }
 
+/// Transient notice shown during a tie-break after certain points.
+public enum TieBreakNotice: Equatable, Sendable {
+    case changeServe
+    case changeSides
+}
+
 /// Mutable projection of the current game (derived from events).
 public struct GameScore: Codable, Sendable, Equatable {
-    /// 0 = love, 1 = 15, 2 = 30, 3 = 40
+    /// 0 = love, 1 = 15, 2 = 30, 3 = 40 (or tie-break point count when `isTieBreak`)
     public var leftPoints: Int
     public var rightPoints: Int
     public var advantageSide: Side?
     public var isGoldenPointActive: Bool
+    public var isTieBreak: Bool
     public var isComplete: Bool
     public var winner: Side?
 
@@ -38,6 +45,7 @@ public struct GameScore: Codable, Sendable, Equatable {
         rightPoints: Int = 0,
         advantageSide: Side? = nil,
         isGoldenPointActive: Bool = false,
+        isTieBreak: Bool = false,
         isComplete: Bool = false,
         winner: Side? = nil
     ) {
@@ -45,6 +53,7 @@ public struct GameScore: Codable, Sendable, Equatable {
         self.rightPoints = rightPoints
         self.advantageSide = advantageSide
         self.isGoldenPointActive = isGoldenPointActive
+        self.isTieBreak = isTieBreak
         self.isComplete = isComplete
         self.winner = winner
     }
@@ -65,10 +74,27 @@ public struct GameScore: Codable, Sendable, Equatable {
         }
     }
 
+    public var tieBreakTotalPoints: Int {
+        leftPoints + rightPoints
+    }
+
+    /// Notice to show after the most recent tie-break point, if any.
+    public var tieBreakNotice: TieBreakNotice? {
+        guard isTieBreak else { return nil }
+        let total = tieBreakTotalPoints
+        guard total > 0 else { return nil }
+        if total % 6 == 0 { return .changeSides }
+        if total % 2 == 1 { return .changeServe }
+        return nil
+    }
+
     /// Labels for left and right suitable for the score screen.
     public var displayPair: (left: String, right: String) {
         if isComplete {
             return ("0", "0")
+        }
+        if isTieBreak {
+            return (String(leftPoints), String(rightPoints))
         }
         if isGoldenPointActive {
             return ("GP", "GP")
@@ -86,6 +112,9 @@ public struct GameScore: Codable, Sendable, Equatable {
     }
 
     public var statusLine: String? {
+        if isTieBreak {
+            return "Tie-break"
+        }
         if isGoldenPointActive {
             return "Golden Point"
         }
@@ -223,7 +252,8 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         if status == .endedEarly, !currentSet.isComplete,
            currentSet.leftGames > 0 || currentSet.rightGames > 0
             || currentGame.leftPoints > 0 || currentGame.rightPoints > 0
-            || currentGame.advantageSide != nil || currentGame.isGoldenPointActive {
+            || currentGame.advantageSide != nil || currentGame.isGoldenPointActive
+            || currentGame.isTieBreak {
             let partial = "\(currentSet.leftGames)-\(currentSet.rightGames)"
             return (sets + [partial]).joined(separator: ", ")
         }

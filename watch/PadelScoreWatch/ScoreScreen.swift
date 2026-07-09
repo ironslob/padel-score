@@ -25,7 +25,9 @@ struct ScoreScreen: View {
             let progress = undoProgress(at: context.date)
 
             VStack(spacing: isLuminanceReduced ? 6 : 10) {
-                if match.currentGame.isGoldenPointActive {
+                if match.currentGame.isTieBreak {
+                    tieBreakHeader
+                } else if match.currentGame.isGoldenPointActive {
                     goldenPointLabel
                 } else {
                     Text("\(games.left) – \(games.right)")
@@ -59,6 +61,7 @@ struct ScoreScreen: View {
             }
         }
         .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.8), trigger: match.events.count)
+        .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: match.currentGame.tieBreakNotice)
         .onDisappear { clearUndoWindow() }
         .onChange(of: isLuminanceReduced) { _, reduced in
             if reduced {
@@ -72,6 +75,68 @@ struct ScoreScreen: View {
             return .title2.weight(.bold).monospacedDigit()
         }
         return .title3.weight(.semibold).monospacedDigit()
+    }
+
+    @ViewBuilder
+    private var tieBreakHeader: some View {
+        if isLuminanceReduced {
+            VStack(spacing: 2) {
+                Text("TB")
+                    .font(setScoreFont)
+                    .foregroundStyle(.primary)
+                if let notice = match.currentGame.tieBreakNotice {
+                    Text(tieBreakNoticeAbbreviation(notice))
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.orange)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(tieBreakAccessibilityLabel)
+        } else {
+            VStack(spacing: 2) {
+                Text("Tie-break")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.orange)
+                Text("\(games.left) – \(games.right)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                if let notice = match.currentGame.tieBreakNotice {
+                    Text(tieBreakNoticeLabel(notice))
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.orange)
+                } else {
+                    Text("First to 7")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(tieBreakAccessibilityLabel)
+        }
+    }
+
+    private var tieBreakAccessibilityLabel: String {
+        var parts = ["Tie-break, 6 games all"]
+        if let notice = match.currentGame.tieBreakNotice {
+            parts.append(tieBreakNoticeLabel(notice))
+        }
+        return parts.joined(separator: ", ")
+    }
+
+    private func tieBreakNoticeLabel(_ notice: TieBreakNotice) -> String {
+        switch notice {
+        case .changeServe: return "Change serve"
+        case .changeSides: return "Change sides"
+        }
+    }
+
+    private func tieBreakNoticeAbbreviation(_ notice: TieBreakNotice) -> String {
+        switch notice {
+        case .changeServe: return "Serve"
+        case .changeSides: return "Sides"
+        }
     }
 
     @ViewBuilder

@@ -156,6 +156,11 @@ public struct ScoringEngine: Sendable {
     private func awardPoint(to side: Side, in state: inout MatchState) {
         guard !state.currentGame.isComplete, state.status == .inProgress else { return }
 
+        if state.currentGame.isTieBreak {
+            awardTieBreakPoint(to: side, in: &state)
+            return
+        }
+
         if state.currentGame.isGoldenPointActive {
             completeGame(winner: side, in: &state)
             return
@@ -187,6 +192,27 @@ public struct ScoringEngine: Sendable {
         state.currentGame.setPoints(myPoints + 1, for: side)
     }
 
+    private func awardTieBreakPoint(to side: Side, in state: inout MatchState) {
+        let myPoints = state.currentGame.points(for: side)
+        state.currentGame.setPoints(myPoints + 1, for: side)
+
+        if state.currentGame.tieBreakTotalPoints % 2 == 1 {
+            state.currentServer = state.currentServer?.opposite
+        }
+
+        let theirPoints = state.currentGame.points(for: side.opposite)
+        if myPoints + 1 >= 7 && (myPoints + 1) - theirPoints >= 2 {
+            completeTieBreak(winner: side, in: &state)
+        }
+    }
+
+    private func completeTieBreak(winner: Side, in state: inout MatchState) {
+        state.currentGame.isComplete = true
+        state.currentGame.winner = winner
+        state.currentSet.setGames(7, for: winner)
+        completeSet(winner: winner, in: &state)
+    }
+
     private func completeGame(winner: Side, in state: inout MatchState) {
         state.currentGame.isComplete = true
         state.currentGame.winner = winner
@@ -195,6 +221,11 @@ public struct ScoringEngine: Sendable {
 
         let games = state.currentSet.games(for: winner) + 1
         state.currentSet.setGames(games, for: winner)
+
+        if state.currentSet.leftGames == 6 && state.currentSet.rightGames == 6 {
+            state.currentGame = GameScore(isTieBreak: true)
+            return
+        }
 
         if isSetWon(by: winner, set: state.currentSet, settings: state.settings) {
             completeSet(winner: winner, in: &state)

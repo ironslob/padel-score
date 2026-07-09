@@ -29,6 +29,23 @@ final class ScoringEngineTests: XCTestCase {
         return s
     }
 
+    private func reachSixSix(from state: MatchState) throws -> MatchState {
+        var s = state
+        for _ in 0..<6 {
+            s = try winGame(for: .left, from: s)
+            s = try winGame(for: .right, from: s)
+        }
+        return s
+    }
+
+    private func winTieBreak(for side: Side, points: Int, from state: MatchState) throws -> MatchState {
+        var s = state
+        for _ in 0..<points {
+            s = try point(side, s)
+        }
+        return s
+    }
+
     // MARK: - Point progression
 
     func testSetStartRequiresServerSelectionBeforeScoring() throws {
@@ -180,6 +197,89 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.winner, .left)
         XCTAssertEqual(s.leftSetsWon, 2)
         XCTAssertEqual(s.completedSets.count, 2)
+    }
+
+    // MARK: - Tie-break
+
+    func testSixSixStartsTieBreak() throws {
+        let s = try reachSixSix(from: start())
+        XCTAssertTrue(s.currentGame.isTieBreak)
+        XCTAssertEqual(s.currentSet.leftGames, 6)
+        XCTAssertEqual(s.currentSet.rightGames, 6)
+        XCTAssertEqual(s.completedSets.count, 0)
+        XCTAssertEqual(s.currentGame.displayPair.left, "0")
+        XCTAssertEqual(s.currentGame.displayPair.right, "0")
+    }
+
+    func testTieBreakFirstToSevenWinsSet() throws {
+        var s = try reachSixSix(from: start())
+        s = try winTieBreak(for: .left, points: 7, from: s)
+        XCTAssertEqual(s.completedSets.count, 1)
+        XCTAssertEqual(s.completedSets[0].leftGames, 7)
+        XCTAssertEqual(s.completedSets[0].rightGames, 6)
+        XCTAssertEqual(s.leftSetsWon, 1)
+    }
+
+    func testTieBreakRequiresTwoPointLead() throws {
+        var s = try reachSixSix(from: start())
+        // 6-6 in tie-break — set not won
+        s = try winTieBreak(for: .left, points: 6, from: s)
+        s = try winTieBreak(for: .right, points: 6, from: s)
+        XCTAssertEqual(s.completedSets.count, 0)
+        XCTAssertTrue(s.currentGame.isTieBreak)
+        XCTAssertEqual(s.currentGame.leftPoints, 6)
+        XCTAssertEqual(s.currentGame.rightPoints, 6)
+
+        // 8-6 in tie-break wins set 7-6
+        s = try winTieBreak(for: .left, points: 2, from: s)
+        XCTAssertEqual(s.completedSets.count, 1)
+        XCTAssertEqual(s.completedSets[0].leftGames, 7)
+        XCTAssertEqual(s.completedSets[0].rightGames, 6)
+    }
+
+    func testTieBreakServeRotation() throws {
+        var s = try reachSixSix(from: start())
+        XCTAssertEqual(s.currentServer, .right)
+
+        s = try point(.left, s) // point 1
+        XCTAssertEqual(s.currentServer, .left)
+
+        s = try point(.right, s) // point 2
+        XCTAssertEqual(s.currentServer, .left)
+
+        s = try point(.left, s) // point 3
+        XCTAssertEqual(s.currentServer, .right)
+    }
+
+    func testTieBreakNoticeChangeSides() throws {
+        var s = try reachSixSix(from: start())
+        XCTAssertNil(s.currentGame.tieBreakNotice)
+
+        s = try winTieBreak(for: .left, points: 6, from: s)
+        XCTAssertEqual(s.currentGame.tieBreakNotice, .changeSides)
+
+        s = try winTieBreak(for: .right, points: 6, from: s)
+        XCTAssertEqual(s.currentGame.tieBreakNotice, .changeSides)
+    }
+
+    func testTieBreakNoticeChangeServe() throws {
+        var s = try reachSixSix(from: start())
+        s = try point(.left, s)
+        XCTAssertEqual(s.currentGame.tieBreakNotice, .changeServe)
+    }
+
+    func testTieBreakUndoAndReplay() throws {
+        var s = try reachSixSix(from: start())
+        s = try point(.left, s)
+        s = try point(.right, s)
+        s = try engine.apply(.undo, to: s)
+        XCTAssertEqual(s.currentGame.leftPoints, 1)
+        XCTAssertEqual(s.currentGame.rightPoints, 0)
+        XCTAssertTrue(s.currentGame.isTieBreak)
+
+        let replayed = engine.replay(events: s.events, onto: MatchState(id: s.id, settings: s.settings, startedAt: s.startedAt))
+        XCTAssertEqual(replayed.currentGame.leftPoints, s.currentGame.leftPoints)
+        XCTAssertEqual(replayed.currentGame.isTieBreak, s.currentGame.isTieBreak)
     }
 
     // MARK: - Undo
