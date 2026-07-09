@@ -25,28 +25,14 @@ struct ScoreScreen: View {
             let progress = undoProgress(at: context.date)
 
             VStack(spacing: isLuminanceReduced ? 6 : 10) {
-                if match.currentGame.isGoldenPointActive, !isLuminanceReduced {
-                    VStack(spacing: 2) {
-                        Text("Golden Point")
-                            .font(.caption2.weight(.bold))
-                            .foregroundStyle(.yellow)
-                        Text("Next point wins")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .accessibilityElement(children: .combine)
-                } else if match.currentGame.isGoldenPointActive {
-                    Text("GP")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(.yellow)
-                        .frame(maxWidth: .infinity)
+                if match.currentGame.isGoldenPointActive {
+                    goldenPointLabel
+                } else {
+                    Text("\(games.left) – \(games.right)")
+                        .font(setScoreFont)
+                        .foregroundStyle(.primary)
+                        .accessibilityLabel("Games \(games.left) to \(games.right)")
                 }
-
-                Text("\(games.left) – \(games.right)")
-                    .font(setScoreFont)
-                    .foregroundStyle(isLuminanceReduced ? .primary : .primary)
-                    .accessibilityLabel("Games \(games.left) to \(games.right)")
 
                 HStack(spacing: 8) {
                     scoreButton(
@@ -86,6 +72,28 @@ struct ScoreScreen: View {
             return .title2.weight(.bold).monospacedDigit()
         }
         return .title3.weight(.semibold).monospacedDigit()
+    }
+
+    @ViewBuilder
+    private var goldenPointLabel: some View {
+        if isLuminanceReduced {
+            Text("GP")
+                .font(setScoreFont)
+                .foregroundStyle(.primary)
+                .accessibilityLabel("Golden Point, next point wins")
+        } else {
+            VStack(spacing: 2) {
+                Text("Golden Point")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.yellow)
+                Text("Next point wins")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Golden Point, next point wins")
+        }
     }
 
     private func scoreButton(
