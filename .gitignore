@@ -1,0 +1,31 @@
+
+# CocoaPods
+# Env / secrets
+# Swift Package Manager
+# Xcode
+# macOS
+*.dSYM
+*.dSYM.zip
+*.hmap
+*.ipa
+*.moved-aside
+*.pem
+*.swp
+*.xccheckout
+*.xcuserdata/
+*.xcuserstate
+*~
+.DS_Store
+.build/
+.env
+.idea/
+.swiftpm/
+DerivedData/
+Package.pins
+Package.resolved
+Packages/
+Pods/
+build/
+playground.xcworkspace
+timeline.xctimeline
+xcuserdata/

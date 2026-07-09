@@ -1,0 +1,130 @@
+name: PadelScore
+options:
+  bundleIdPrefix: com.padelscore
+  deploymentTarget:
+    iOS: "17.0"
+    watchOS: "10.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+settings:
+  SWIFT_VERSION: "5.0"
+targets:
+  PadelScore:
+    type: application
+    platform: iOS
+    sources:
+      - path: iPhone/PadelScore
+      - path: shared
+        excludes:
+          - "**/*Tests*"
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.padelscore.app
+      GENERATE_INFOPLIST_FILE: YES
+      INFOPLIST_KEY_CFBundleDisplayName: Padel Score
+      INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+      INFOPLIST_KEY_UILaunchScreen_Generation: YES
+      INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+      CURRENT_PROJECT_VERSION: 1
+      MARKETING_VERSION: "1.0"
+      SUPPORTS_MACCATALYST: NO
+      TARGETED_DEVICE_FAMILY: "1"
+    dependencies:
+      - target: PadelScoreWatch
+        embed: true
+    scheme:
+      testTargets:
+        - PadelScoreTests
+
+  PadelScoreWatch:
+    type: application
+    platform: watchOS
+    sources:
+      - path: watch/PadelScoreWatch
+      - path: shared
+        excludes:
+          - "**/*Tests*"
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.padelscore.app.watchkitapp
+      GENERATE_INFOPLIST_FILE: YES
+      INFOPLIST_KEY_CFBundleDisplayName: Padel Score
+      INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.padelscore.app
+      INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp: YES
+      INFOPLIST_KEY_WKSupportsAlwaysOnDisplay: YES
+      INFOPLIST_KEY_WKBackgroundModes:
+        - workout-processing
+      INFOPLIST_KEY_NSHealthShareUsageDescription: Padel Score reads workout data when you choose to track a match as a workout.
+      INFOPLIST_KEY_NSHealthUpdateUsageDescription: Padel Score saves workout duration when you track a match as a workout.
+      CODE_SIGN_ENTITLEMENTS: watch/PadelScoreWatch/PadelScoreWatch.entitlements
+      CURRENT_PROJECT_VERSION: 1
+      MARKETING_VERSION: "1.0"
+      TARGETED_DEVICE_FAMILY: "4"
+      SDKROOT: watchos
+      SUPPORTED_PLATFORMS: "watchos watchsimulator"
+    dependencies:
+      - target: PadelScoreComplications
+        embed: true
+    capabilities:
+      HealthKit:
+        enabled: true
+    scheme: {}
+
+  PadelScoreComplications:
+    type: app-extension
+    platform: watchOS
+    sources:
+      - path: watch/PadelScoreComplications
+        excludes:
+          - Info.plist
+      - path: shared
+        excludes:
+          - "**/*Tests*"
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.padelscore.app.watchkitapp.complications
+      GENERATE_INFOPLIST_FILE: NO
+      INFOPLIST_FILE: watch/PadelScoreComplications/Info.plist
+      CODE_SIGN_ENTITLEMENTS: watch/PadelScoreComplications/PadelScoreComplications.entitlements
+      CURRENT_PROJECT_VERSION: 1
+      MARKETING_VERSION: "1.0"
+      TARGETED_DEVICE_FAMILY: "4"
+      SDKROOT: watchos
+      SUPPORTED_PLATFORMS: "watchos watchsimulator"
+    scheme: {}
+
+  PadelScoreTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: tests/Unit
+      - path: shared
+        excludes:
+          - "**/*Tests*"
+    settings:
+      GENERATE_INFOPLIST_FILE: YES
+      PRODUCT_BUNDLE_IDENTIFIER: com.padelscore.app.tests
+      TARGETED_DEVICE_FAMILY: "1"
+      # Hostless unit tests — shared sources compiled into the test bundle.
+      TEST_HOST: ""
+      BUNDLE_LOADER: ""
+
+schemes:
+  PadelScore:
+    build:
+      targets:
+        PadelScoreWatch: [all]
+        PadelScore: [all]
+        PadelScoreTests: [test]
+    test:
+      targets:
+        - PadelScoreTests
+  PadelScoreWatch:
+    build:
+      targets:
+        PadelScoreWatch: [all]
+  PadelScoreTests:
+    build:
+      targets:
+        PadelScoreTests: [build, test]
+    test:
+      targets:
+        - PadelScoreTests
+      gatherCoverageData: false
