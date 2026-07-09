@@ -4,13 +4,20 @@ struct WatchRootView: View {
     @EnvironmentObject private var service: MatchService
     @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
     @Environment(\.scenePhase) private var scenePhase
+    @State private var showGameInterstitial = false
+    @State private var gameInterstitialCompletedSet = false
+    @State private var gameInterstitialTask: Task<Void, Never>?
+
+    private let gameInterstitialSeconds: TimeInterval = 3
 
     var body: some View {
         Group {
             if let match = service.activeMatch {
                 switch match.status {
                 case .inProgress:
-                    if match.needsServerSelection {
+                    if showGameInterstitial {
+                        GameInterstitialView(match: match, completedSet: gameInterstitialCompletedSet)
+                    } else if match.needsServerSelection {
                         SelectServerView()
                     } else {
                         ActiveMatchPager(match: match)
@@ -26,6 +33,9 @@ struct WatchRootView: View {
         }
         .onChange(of: scenePhase) { _, newPhase in
             sessionCoordinator.handleScenePhaseChange(newPhase)
+        }
+        .onChange(of: service.activeMatch) { oldMatch, newMatch in
+            handleMatchChange(from: oldMatch, to: newMatch)
         }
         .alert("Workout tracking unavailable", isPresented: workoutErrorBinding) {
             Button("OK") { sessionCoordinator.dismissWorkoutError() }
@@ -50,6 +60,55 @@ struct WatchRootView: View {
         }
     }
 
+    private func handleMatchChange(from oldMatch: MatchState?, to newMatch: MatchState?) {
+        guard let oldMatch, let newMatch else {
+            clearGameInterstitial()
+            return
+        }
+
+        if let completedSet = didCompleteSet(from: oldMatch, to: newMatch) {
+            beginGameInterstitialWindow(completedSet: completedSet)
+            return
+        }
+
+        // If an undo happens while interstitial is visible, drop it immediately.
+        if showGameInterstitial && newMatch.events.count < oldMatch.events.count {
+            clearGameInterstitial()
+        }
+    }
+
+    private func didCompleteSet(from oldMatch: MatchState, to newMatch: MatchState) -> Bool? {
+        guard oldMatch.status == .inProgress, newMatch.status == .inProgress else { return nil }
+        guard newMatch.events.count > oldMatch.events.count else { return nil }
+        guard newMatch.events.last?.kind == .pointWon else { return nil }
+
+        let oldGamesTotal = oldMatch.currentSet.leftGames + oldMatch.currentSet.rightGames
+        let newGamesTotal = newMatch.currentSet.leftGames + newMatch.currentSet.rightGames
+        let setAdvanced = newMatch.completedSets.count > oldMatch.completedSets.count
+        let gameAdvanced = newGamesTotal > oldGamesTotal
+        guard setAdvanced || gameAdvanced else { return nil }
+        return setAdvanced
+    }
+
+    private func beginGameInterstitialWindow(completedSet: Bool) {
+        gameInterstitialTask?.cancel()
+        gameInterstitialCompletedSet = completedSet
+        showGameInterstitial = true
+        gameInterstitialTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: UInt64(gameInterstitialSeconds * 1_000_000_000))
+            if Task.isCancelled { return }
+            showGameInterstitial = false
+            gameInterstitialTask = nil
+        }
+    }
+
+    private func clearGameInterstitial() {
+        gameInterstitialTask?.cancel()
+        gameInterstitialTask = nil
+        showGameInterstitial = false
+        gameInterstitialCompletedSet = false
+    }
+
     private var workoutErrorBinding: Binding<Bool> {
         Binding(
             get: { sessionCoordinator.workoutErrorMessage != nil },
@@ -59,6 +118,45 @@ struct WatchRootView: View {
                 }
             }
         )
+    }
+}
+
+private struct GameInterstitialView: View {
+    @EnvironmentObject private var service: MatchService
+    let match: MatchState
+    let completedSet: Bool
+
+    private var sets: (left: String, right: String) { match.matchSetsDisplay }
+    private var games: (left: String, right: String) {
+        if completedSet, let finishedSet = match.completedSets.last {
+            return finishedSet.displayPair
+        }
+        return match.currentSet.displayPair
+    }
+
+    var body: some View {
+        VStack(spacing: 10) {
+            Text(completedSet ? "Set!" : "Game!")
+                .font(.headline.weight(.bold))
+                .frame(maxWidth: .infinity)
+
+            VStack(spacing: 4) {
+                Text("Sets \(sets.left) – \(sets.right)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text("Games \(games.left) – \(games.right)")
+                    .font(.title3.weight(.semibold).monospacedDigit())
+            }
+            .frame(maxWidth: .infinity)
+
+            Button("Undo") {
+                service.undoLastPoint()
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.orange)
+            .disabled(!service.canUndo)
+        }
+        .padding()
     }
 }
 

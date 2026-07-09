@@ -13,7 +13,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         gamesToWinSet: Int = 6,
         mustWinByTwoGames: Bool = true,
         goldenPointEnabled: Bool = true,
-        undoTimeoutSeconds: TimeInterval = 5
+        undoTimeoutSeconds: TimeInterval = 3
     ) {
         self.setsToWin = setsToWin
         self.gamesToWinSet = gamesToWinSet

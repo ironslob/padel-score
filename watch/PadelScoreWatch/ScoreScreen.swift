@@ -143,8 +143,17 @@ struct ScoreScreen: View {
             return
         }
 
+        let previousMatch = service.activeMatch
         service.awardPoint(to: side)
-        beginUndoWindow(for: side)
+        let updatedMatch = service.activeMatch
+
+        // For points that end a game, we show a dedicated Game interstitial with undo
+        // instead of keeping the in-button quick undo active.
+        if !didPointEndGame(previous: previousMatch, updated: updatedMatch) {
+            beginUndoWindow(for: side)
+        } else {
+            clearUndoWindow()
+        }
     }
 
     private func beginUndoWindow(for side: Side) {
@@ -170,6 +179,27 @@ struct ScoreScreen: View {
     private func undoProgress(at date: Date) -> Double {
         guard let started = undoStartedAt, undoTimeout > 0 else { return 0 }
         return min(1, max(0, date.timeIntervalSince(started) / undoTimeout))
+    }
+
+    private func didPointEndGame(previous: MatchState?, updated: MatchState?) -> Bool {
+        guard
+            let previous,
+            let updated,
+            previous.status == .inProgress,
+            updated.status == .inProgress
+        else {
+            return false
+        }
+
+        // A game boundary is visible as either:
+        // - current set games increasing (regular game win), or
+        // - completed sets increasing (set-clinching game).
+        let previousGamesTotal = previous.currentSet.leftGames + previous.currentSet.rightGames
+        let updatedGamesTotal = updated.currentSet.leftGames + updated.currentSet.rightGames
+        if updatedGamesTotal > previousGamesTotal {
+            return true
+        }
+        return updated.completedSets.count > previous.completedSets.count
     }
 }
 
