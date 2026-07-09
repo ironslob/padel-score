@@ -290,7 +290,6 @@ struct StartMatchView: View {
             case .choosingGoldenPoint:
                 GoldenPointChoiceView(
                     isStarting: isStarting,
-                    onBack: { phase = .idle },
                     onChoice: { goldenPointEnabled in
                         Task { await startMatch(goldenPointEnabled: goldenPointEnabled) }
                     }
@@ -338,14 +337,16 @@ struct StartMatchView: View {
 
 struct GoldenPointChoiceView: View {
     let isStarting: Bool
-    let onBack: () -> Void
     let onChoice: (Bool) -> Void
 
     var body: some View {
         VStack(spacing: 10) {
             Text("Are you playing golden point?")
-                .font(.headline)
+                .font(.subheadline.weight(.semibold))
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity)
+                .accessibilityLabel("Are you playing golden point?")
 
             if isStarting {
                 ProgressView()
@@ -366,14 +367,6 @@ struct GoldenPointChoiceView: View {
                 .frame(maxWidth: .infinity)
                 .accessibilityLabel("No, use advantage and deuce only")
             }
-
-            Button("Back") {
-                onBack()
-            }
-            .font(.caption)
-            .buttonStyle(.plain)
-            .disabled(isStarting)
-            .accessibilityLabel("Back")
         }
     }
 }
