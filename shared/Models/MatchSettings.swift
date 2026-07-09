@@ -1,6 +1,6 @@
 import Foundation
 
-/// V1 defaults from product.md — not user-configurable yet.
+/// V1 defaults from product.md. `goldenPointEnabled` is chosen per match at start on Watch.
 public struct MatchSettings: Codable, Sendable, Equatable {
     public var setsToWin: Int
     public var gamesToWinSet: Int

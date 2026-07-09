@@ -67,10 +67,12 @@ public final class MatchSessionCoordinator: ObservableObject {
         modeStore.setPreferredWorkoutTrackingModeRawValue(mode.rawValue)
     }
 
-    public func startMatch() async {
+    public func startMatch(goldenPointEnabled: Bool) async {
         guard service.activeMatch == nil else { return }
 
-        service.startMatch()
+        var settings = MatchSettings.default
+        settings.goldenPointEnabled = goldenPointEnabled
+        service.startMatch(settings: settings)
         publishSnapshot(for: service.activeMatch)
 
         await startWorkoutSession()

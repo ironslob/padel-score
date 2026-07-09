@@ -85,4 +85,14 @@ final class MatchServiceTests: XCTestCase {
         XCTAssertEqual(service.activeMatch?.needsServerSelection, false)
         XCTAssertEqual(service.activeMatch?.currentServer, .right)
     }
+
+    func testStartMatchPersistsGoldenPointSetting() {
+        let store = InMemoryMatchStore()
+        let service = MatchService(store: store)
+        var settings = MatchSettings.default
+        settings.goldenPointEnabled = false
+        service.startMatch(settings: settings)
+        XCTAssertEqual(service.activeMatch?.settings.goldenPointEnabled, false)
+        XCTAssertEqual(store.active?.settings.goldenPointEnabled, false)
+    }
 }

@@ -252,33 +252,52 @@ struct SelectServerView: View {
     }
 }
 
+private enum StartMatchPhase {
+    case idle
+    case choosingGoldenPoint
+}
+
 struct StartMatchView: View {
     @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
+    @State private var phase: StartMatchPhase = .idle
     @State private var isStarting = false
     @State private var showDuringPlayHelp = false
 
     var body: some View {
+        Group {
+            switch phase {
+            case .idle:
+                idleContent
+            case .choosingGoldenPoint:
+                GoldenPointChoiceView(
+                    isStarting: isStarting,
+                    onBack: { phase = .idle },
+                    onChoice: { goldenPointEnabled in
+                        Task { await startMatch(goldenPointEnabled: goldenPointEnabled) }
+                    }
+                )
+            }
+        }
+        .padding()
+        .sheet(isPresented: $showDuringPlayHelp) {
+            DuringPlayHelpView()
+        }
+    }
+
+    private var idleContent: some View {
         VStack(spacing: 12) {
             Text("Padel Score")
                 .font(.headline)
                 .multilineTextAlignment(.center)
 
             Button {
-                Task { await startMatch() }
+                phase = .choosingGoldenPoint
             } label: {
-                Group {
-                    if isStarting {
-                        ProgressView()
-                            .frame(maxWidth: .infinity)
-                    } else {
-                        Text("Start Match")
-                            .frame(maxWidth: .infinity)
-                    }
-                }
+                Text("Start Match")
+                    .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
             .tint(.green)
-            .disabled(isStarting)
             .accessibilityLabel("Start Match")
 
             Button("During play tips") {
@@ -288,17 +307,55 @@ struct StartMatchView: View {
             .buttonStyle(.plain)
             .accessibilityLabel("During play tips")
         }
-        .padding()
-        .sheet(isPresented: $showDuringPlayHelp) {
-            DuringPlayHelpView()
-        }
     }
 
-    private func startMatch() async {
+    private func startMatch(goldenPointEnabled: Bool) async {
         guard !isStarting else { return }
         isStarting = true
         defer { isStarting = false }
-        await sessionCoordinator.startMatch()
+        await sessionCoordinator.startMatch(goldenPointEnabled: goldenPointEnabled)
+    }
+}
+
+struct GoldenPointChoiceView: View {
+    let isStarting: Bool
+    let onBack: () -> Void
+    let onChoice: (Bool) -> Void
+
+    var body: some View {
+        VStack(spacing: 10) {
+            Text("Are you playing golden point?")
+                .font(.headline)
+                .multilineTextAlignment(.center)
+
+            if isStarting {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+            } else {
+                Button("Yes") {
+                    onChoice(true)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.green)
+                .frame(maxWidth: .infinity)
+                .accessibilityLabel("Yes, play golden point")
+
+                Button("No") {
+                    onChoice(false)
+                }
+                .buttonStyle(.bordered)
+                .frame(maxWidth: .infinity)
+                .accessibilityLabel("No, use advantage and deuce only")
+            }
+
+            Button("Back") {
+                onBack()
+            }
+            .font(.caption)
+            .buttonStyle(.plain)
+            .disabled(isStarting)
+            .accessibilityLabel("Back")
+        }
     }
 }
 

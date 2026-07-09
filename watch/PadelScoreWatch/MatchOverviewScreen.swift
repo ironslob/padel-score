@@ -9,6 +9,10 @@ struct MatchOverviewScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
+                labeled(
+                    "Scoring",
+                    match.settings.goldenPointEnabled ? "Golden point" : "Advantage / Deuce"
+                )
                 labeled("Current Set", "\(match.currentSet.leftGames) – \(match.currentSet.rightGames)")
                 labeled("Current Match", "\(match.leftSetsWon) – \(match.rightSetsWon)")
                 labeled("Elapsed", DurationFormatter.elapsed(now.timeIntervalSince(match.startedAt)))
