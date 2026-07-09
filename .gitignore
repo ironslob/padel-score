@@ -1,5 +1,8 @@
 
 # CocoaPods
+# Local Xcode signing (copy Config/Signing.xcconfig.example → Config/Signing.xcconfig)
+Config/Signing.xcconfig
+
 # Env / secrets
 # Swift Package Manager
 # Xcode

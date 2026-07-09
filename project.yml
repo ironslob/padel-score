@@ -6,12 +6,21 @@ options:
     watchOS: "10.0"
   createIntermediateGroups: true
   groupSortPosition: top
+configs:
+  Debug: debug
+  Release: release
+configFiles:
+  Debug: Config/Signing.xcconfig
+  Release: Config/Signing.xcconfig
 settings:
   SWIFT_VERSION: "5.0"
 targets:
   PadelScore:
     type: application
     platform: iOS
+    configFiles:
+      Debug: Config/Signing.xcconfig
+      Release: Config/Signing.xcconfig
     sources:
       - path: iPhone/PadelScore
       - path: shared
@@ -38,6 +47,9 @@ targets:
   PadelScoreWatch:
     type: application
     platform: watchOS
+    configFiles:
+      Debug: Config/Signing.xcconfig
+      Release: Config/Signing.xcconfig
     sources:
       - path: watch/PadelScoreWatch
       - path: shared
@@ -71,6 +83,9 @@ targets:
   PadelScoreComplications:
     type: app-extension
     platform: watchOS
+    configFiles:
+      Debug: Config/Signing.xcconfig
+      Release: Config/Signing.xcconfig
     sources:
       - path: watch/PadelScoreComplications
         excludes:
@@ -93,6 +108,9 @@ targets:
   PadelScoreTests:
     type: bundle.unit-test
     platform: iOS
+    configFiles:
+      Debug: Config/Signing.xcconfig
+      Release: Config/Signing.xcconfig
     sources:
       - path: tests/Unit
       - path: shared
