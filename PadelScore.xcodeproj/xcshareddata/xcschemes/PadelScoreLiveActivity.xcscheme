@@ -16,9 +16,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "7638DF011CA6981D7D0A47C1"
-               BuildableName = "PadelScoreComplications.appex"
-               BlueprintName = "PadelScoreComplications"
+               BlueprintIdentifier = "D4347D2A56CBEF9AD8524FBD"
+               BuildableName = "PadelScoreLiveActivity.appex"
+               BlueprintName = "PadelScoreLiveActivity"
                ReferencedContainer = "container:PadelScore.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -33,9 +33,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "7638DF011CA6981D7D0A47C1"
-            BuildableName = "PadelScoreComplications.appex"
-            BlueprintName = "PadelScoreComplications"
+            BlueprintIdentifier = "D4347D2A56CBEF9AD8524FBD"
+            BuildableName = "PadelScoreLiveActivity.appex"
+            BlueprintName = "PadelScoreLiveActivity"
             ReferencedContainer = "container:PadelScore.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -59,9 +59,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "7638DF011CA6981D7D0A47C1"
-            BuildableName = "PadelScoreComplications.appex"
-            BlueprintName = "PadelScoreComplications"
+            BlueprintIdentifier = "D4347D2A56CBEF9AD8524FBD"
+            BuildableName = "PadelScoreLiveActivity.appex"
+            BlueprintName = "PadelScoreLiveActivity"
             ReferencedContainer = "container:PadelScore.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -78,9 +78,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "7638DF011CA6981D7D0A47C1"
-            BuildableName = "PadelScoreComplications.appex"
-            BlueprintName = "PadelScoreComplications"
+            BlueprintIdentifier = "D4347D2A56CBEF9AD8524FBD"
+            BuildableName = "PadelScoreLiveActivity.appex"
+            BlueprintName = "PadelScoreLiveActivity"
             ReferencedContainer = "container:PadelScore.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

@@ -7,25 +7,35 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		03EF74EFE76E9D3FEE3DCEBA /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */; };
 		040B57A51E6C1A70F7B59B36 /* MatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC88226DEFCD298F1B0BD27F /* MatchStatus.swift */; };
 		04693C8BFD4F9BF094126DC8 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F39A6BB8A9C87682706C31 /* Side.swift */; };
 		05B8B333975B2337AC78A7B1 /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5280AF8EE3046E27284AC07 /* MatchScoreSnapshot.swift */; };
 		068914E9B015B8B918079194 /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AE16A34EFD9E8C139CDB82 /* MatchSettings.swift */; };
 		06E57F55D620F5AD181A5509 /* ScoringEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3A3C1839AE335315C3B2EC /* ScoringEngineTests.swift */; };
 		07F297C2B438902044E72514 /* MatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC88226DEFCD298F1B0BD27F /* MatchStatus.swift */; };
+		08D183B8CD531D8014DE4955 /* PadelScoreLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0C3B2561AD78B79ABA7948E /* PadelScoreLiveActivity.swift */; };
 		0EFA86C13AA0906016A027C4 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E569C0959CB5D66455E0238 /* DurationFormatter.swift */; };
+		106555E2E5C57A750D6F446D /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E569C0959CB5D66455E0238 /* DurationFormatter.swift */; };
 		1369E0EEB77F4CBECACBA31C /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AE16A34EFD9E8C139CDB82 /* MatchSettings.swift */; };
 		13B10553DDE7A0A081E414A8 /* MatchScoreSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD602323CFA1E272F96BA1B5 /* MatchScoreSnapshotTests.swift */; };
 		1463EBD46CB9D0593AE8B752 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E569C0959CB5D66455E0238 /* DurationFormatter.swift */; };
+		14919B8F2DADC81367C3C5A8 /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FDA4B4F2922F76A4458E484 /* MatchLiveActivityLifecycle.swift */; };
 		1D05611BFA160D28C325E127 /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AE16A34EFD9E8C139CDB82 /* MatchSettings.swift */; };
 		1D27E908C4DB4ADBF4091BA9 /* WatchRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F9E3CF93B6EA45A583A60F /* WatchRootView.swift */; };
 		1E47734A4283C2554AF40D0E /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAE2617B6059D58700143F9 /* MatchStore.swift */; };
 		1F1DF178045BF3E5E86B822D /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB0B8A61BC8E866C82DE480 /* ScoringEngine.swift */; };
+		237C88A89C80EA16421FA5C4 /* MatchLiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FCE07AE677E1B7FE1702AD1 /* MatchLiveActivityManager.swift */; };
+		24263AA00F1D34F114F52971 /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AE16A34EFD9E8C139CDB82 /* MatchSettings.swift */; };
 		26D0ADDF62A10E701511778B /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */; };
 		2D107A3BEEDD6C0FD0845CE0 /* PhoneRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22CC73634E156D71C6D5919E /* PhoneRootView.swift */; };
+		2D1CE91BB767A2BE61394410 /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */; };
 		2D56650F632ED40535BC21E0 /* WristRaiseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6655781AD5469BC748B7FC /* WristRaiseSupport.swift */; };
+		2FB79EACA46DFC1619126DBA /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FDA4B4F2922F76A4458E484 /* MatchLiveActivityLifecycle.swift */; };
+		3398CE72C2CAE6EE6C02C2BE /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5280AF8EE3046E27284AC07 /* MatchScoreSnapshot.swift */; };
 		36D1661CB56F2E812B71F02E /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */; };
 		3C9EDABB059B0CE556070578 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E569C0959CB5D66455E0238 /* DurationFormatter.swift */; };
+		3CC5E0C54C636FEA7214A649 /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F667B5CAD398361E2A01A9D /* MatchEvent.swift */; };
 		3F78018956A9FBF94D1B0549 /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99CC8397F215F09A6AC2A53E /* MatchState.swift */; };
 		4D82F3361DC385D4354DC4A6 /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99CC8397F215F09A6AC2A53E /* MatchState.swift */; };
 		4E367278A05149090C45A924 /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F667B5CAD398361E2A01A9D /* MatchEvent.swift */; };
@@ -36,34 +46,47 @@
 		5F5BF498B484EB383D7E6BCF /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AE16A34EFD9E8C139CDB82 /* MatchSettings.swift */; };
 		66320465F9D1099263F7A393 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F39A6BB8A9C87682706C31 /* Side.swift */; };
 		67FBAE848484D09FDE2306D2 /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAE2617B6059D58700143F9 /* MatchStore.swift */; };
+		6B919D9C92922422D409B2CF /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99CC8397F215F09A6AC2A53E /* MatchState.swift */; };
 		6DE6E0825F16BAC73B6F0DE5 /* MatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC88226DEFCD298F1B0BD27F /* MatchStatus.swift */; };
 		705F5F748D73819E71400061 /* PadelScoreWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 7EECBA3C216DC597AF5042BA /* PadelScoreWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7207E92405D5B7C355F8685D /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */; };
 		725A7B8089A6D94CCB21C514 /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */; };
 		748A2721FE819EC4D0873E75 /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED2219439EB11A50944927C /* MatchService.swift */; };
 		76E2EADC52C8CA461B6083A4 /* MatchCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5534DDF606242531FBBB7534 /* MatchCompleteView.swift */; };
 		78AFC5EECDF9B906D09568C9 /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F667B5CAD398361E2A01A9D /* MatchEvent.swift */; };
+		7A020E09D2BD9BEFB03B3795 /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FDA4B4F2922F76A4458E484 /* MatchLiveActivityLifecycle.swift */; };
 		7A2ACCEA5BF1BCF9401C6A8F /* MatchSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B58B293D12B0633725EF30 /* MatchSessionCoordinator.swift */; };
 		7AA38F4A869E1667D9FDBBDB /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F667B5CAD398361E2A01A9D /* MatchEvent.swift */; };
 		7ADC5D3E3980D883DE1934D4 /* WristRaiseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6655781AD5469BC748B7FC /* WristRaiseSupport.swift */; };
+		7B8189E4804A5A2E0B8D78B7 /* WristRaiseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6655781AD5469BC748B7FC /* WristRaiseSupport.swift */; };
 		7E4E1D169C820FB3FBE29075 /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99CC8397F215F09A6AC2A53E /* MatchState.swift */; };
 		7F1C0ABD8315213BC60C74E0 /* ScoreScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 814FBB77004712A10C28A4C1 /* ScoreScreen.swift */; };
 		825CC5AAC6DFC4F0535DE543 /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED2219439EB11A50944927C /* MatchService.swift */; };
+		8283D59E9B1B41475450DCB4 /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */; };
 		8464016A350118613A6F2CBD /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAE2617B6059D58700143F9 /* MatchStore.swift */; };
 		8578E5765B465E97E6BE32CE /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F667B5CAD398361E2A01A9D /* MatchEvent.swift */; };
 		85B5A6871B492EA7C95ED8A5 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F39A6BB8A9C87682706C31 /* Side.swift */; };
+		8851D025EC8D3054D944D568 /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FDA4B4F2922F76A4458E484 /* MatchLiveActivityLifecycle.swift */; };
 		8855C29E3A61EB7EC6EE226F /* PadelScoreWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2477DA544767D8F8F7C428A /* PadelScoreWatchApp.swift */; };
+		899F404562795E243CA9B8A9 /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAE2617B6059D58700143F9 /* MatchStore.swift */; };
 		94DA941A86FEFE71AA3D4BCD /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5280AF8EE3046E27284AC07 /* MatchScoreSnapshot.swift */; };
+		988C3E02A8A143389C2A22A1 /* MatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC88226DEFCD298F1B0BD27F /* MatchStatus.swift */; };
 		9908FAFE56F6B75A30F9A887 /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5280AF8EE3046E27284AC07 /* MatchScoreSnapshot.swift */; };
 		A329BC2AEEEBF77221738A05 /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAE2617B6059D58700143F9 /* MatchStore.swift */; };
 		A4AB22CF8A715F5698D930E5 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F39A6BB8A9C87682706C31 /* Side.swift */; };
+		A7B58122276B14213B16A718 /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB0B8A61BC8E866C82DE480 /* ScoringEngine.swift */; };
+		A7DC2D4D4BEE89559EEA0448 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F39A6BB8A9C87682706C31 /* Side.swift */; };
 		AB0D62D446D04A41BC058C02 /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5280AF8EE3046E27284AC07 /* MatchScoreSnapshot.swift */; };
 		AF9A29F298B82C273E6695DB /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */; };
 		B548E8CE5FFABBF5666F2475 /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */; };
 		B87E2AA087F1C368DCBDB02A /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99CC8397F215F09A6AC2A53E /* MatchState.swift */; };
 		BF080741067D2EB6D16A7E4A /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB0B8A61BC8E866C82DE480 /* ScoringEngine.swift */; };
+		C1A7884444757AD4A69B4CAA /* PadelScoreLiveActivity.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5EC885D5139C7BFEEEA3D62A /* PadelScoreLiveActivity.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C2188E92550397E384518DA9 /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */; };
 		C8662ADECB22DEC12008A394 /* PadelScoreComplications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A33452D4B6D5430B73DE194 /* PadelScoreComplications.swift */; };
+		CDF6DDE4A18EB6A3D3F0122F /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */; };
 		CF365B4DB69B504496179938 /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED2219439EB11A50944927C /* MatchService.swift */; };
+		D03A6B1507341602F0F763C0 /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED2219439EB11A50944927C /* MatchService.swift */; };
 		D1EA181893A44DD35F66198D /* MatchServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3429803BAEF2F899EDA8F51 /* MatchServiceTests.swift */; };
 		D9C5CDEA78303C43F4C28602 /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED2219439EB11A50944927C /* MatchService.swift */; };
 		DB1C76ACB2A6561C876EE7DE /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB0B8A61BC8E866C82DE480 /* ScoringEngine.swift */; };
@@ -73,7 +96,10 @@
 		E5C94A1F8AC9F4BFC7C0C261 /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */; };
 		EB869FAA66CE4311EDFBD3F6 /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB0B8A61BC8E866C82DE480 /* ScoringEngine.swift */; };
 		ED5F700D9336127D8D9A5128 /* ActionsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C830D43DC864380321C452BB /* ActionsScreen.swift */; };
+		EDE1D66587A2E1B9E7E0C5DC /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FDA4B4F2922F76A4458E484 /* MatchLiveActivityLifecycle.swift */; };
+		F14E69F6674D310F97A51B47 /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */; };
 		F6BEF7C674F21E5564C5F1BC /* PadelScoreApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89612FA01E3330D57011549 /* PadelScoreApp.swift */; };
+		F722101338D0A58B0E62EC6F /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */; };
 		F7380CBB1305FEC26BF90F6F /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */; };
 /* End PBXBuildFile section */
 
@@ -85,6 +111,13 @@
 			remoteGlobalIDString = 41F8D84B854F63B981445495;
 			remoteInfo = PadelScoreWatch;
 		};
+		8EB267C45E3ADF603E7A8427 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4852C7C9976BEA97D8ACFD1F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D4347D2A56CBEF9AD8524FBD;
+			remoteInfo = PadelScoreLiveActivity;
+		};
 		950C4FA2D727B3557E6C2206 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 4852C7C9976BEA97D8ACFD1F /* Project object */;
@@ -95,6 +128,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		A0BC3379E3A3BF2CA07A96BC /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C1A7884444757AD4A69B4CAA /* PadelScoreLiveActivity.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BF31C8D20AB6E3584A0960E5 /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -120,15 +164,19 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		01FD997E0740D7B682F0D9FF /* PadelScoreLiveActivity.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PadelScoreLiveActivity.entitlements; sourceTree = "<group>"; };
+		0FDA4B4F2922F76A4458E484 /* MatchLiveActivityLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLiveActivityLifecycle.swift; sourceTree = "<group>"; };
 		122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSyncCoordinator.swift; sourceTree = "<group>"; };
 		12F39A6BB8A9C87682706C31 /* Side.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Side.swift; sourceTree = "<group>"; };
 		22CC73634E156D71C6D5919E /* PhoneRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneRootView.swift; sourceTree = "<group>"; };
 		33F839A16B12716B5C4C16F8 /* MatchDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDetailView.swift; sourceTree = "<group>"; };
 		3DF20D1E4C32A866863ADBBB /* PadelScoreComplications.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PadelScoreComplications.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		3FCE07AE677E1B7FE1702AD1 /* MatchLiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLiveActivityManager.swift; sourceTree = "<group>"; };
 		4E569C0959CB5D66455E0238 /* DurationFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationFormatter.swift; sourceTree = "<group>"; };
 		5534DDF606242531FBBB7534 /* MatchCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCompleteView.swift; sourceTree = "<group>"; };
 		5C3A3C1839AE335315C3B2EC /* ScoringEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoringEngineTests.swift; sourceTree = "<group>"; };
 		5DAE2617B6059D58700143F9 /* MatchStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchStore.swift; sourceTree = "<group>"; };
+		5EC885D5139C7BFEEEA3D62A /* PadelScoreLiveActivity.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = PadelScoreLiveActivity.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		7784767F602335AA12F76C2F /* MatchOverviewScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverviewScreen.swift; sourceTree = "<group>"; };
 		7EECBA3C216DC597AF5042BA /* PadelScoreWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PadelScoreWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		814FBB77004712A10C28A4C1 /* ScoreScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreScreen.swift; sourceTree = "<group>"; };
@@ -137,6 +185,8 @@
 		96129224EF231025063149C3 /* PadelScoreComplications.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PadelScoreComplications.entitlements; sourceTree = "<group>"; };
 		97D26C0DE07BCE5013AF252D /* PadelScore.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PadelScore.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		99CC8397F215F09A6AC2A53E /* MatchState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchState.swift; sourceTree = "<group>"; };
+		A0C3B2561AD78B79ABA7948E /* PadelScoreLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadelScoreLiveActivity.swift; sourceTree = "<group>"; };
+		A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPauseResumeLogic.swift; sourceTree = "<group>"; };
 		B07C649A69F7DEA5409E0CF2 /* PadelScoreWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PadelScoreWatch.entitlements; sourceTree = "<group>"; };
 		B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchAction.swift; sourceTree = "<group>"; };
 		B595ED7E7254DF7811498847 /* PadelScore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PadelScore.entitlements; sourceTree = "<group>"; };
@@ -203,6 +253,7 @@
 			children = (
 				97D26C0DE07BCE5013AF252D /* PadelScore.app */,
 				3DF20D1E4C32A866863ADBBB /* PadelScoreComplications.appex */,
+				5EC885D5139C7BFEEEA3D62A /* PadelScoreLiveActivity.appex */,
 				E3E4A0CD22466BE9A79A6DEE /* PadelScoreTests.xctest */,
 				7EECBA3C216DC597AF5042BA /* PadelScoreWatch.app */,
 			);
@@ -213,6 +264,7 @@
 			isa = PBXGroup;
 			children = (
 				CED2219439EB11A50944927C /* MatchService.swift */,
+				A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */,
 				DF6655781AD5469BC748B7FC /* WristRaiseSupport.swift */,
 			);
 			path = Services;
@@ -239,6 +291,7 @@
 			isa = PBXGroup;
 			children = (
 				33F839A16B12716B5C4C16F8 /* MatchDetailView.swift */,
+				3FCE07AE677E1B7FE1702AD1 /* MatchLiveActivityManager.swift */,
 				B595ED7E7254DF7811498847 /* PadelScore.entitlements */,
 				E89612FA01E3330D57011549 /* PadelScoreApp.swift */,
 				22CC73634E156D71C6D5919E /* PhoneRootView.swift */,
@@ -267,6 +320,7 @@
 			isa = PBXGroup;
 			children = (
 				8F667B5CAD398361E2A01A9D /* MatchEvent.swift */,
+				0FDA4B4F2922F76A4458E484 /* MatchLiveActivityLifecycle.swift */,
 				C5280AF8EE3046E27284AC07 /* MatchScoreSnapshot.swift */,
 				C3AE16A34EFD9E8C139CDB82 /* MatchSettings.swift */,
 				99CC8397F215F09A6AC2A53E /* MatchState.swift */,
@@ -302,6 +356,7 @@
 			isa = PBXGroup;
 			children = (
 				9DCAB4832985C50E28476988 /* PadelScore */,
+				E60F4CFAC68121FD0A5F10A3 /* PadelScoreLiveActivity */,
 			);
 			path = iPhone;
 			sourceTree = "<group>";
@@ -317,6 +372,15 @@
 				F11E9E1C0202CE9A32786E43 /* Utilities */,
 			);
 			path = shared;
+			sourceTree = "<group>";
+		};
+		E60F4CFAC68121FD0A5F10A3 /* PadelScoreLiveActivity */ = {
+			isa = PBXGroup;
+			children = (
+				01FD997E0740D7B682F0D9FF /* PadelScoreLiveActivity.entitlements */,
+				A0C3B2561AD78B79ABA7948E /* PadelScoreLiveActivity.swift */,
+			);
+			path = PadelScoreLiveActivity;
 			sourceTree = "<group>";
 		};
 		F11E9E1C0202CE9A32786E43 /* Utilities */ = {
@@ -388,12 +452,14 @@
 			buildConfigurationList = 8C0B968DEE136FB3AF729E8F /* Build configuration list for PBXNativeTarget "PadelScore" */;
 			buildPhases = (
 				B0F61FF0DDB792E9121BACAC /* Sources */,
+				A0BC3379E3A3BF2CA07A96BC /* Embed Foundation Extensions */,
 				BF31C8D20AB6E3584A0960E5 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				05856787DDA5B4B8E0EBE1B4 /* PBXTargetDependency */,
+				2900CE3A5F0D0FBAF2186725 /* PBXTargetDependency */,
 			);
 			name = PadelScore;
 			packageProductDependencies = (
@@ -401,6 +467,23 @@
 			productName = PadelScore;
 			productReference = 97D26C0DE07BCE5013AF252D /* PadelScore.app */;
 			productType = "com.apple.product-type.application";
+		};
+		D4347D2A56CBEF9AD8524FBD /* PadelScoreLiveActivity */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D19051C26C32F498F5464E81 /* Build configuration list for PBXNativeTarget "PadelScoreLiveActivity" */;
+			buildPhases = (
+				9FD9D29EEB2FCD248A640791 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PadelScoreLiveActivity;
+			packageProductDependencies = (
+			);
+			productName = PadelScoreLiveActivity;
+			productReference = 5EC885D5139C7BFEEEA3D62A /* PadelScoreLiveActivity.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -427,6 +510,10 @@
 						DevelopmentTeam = TGX22822SP;
 						ProvisioningStyle = Automatic;
 					};
+					D4347D2A56CBEF9AD8524FBD = {
+						DevelopmentTeam = TGX22822SP;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = E0CE50DCF5F6ACF9691A0E3A /* Build configuration list for PBXProject "PadelScore" */;
@@ -445,6 +532,7 @@
 			targets = (
 				C02A1B5180A4ED1F44008326 /* PadelScore */,
 				7638DF011CA6981D7D0A47C1 /* PadelScoreComplications */,
+				D4347D2A56CBEF9AD8524FBD /* PadelScoreLiveActivity */,
 				6DE7DC2CD4868FD5F7BC0713 /* PadelScoreTests */,
 				41F8D84B854F63B981445495 /* PadelScoreWatch */,
 			);
@@ -461,6 +549,7 @@
 				E5C94A1F8AC9F4BFC7C0C261 /* MatchAction.swift in Sources */,
 				76E2EADC52C8CA461B6083A4 /* MatchCompleteView.swift in Sources */,
 				78AFC5EECDF9B906D09568C9 /* MatchEvent.swift in Sources */,
+				14919B8F2DADC81367C3C5A8 /* MatchLiveActivityLifecycle.swift in Sources */,
 				56A05B9CDD495AD682908B19 /* MatchOverviewScreen.swift in Sources */,
 				AB0D62D446D04A41BC058C02 /* MatchScoreSnapshot.swift in Sources */,
 				CF365B4DB69B504496179938 /* MatchService.swift in Sources */,
@@ -475,7 +564,31 @@
 				BF080741067D2EB6D16A7E4A /* ScoringEngine.swift in Sources */,
 				04693C8BFD4F9BF094126DC8 /* Side.swift in Sources */,
 				1D27E908C4DB4ADBF4091BA9 /* WatchRootView.swift in Sources */,
+				8283D59E9B1B41475450DCB4 /* WorkoutPauseResumeLogic.swift in Sources */,
 				2D56650F632ED40535BC21E0 /* WristRaiseSupport.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9FD9D29EEB2FCD248A640791 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				106555E2E5C57A750D6F446D /* DurationFormatter.swift in Sources */,
+				03EF74EFE76E9D3FEE3DCEBA /* MatchAction.swift in Sources */,
+				3CC5E0C54C636FEA7214A649 /* MatchEvent.swift in Sources */,
+				7A020E09D2BD9BEFB03B3795 /* MatchLiveActivityLifecycle.swift in Sources */,
+				3398CE72C2CAE6EE6C02C2BE /* MatchScoreSnapshot.swift in Sources */,
+				D03A6B1507341602F0F763C0 /* MatchService.swift in Sources */,
+				24263AA00F1D34F114F52971 /* MatchSettings.swift in Sources */,
+				6B919D9C92922422D409B2CF /* MatchState.swift in Sources */,
+				988C3E02A8A143389C2A22A1 /* MatchStatus.swift in Sources */,
+				899F404562795E243CA9B8A9 /* MatchStore.swift in Sources */,
+				7207E92405D5B7C355F8685D /* MatchSyncCoordinator.swift in Sources */,
+				08D183B8CD531D8014DE4955 /* PadelScoreLiveActivity.swift in Sources */,
+				A7B58122276B14213B16A718 /* ScoringEngine.swift in Sources */,
+				A7DC2D4D4BEE89559EEA0448 /* Side.swift in Sources */,
+				F14E69F6674D310F97A51B47 /* WorkoutPauseResumeLogic.swift in Sources */,
+				7B8189E4804A5A2E0B8D78B7 /* WristRaiseSupport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -486,6 +599,7 @@
 				3C9EDABB059B0CE556070578 /* DurationFormatter.swift in Sources */,
 				725A7B8089A6D94CCB21C514 /* MatchAction.swift in Sources */,
 				8578E5765B465E97E6BE32CE /* MatchEvent.swift in Sources */,
+				EDE1D66587A2E1B9E7E0C5DC /* MatchLiveActivityLifecycle.swift in Sources */,
 				94DA941A86FEFE71AA3D4BCD /* MatchScoreSnapshot.swift in Sources */,
 				D9C5CDEA78303C43F4C28602 /* MatchService.swift in Sources */,
 				5F5BF498B484EB383D7E6BCF /* MatchSettings.swift in Sources */,
@@ -496,6 +610,7 @@
 				C8662ADECB22DEC12008A394 /* PadelScoreComplications.swift in Sources */,
 				1F1DF178045BF3E5E86B822D /* ScoringEngine.swift in Sources */,
 				85B5A6871B492EA7C95ED8A5 /* Side.swift in Sources */,
+				F722101338D0A58B0E62EC6F /* WorkoutPauseResumeLogic.swift in Sources */,
 				7ADC5D3E3980D883DE1934D4 /* WristRaiseSupport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -508,6 +623,8 @@
 				26D0ADDF62A10E701511778B /* MatchAction.swift in Sources */,
 				DF63EE4162D80A1D2249F790 /* MatchDetailView.swift in Sources */,
 				4E367278A05149090C45A924 /* MatchEvent.swift in Sources */,
+				8851D025EC8D3054D944D568 /* MatchLiveActivityLifecycle.swift in Sources */,
+				237C88A89C80EA16421FA5C4 /* MatchLiveActivityManager.swift in Sources */,
 				05B8B333975B2337AC78A7B1 /* MatchScoreSnapshot.swift in Sources */,
 				825CC5AAC6DFC4F0535DE543 /* MatchService.swift in Sources */,
 				1D05611BFA160D28C325E127 /* MatchSettings.swift in Sources */,
@@ -519,6 +636,7 @@
 				2D107A3BEEDD6C0FD0845CE0 /* PhoneRootView.swift in Sources */,
 				DB1C76ACB2A6561C876EE7DE /* ScoringEngine.swift in Sources */,
 				66320465F9D1099263F7A393 /* Side.swift in Sources */,
+				2D1CE91BB767A2BE61394410 /* WorkoutPauseResumeLogic.swift in Sources */,
 				E2209B5327DE9A358282734D /* WristRaiseSupport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -530,6 +648,7 @@
 				0EFA86C13AA0906016A027C4 /* DurationFormatter.swift in Sources */,
 				B548E8CE5FFABBF5666F2475 /* MatchAction.swift in Sources */,
 				7AA38F4A869E1667D9FDBBDB /* MatchEvent.swift in Sources */,
+				2FB79EACA46DFC1619126DBA /* MatchLiveActivityLifecycle.swift in Sources */,
 				9908FAFE56F6B75A30F9A887 /* MatchScoreSnapshot.swift in Sources */,
 				13B10553DDE7A0A081E414A8 /* MatchScoreSnapshotTests.swift in Sources */,
 				748A2721FE819EC4D0873E75 /* MatchService.swift in Sources */,
@@ -542,6 +661,7 @@
 				EB869FAA66CE4311EDFBD3F6 /* ScoringEngine.swift in Sources */,
 				06E57F55D620F5AD181A5509 /* ScoringEngineTests.swift in Sources */,
 				A4AB22CF8A715F5698D930E5 /* Side.swift in Sources */,
+				CDF6DDE4A18EB6A3D3F0122F /* WorkoutPauseResumeLogic.swift in Sources */,
 				5DC6C3BC583F898B4DFB46F7 /* WristRaiseSupport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -558,6 +678,11 @@
 			isa = PBXTargetDependency;
 			target = 7638DF011CA6981D7D0A47C1 /* PadelScoreComplications */;
 			targetProxy = 950C4FA2D727B3557E6C2206 /* PBXContainerItemProxy */;
+		};
+		2900CE3A5F0D0FBAF2186725 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D4347D2A56CBEF9AD8524FBD /* PadelScoreLiveActivity */;
+			targetProxy = 8EB267C45E3ADF603E7A8427 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -608,14 +733,14 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
-				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
 			};
 			name = Release;
 		};
@@ -630,6 +755,9 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Padel Score";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Padel Score reads workout data when you choose to track a match as a workout.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Padel Score saves workout duration when you track a match as a workout.";
+				INFOPLIST_KEY_SupportsLaunchForLiveActivityAttributeTypes = (
+					MatchActivityAttributes,
+				);
 				INFOPLIST_KEY_WKBackgroundModes = (
 					"workout-processing",
 				);
@@ -666,6 +794,26 @@
 				TARGETED_DEVICE_FAMILY = 4;
 			};
 			name = Debug;
+		};
+		7835F8F3D6125A66830D4C85 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = iPhone/PadelScoreLiveActivity/PadelScoreLiveActivity.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = iPhone/PadelScoreLiveActivity/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwilson.padelscore.liveactivity;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
 		};
 		81096FF827C7DB114408DA3D /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -719,7 +867,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -727,7 +875,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
 			};
 			name = Debug;
 		};
@@ -746,6 +894,26 @@
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "";
+			};
+			name = Debug;
+		};
+		9D41444B47824C2740447DF2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = iPhone/PadelScoreLiveActivity/PadelScoreLiveActivity.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = iPhone/PadelScoreLiveActivity/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwilson.padelscore.liveactivity;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -780,6 +948,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Padel Score";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -806,6 +975,9 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Padel Score";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Padel Score reads workout data when you choose to track a match as a workout.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Padel Score saves workout duration when you track a match as a workout.";
+				INFOPLIST_KEY_SupportsLaunchForLiveActivityAttributeTypes = (
+					MatchActivityAttributes,
+				);
 				INFOPLIST_KEY_WKBackgroundModes = (
 					"workout-processing",
 				);
@@ -830,6 +1002,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Padel Score";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -898,6 +1071,15 @@
 			buildConfigurations = (
 				D1DB54682EEDEDCA886820F5 /* Debug */,
 				C7E7EE53211E314AB23E8620 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D19051C26C32F498F5464E81 /* Build configuration list for PBXNativeTarget "PadelScoreLiveActivity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9D41444B47824C2740447DF2 /* Debug */,
+				7835F8F3D6125A66830D4C85 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

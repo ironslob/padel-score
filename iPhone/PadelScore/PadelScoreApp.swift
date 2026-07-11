@@ -8,6 +8,12 @@ struct PadelScoreApp: App {
         WindowGroup {
             PhoneRootView()
                 .environmentObject(appModel.service)
+                .onChange(of: appModel.service.activeMatch) { _, match in
+                    appModel.liveActivityManager.sync(with: match)
+                }
+                .onAppear {
+                    appModel.liveActivityManager.sync(with: appModel.service.activeMatch)
+                }
         }
     }
 }
@@ -16,6 +22,7 @@ struct PadelScoreApp: App {
 final class PhoneAppModel: ObservableObject {
     let service: MatchService
     let sync: MatchSyncCoordinator
+    let liveActivityManager = MatchLiveActivityManager()
 
     init() {
         let service = MatchService(store: FileMatchStore())

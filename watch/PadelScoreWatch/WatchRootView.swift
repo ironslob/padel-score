@@ -9,6 +9,7 @@ struct WatchRootView: View {
     @State private var gameInterstitialIsTieBreak = false
     @State private var gameInterstitialStartedAt: Date?
     @State private var gameInterstitialTask: Task<Void, Never>?
+    @State private var scorePageToken = 0
 
     var body: some View {
         Group {
@@ -27,7 +28,7 @@ struct WatchRootView: View {
                     } else if match.needsServerSelection {
                         SelectServerView()
                     } else {
-                        ActiveMatchPager(match: match)
+                        ActiveMatchPager(match: match, scorePageToken: scorePageToken)
                     }
                 case .completed, .endedEarly:
                     MatchCompleteView(match: match)
@@ -43,6 +44,11 @@ struct WatchRootView: View {
         }
         .onChange(of: service.activeMatch) { oldMatch, newMatch in
             handleMatchChange(from: oldMatch, to: newMatch)
+        }
+        .onOpenURL { url in
+            if url.scheme == "padelscore", url.host == "score" {
+                scorePageToken += 1
+            }
         }
         .alert("Workout tracking unavailable", isPresented: workoutErrorBinding) {
             Button("OK") { sessionCoordinator.dismissWorkoutError() }
@@ -408,6 +414,7 @@ private enum ActiveMatchPage: Int, Hashable {
 
 struct ActiveMatchPager: View {
     let match: MatchState
+    let scorePageToken: Int
 
     @Environment(\.isLuminanceReduced) private var isLuminanceReduced
     @Environment(\.scenePhase) private var scenePhase
@@ -435,6 +442,9 @@ struct ActiveMatchPager: View {
             if newPhase == .active {
                 selectedPage = .score
             }
+        }
+        .onChange(of: scorePageToken) { _, _ in
+            selectedPage = .score
         }
     }
 }

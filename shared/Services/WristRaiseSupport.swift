@@ -67,7 +67,7 @@ public struct UserDefaultsWorkoutModePreferenceStore: WorkoutModePreferenceStori
 public enum DuringPlayAccessCopy {
     public static let firstMatchTip =
         "Pin Padel Score in your Dock, then swipe up from the watch face to reopen. " +
-        "Between points, check the dimmed score on your wrist."
+        "Add the Match Glance widget to your Smart Stack for score and elapsed time between points."
 
     public static let scoreOnlyConsequence =
         "Scores the match without starting a Health workout."
@@ -78,6 +78,12 @@ public enum DuringPlayAccessCopy {
     public static let helpTitle = "During play"
 
     public static let helpSections: [(title: String, body: String)] = [
+        (
+            "Smart Stack",
+            "Turn the Digital Crown up or swipe up from the watch face, tap +, and add Padel Score → Match Glance. " +
+            "Pin it to keep score and elapsed time at the top. When tracking as a workout, Apple's workout timer " +
+            "appears separately; Match Glance shows your score."
+        ),
         (
             "Swipe up",
             "Swipe up from the watch face to open the Dock, then tap Padel Score. " +

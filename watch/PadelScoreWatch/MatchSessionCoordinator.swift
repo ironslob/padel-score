@@ -36,6 +36,7 @@ public final class MatchSessionCoordinator: ObservableObject {
 
     @Published public private(set) var workoutTrackingMode: WorkoutTrackingMode = .trackAsWorkout
     @Published public private(set) var isWorkoutSessionActive = false
+    @Published public private(set) var isWorkoutPaused = false
     @Published public var workoutErrorMessage: String?
     @Published public var showWristRaiseTip = false
     @Published public var showWorkoutConflictPrompt = false
@@ -59,6 +60,9 @@ public final class MatchSessionCoordinator: ObservableObject {
         self.workoutManager = workoutManager ?? HealthKitWorkoutSessionManager(healthStore: healthStore)
         self.tipStore = tipStore
         self.modeStore = modeStore
+        self.workoutManager.pauseStateHandler = { [weak self] isPaused in
+            self?.isWorkoutPaused = isPaused
+        }
         bindService()
         publishSnapshot(for: service.activeMatch)
         rescheduleInactivityTimer(for: service.activeMatch)
@@ -216,13 +220,19 @@ public final class MatchSessionCoordinator: ObservableObject {
 
 public protocol WorkoutSessionManaging: AnyObject {
     var isRunning: Bool { get }
+    var isPaused: Bool { get }
+    var pauseStateHandler: ((Bool) -> Void)? { get set }
     @MainActor func startWorkout(activityType: HKWorkoutActivityType, metadata: [String: String]) async throws
     @MainActor func endWorkout(save: Bool) async throws
+    @MainActor func pauseWorkout()
+    @MainActor func resumeWorkout()
 }
 
 @MainActor
 public final class HealthKitWorkoutSessionManager: NSObject, WorkoutSessionManaging {
     public private(set) var isRunning = false
+    public private(set) var isPaused = false
+    public var pauseStateHandler: ((Bool) -> Void)?
 
     private let healthStore: HKHealthStore?
     private var session: HKWorkoutSession?
@@ -331,8 +341,26 @@ public final class HealthKitWorkoutSessionManager: NSObject, WorkoutSessionManag
         }
     }
 
+    public func pauseWorkout() {
+        guard isRunning, !isPaused, let session else { return }
+        session.pause()
+        setPaused(true)
+    }
+
+    public func resumeWorkout() {
+        guard isRunning, isPaused, let session else { return }
+        session.resume()
+        setPaused(false)
+    }
+
+    private func setPaused(_ paused: Bool) {
+        isPaused = paused
+        pauseStateHandler?(paused)
+    }
+
     private func cleanup() {
         isRunning = false
+        isPaused = false
         session = nil
         builder = nil
     }
@@ -349,8 +377,11 @@ extension HealthKitWorkoutSessionManager: HKWorkoutSessionDelegate {
             switch toState {
             case .running:
                 isRunning = true
+                setPaused(false)
                 startContinuation?.resume()
                 startContinuation = nil
+            case .paused:
+                setPaused(true)
             case .ended, .stopped:
                 if fromState == .running || fromState == .paused {
                     // End handled by endWorkout.
@@ -378,6 +409,21 @@ extension HealthKitWorkoutSessionManager: HKWorkoutSessionDelegate {
             endContinuation?.resume(throwing: workoutError)
             endContinuation = nil
             cleanup()
+        }
+    }
+
+    nonisolated public func workoutSession(
+        _ workoutSession: HKWorkoutSession,
+        didGenerate event: HKWorkoutEvent
+    ) {
+        guard event.type == .pauseOrResumeRequest else { return }
+        Task { @MainActor in
+            switch WorkoutPauseResumeLogic.action(isPaused: isPaused) {
+            case .pause:
+                pauseWorkout()
+            case .resume:
+                resumeWorkout()
+            }
         }
     }
 }
