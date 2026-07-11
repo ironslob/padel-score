@@ -95,4 +95,92 @@ final class MatchServiceTests: XCTestCase {
         XCTAssertEqual(service.activeMatch?.settings.goldenPointEnabled, false)
         XCTAssertEqual(store.active?.settings.goldenPointEnabled, false)
     }
+
+    func testExpireInactiveMatchWithPointsEndsEarly() throws {
+        let engine = ScoringEngine()
+        let oldDate = Date(timeIntervalSinceNow: -31 * 60)
+        var match = engine.startMatch(at: oldDate)
+        match = try engine.apply(.selectServer(.left), to: match, at: oldDate)
+        match = try engine.apply(.pointWon(.left), to: match, at: oldDate)
+
+        let service = serviceWithActiveMatch(match)
+        service.expireInactiveMatchIfNeeded()
+
+        XCTAssertEqual(service.activeMatch?.status, .endedEarly)
+        XCTAssertEqual(service.archivedMatches.count, 1)
+    }
+
+    func testExpireInactiveMatchWithRecentPointStaysInProgress() throws {
+        let engine = ScoringEngine()
+        let startDate = Date(timeIntervalSinceNow: -60 * 60)
+        let recentDate = Date(timeIntervalSinceNow: -5 * 60)
+        var match = engine.startMatch(at: startDate)
+        match = try engine.apply(.selectServer(.left), to: match, at: startDate)
+        match = try engine.apply(.pointWon(.left), to: match, at: recentDate)
+
+        let service = serviceWithActiveMatch(match)
+        service.expireInactiveMatchIfNeeded()
+
+        XCTAssertEqual(service.activeMatch?.status, .inProgress)
+        XCTAssertTrue(service.archivedMatches.isEmpty)
+    }
+
+    func testExpireInactiveZeroPointMatchDiscards() throws {
+        let engine = ScoringEngine()
+        let oldDate = Date(timeIntervalSinceNow: -31 * 60)
+        let match = engine.startMatch(at: oldDate)
+
+        let service = serviceWithActiveMatch(match)
+        service.expireInactiveMatchIfNeeded()
+
+        XCTAssertNil(service.activeMatch)
+        XCTAssertTrue(service.archivedMatches.isEmpty)
+    }
+
+    func testExpireInactiveRecentZeroPointMatchStaysInProgress() throws {
+        let engine = ScoringEngine()
+        let recentDate = Date(timeIntervalSinceNow: -5 * 60)
+        let match = engine.startMatch(at: recentDate)
+
+        let service = serviceWithActiveMatch(match)
+        service.expireInactiveMatchIfNeeded()
+
+        XCTAssertEqual(service.activeMatch?.status, .inProgress)
+    }
+
+    func testRestoreExpiresInactiveMatch() throws {
+        let store = InMemoryMatchStore()
+        let engine = ScoringEngine()
+        let oldDate = Date(timeIntervalSinceNow: -31 * 60)
+        var match = engine.startMatch(at: oldDate)
+        match = try engine.apply(.selectServer(.left), to: match, at: oldDate)
+        match = try engine.apply(.pointWon(.left), to: match, at: oldDate)
+        store.active = match
+
+        let service = MatchService(store: store)
+
+        XCTAssertEqual(service.activeMatch?.status, .endedEarly)
+        XCTAssertEqual(service.archivedMatches.count, 1)
+    }
+
+    func testUndoAllPointsOnInactiveMatchDiscards() throws {
+        let engine = ScoringEngine()
+        let startDate = Date(timeIntervalSinceNow: -31 * 60)
+        let recentDate = Date(timeIntervalSinceNow: -5 * 60)
+        var match = engine.startMatch(at: startDate)
+        match = try engine.apply(.selectServer(.left), to: match, at: startDate)
+        match = try engine.apply(.pointWon(.left), to: match, at: recentDate)
+
+        let service = serviceWithActiveMatch(match)
+        service.undoLastPoint()
+
+        XCTAssertNil(service.activeMatch)
+        XCTAssertTrue(service.archivedMatches.isEmpty)
+    }
+
+    private func serviceWithActiveMatch(_ match: MatchState) -> MatchService {
+        let store = InMemoryMatchStore()
+        store.active = match
+        return MatchService(store: store)
+    }
 }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PhoneRootView: View {
     @EnvironmentObject private var service: MatchService
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         NavigationStack {
@@ -43,6 +44,11 @@ struct PhoneRootView: View {
             }
             .refreshable {
                 service.restore()
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                service.expireInactiveMatchIfNeeded()
             }
         }
     }

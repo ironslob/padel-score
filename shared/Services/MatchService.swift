@@ -29,6 +29,7 @@ public final class MatchService: ObservableObject {
             activeMatch = try store.loadActiveMatch()
             archivedMatches = try store.loadArchivedMatches().filter { $0.status != .discarded }
             logger.info("Restored active=\(self.activeMatch != nil) archive=\(self.archivedMatches.count)")
+            expireInactiveMatchIfNeeded()
         } catch {
             logger.error("Restore failed: \(error.localizedDescription)")
             activeMatch = nil
@@ -53,6 +54,7 @@ public final class MatchService: ObservableObject {
                 finalizeActiveMatch()
             } else {
                 persist()
+                expireInactiveMatchIfNeeded()
             }
             logger.info("Point \(side.rawValue)")
         } catch {
@@ -66,6 +68,7 @@ public final class MatchService: ObservableObject {
             match = try engine.apply(.selectServer(side), to: match)
             activeMatch = match
             persist()
+            expireInactiveMatchIfNeeded()
             logger.info("Server selected \(side.rawValue)")
         } catch {
             logger.error("Select server failed: \(error.localizedDescription)")
@@ -78,6 +81,7 @@ public final class MatchService: ObservableObject {
             match = try engine.apply(.undo, to: match)
             activeMatch = match
             persist()
+            expireInactiveMatchIfNeeded()
             logger.info("Undo")
         } catch {
             logger.error("Undo failed: \(error.localizedDescription)")
@@ -98,6 +102,18 @@ public final class MatchService: ObservableObject {
             logger.info("Match finished")
         } catch {
             logger.error("Finish failed: \(error.localizedDescription)")
+        }
+    }
+
+    /// Ends or discards an in-progress match that has exceeded the inactivity timeout.
+    public func expireInactiveMatchIfNeeded(at date: Date = Date()) {
+        guard let match = activeMatch, match.isInactive(at: date) else { return }
+        if match.hasScoredPoints {
+            endMatchEarly()
+            logger.info("Match expired due to inactivity (ended early)")
+        } else {
+            discardMatch()
+            logger.info("Match expired due to inactivity (discarded)")
         }
     }
 

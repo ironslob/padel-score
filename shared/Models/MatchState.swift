@@ -232,6 +232,19 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         return end.timeIntervalSince(startedAt)
     }
 
+    public var hasScoredPoints: Bool {
+        events.contains { $0.kind == .pointWon }
+    }
+
+    public var lastScoringActivityAt: Date {
+        events.last(where: { $0.kind == .pointWon })?.timestamp ?? startedAt
+    }
+
+    public func isInactive(at date: Date = Date()) -> Bool {
+        guard status == .inProgress else { return false }
+        return date.timeIntervalSince(lastScoringActivityAt) >= MatchSettings.inactivityTimeoutSeconds
+    }
+
     public var matchSetsDisplay: (left: String, right: String) {
         (String(leftSetsWon), String(rightSetsWon))
     }

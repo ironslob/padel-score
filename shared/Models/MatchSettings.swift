@@ -5,6 +5,9 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     /// Quick-undo window on the score screen and game interstitial. Not persisted per match.
     public static let quickUndoTimeoutSeconds: TimeInterval = 3
 
+    /// Auto-end or discard an in-progress match after this much time without a new point.
+    public static let inactivityTimeoutSeconds: TimeInterval = 30 * 60
+
     public var setsToWin: Int
     public var gamesToWinSet: Int
     public var mustWinByTwoGames: Bool

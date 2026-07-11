@@ -46,6 +46,7 @@ public final class MatchSessionCoordinator: ObservableObject {
     private let modeStore: WorkoutModePreferenceStoring
     private let logger = Logger(subsystem: "com.padelscore", category: "MatchSession")
     private var cancellables = Set<AnyCancellable>()
+    private var inactivityTask: Task<Void, Never>?
 
     public init(
         service: MatchService,
@@ -60,6 +61,7 @@ public final class MatchSessionCoordinator: ObservableObject {
         self.modeStore = modeStore
         bindService()
         publishSnapshot(for: service.activeMatch)
+        rescheduleInactivityTimer(for: service.activeMatch)
     }
 
     public func setWorkoutTrackingMode(_ mode: WorkoutTrackingMode) {
@@ -90,7 +92,9 @@ public final class MatchSessionCoordinator: ObservableObject {
     public func handleScenePhaseChange(_ phase: ScenePhase) {
         switch phase {
         case .active:
+            service.expireInactiveMatchIfNeeded()
             publishSnapshot(for: service.activeMatch)
+            rescheduleInactivityTimer(for: service.activeMatch)
         case .inactive, .background:
             break
         @unknown default:
@@ -120,8 +124,28 @@ public final class MatchSessionCoordinator: ObservableObject {
                 guard let self else { return }
                 self.publishSnapshot(for: match)
                 self.handleActiveMatchChanged(match)
+                self.rescheduleInactivityTimer(for: match)
             }
             .store(in: &cancellables)
+    }
+
+    private func rescheduleInactivityTimer(for match: MatchState?) {
+        inactivityTask?.cancel()
+        inactivityTask = nil
+        guard let match, match.status == .inProgress else { return }
+
+        let elapsed = Date().timeIntervalSince(match.lastScoringActivityAt)
+        let remaining = MatchSettings.inactivityTimeoutSeconds - elapsed
+        if remaining <= 0 {
+            service.expireInactiveMatchIfNeeded()
+            return
+        }
+
+        inactivityTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
+            if Task.isCancelled { return }
+            service.expireInactiveMatchIfNeeded()
+        }
     }
 
     private func publishSnapshot(for match: MatchState?) {
