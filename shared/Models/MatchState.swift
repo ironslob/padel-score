@@ -261,16 +261,36 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
     }
 
     public var finalScoreSummary: String {
-        let sets = completedSets.map { "\($0.leftGames)-\($0.rightGames)" }
-        if status == .endedEarly, !currentSet.isComplete,
-           currentSet.leftGames > 0 || currentSet.rightGames > 0
-            || currentGame.leftPoints > 0 || currentGame.rightPoints > 0
-            || currentGame.advantageSide != nil || currentGame.isGoldenPointActive
-            || currentGame.isTieBreak {
-            let partial = "\(currentSet.leftGames)-\(currentSet.rightGames)"
-            return (sets + [partial]).joined(separator: ", ")
+        var lines = completedSets.map { "\($0.leftGames)-\($0.rightGames)" }
+        if let partialSetLine = partialSetLineForEarlyEnd {
+            lines.append(partialSetLine)
         }
-        return sets.joined(separator: ", ")
+        return lines.joined(separator: ", ")
+    }
+
+    /// Games in the incomplete set when a match ends early, including the in-progress game if any.
+    private var partialSetLineForEarlyEnd: String? {
+        guard status == .endedEarly, !currentSet.isComplete else { return nil }
+        guard currentSet.leftGames > 0 || currentSet.rightGames > 0 || hasInProgressGameScore else {
+            return nil
+        }
+        var line = "\(currentSet.leftGames)-\(currentSet.rightGames)"
+        if let gameScore = inProgressGameScoreLabel {
+            line += " (\(gameScore))"
+        }
+        return line
+    }
+
+    private var hasInProgressGameScore: Bool {
+        currentGame.leftPoints > 0 || currentGame.rightPoints > 0
+            || currentGame.advantageSide != nil || currentGame.isGoldenPointActive
+            || currentGame.isTieBreak
+    }
+
+    private var inProgressGameScoreLabel: String? {
+        guard hasInProgressGameScore else { return nil }
+        let pair = currentGame.displayPair
+        return "\(pair.left)-\(pair.right)"
     }
 
     private enum CodingKeys: String, CodingKey {

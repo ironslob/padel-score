@@ -361,4 +361,77 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(replayed.currentGame.rightPoints, s.currentGame.rightPoints)
         XCTAssertEqual(replayed.events.count, s.events.count)
     }
+
+    // MARK: - Final score summary
+
+    func testFinalScoreSummaryForCompletedMatch() throws {
+        var s = start()
+        for _ in 0..<2 {
+            for _ in 0..<6 {
+                s = try winGame(for: .left, from: s)
+            }
+        }
+        XCTAssertEqual(s.finalScoreSummary, "6-0, 6-0")
+    }
+
+    func testFinalScoreSummaryEndedEarlyMidGame() throws {
+        var s = start()
+        for _ in 0..<3 {
+            s = try winGame(for: .left, from: s)
+        }
+        for _ in 0..<2 {
+            s = try winGame(for: .right, from: s)
+        }
+        s = try point(.left, s)
+        s = try point(.left, s)
+        s = try point(.left, s)
+        s = try point(.right, s)
+        s = try engine.apply(.endEarly, to: s)
+
+        XCTAssertEqual(s.finalScoreSummary, "3-2 (40-15)")
+    }
+
+    func testFinalScoreSummaryEndedEarlyAfterCompletedSet() throws {
+        var s = start()
+        for _ in 0..<6 {
+            s = try winGame(for: .left, from: s)
+        }
+        s = try engine.apply(.selectServer(.left), to: s)
+        for _ in 0..<3 {
+            s = try winGame(for: .left, from: s)
+        }
+        for _ in 0..<2 {
+            s = try winGame(for: .right, from: s)
+        }
+        s = try point(.left, s)
+        s = try point(.left, s)
+        s = try point(.right, s)
+        s = try engine.apply(.endEarly, to: s)
+
+        XCTAssertEqual(s.finalScoreSummary, "6-0, 3-2 (30-15)")
+    }
+
+    func testFinalScoreSummaryEndedEarlyBetweenGames() throws {
+        var s = start()
+        s = try winGame(for: .left, from: s)
+        s = try engine.apply(.endEarly, to: s)
+
+        XCTAssertEqual(s.finalScoreSummary, "1-0")
+    }
+
+    func testFinalScoreSummaryEndedEarlyInTieBreak() throws {
+        var s = try reachSixSix(from: start())
+        s = try winTieBreak(for: .left, points: 4, from: s)
+        s = try winTieBreak(for: .right, points: 3, from: s)
+        s = try engine.apply(.endEarly, to: s)
+
+        XCTAssertEqual(s.finalScoreSummary, "6-6 (4-3)")
+    }
+
+    func testFinalScoreSummaryEndedEarlyWithNoScore() throws {
+        var s = start()
+        s = try engine.apply(.endEarly, to: s)
+
+        XCTAssertEqual(s.finalScoreSummary, "")
+    }
 }
