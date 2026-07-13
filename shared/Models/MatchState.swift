@@ -254,9 +254,6 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         if settings.usThemLabels {
             return ("Us", "Them")
         }
-        if settings.fixedServerPositions {
-            return ("Serving", "Receiving")
-        }
         switch currentServer {
         case .left: return ("Serving", "Receiving")
         case .right: return ("Receiving", "Serving")

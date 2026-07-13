@@ -214,12 +214,18 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.currentServer, .left)
     }
 
-    func testFixedServerPositionsSkipsServerSelection() {
+    func testMatchStartAlwaysRequiresServerSelection() {
+        let s = startUnselected()
+        XCTAssertTrue(s.needsServerSelection)
+        XCTAssertNil(s.currentServer)
+    }
+
+    func testFixedServerPositionsStillRequiresServerSelectionAtMatchStart() {
         var settings = MatchSettings.default
         settings.fixedServerPositions = true
         let s = engine.startMatch(settings: settings)
-        XCTAssertFalse(s.needsServerSelection)
-        XCTAssertEqual(s.currentServer, .left)
+        XCTAssertTrue(s.needsServerSelection)
+        XCTAssertNil(s.currentServer)
     }
 
     func testUsThemLabelsShowFixedTeamLabels() throws {
@@ -246,21 +252,38 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.servingRoleLabels.right, "Serving")
     }
 
-    func testFixedServerPositionsKeepsServerOnLeft() throws {
+    func testFixedServerPositionsKeepsChosenServer() throws {
         var settings = MatchSettings.default
         settings.fixedServerPositions = true
         var s = engine.startMatch(settings: settings)
+        s = try engine.apply(.selectServer(.left), to: s)
         XCTAssertEqual(s.currentServer, .left)
         s = try winGame(for: .left, from: s)
         XCTAssertEqual(s.currentServer, .left)
         s = try winGame(for: .right, from: s)
         XCTAssertEqual(s.currentServer, .left)
+        XCTAssertEqual(s.servingRoleLabels.left, "Serving")
+        XCTAssertEqual(s.servingRoleLabels.right, "Receiving")
+    }
+
+    func testFixedServerPositionsKeepsRightServerWhenChosen() throws {
+        var settings = MatchSettings.default
+        settings.fixedServerPositions = true
+        var s = engine.startMatch(settings: settings)
+        s = try engine.apply(.selectServer(.right), to: s)
+        XCTAssertEqual(s.currentServer, .right)
+        XCTAssertEqual(s.servingRoleLabels.left, "Receiving")
+        XCTAssertEqual(s.servingRoleLabels.right, "Serving")
+        s = try winGame(for: .left, from: s)
+        XCTAssertEqual(s.currentServer, .right)
+        XCTAssertEqual(s.servingRoleLabels.right, "Serving")
     }
 
     func testFixedServerPositionsNoTieBreakServeRotation() throws {
         var settings = MatchSettings.default
         settings.fixedServerPositions = true
         var s = engine.startMatch(settings: settings)
+        s = try engine.apply(.selectServer(.left), to: s)
         s = try reachSixSix(from: s)
         XCTAssertEqual(s.currentServer, .left)
         s = try point(.left, s)
@@ -276,6 +299,7 @@ final class ScoringEngineTests: XCTestCase {
         settings.fixedServerPositions = true
         settings.askServeAtSetStart = true
         var s = engine.startMatch(settings: settings)
+        s = try engine.apply(.selectServer(.left), to: s)
         for _ in 0..<5 {
             s = try winGame(for: .left, from: s)
             s = try winGame(for: .right, from: s)

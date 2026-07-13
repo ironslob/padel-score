@@ -395,7 +395,7 @@ struct MatchPreferenceToggles: View {
             )
         )
         PreferenceToggleRow(
-            title: "Server always on the left",
+            title: "Don't rotate serve",
             helper: SettingsCopy.fixedServerPositions,
             showsHelper: showsHelperText,
             isOn: Binding(

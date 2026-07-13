@@ -24,8 +24,8 @@ public struct ScoringEngine: Sendable {
             status: .inProgress,
             events: [event],
             startedAt: date,
-            currentServer: settings.fixedServerPositions ? .left : nil,
-            needsServerSelection: !settings.fixedServerPositions
+            currentServer: nil,
+            needsServerSelection: true
         )
     }
 
@@ -105,7 +105,7 @@ public struct ScoringEngine: Sendable {
         state.rightSetsWon = 0
         state.winner = nil
         state.currentServer = nil
-        state.needsServerSelection = !state.settings.fixedServerPositions
+        state.needsServerSelection = true
         state.finishedAt = nil
         state.status = .inProgress
 
@@ -115,12 +115,7 @@ public struct ScoringEngine: Sendable {
             case .matchStarted:
                 state.startedAt = event.timestamp
                 state.status = .inProgress
-                if state.settings.fixedServerPositions {
-                    state.currentServer = .left
-                    state.needsServerSelection = false
-                } else {
-                    state.needsServerSelection = true
-                }
+                state.needsServerSelection = true
 
             case .serverSelected:
                 guard let side = event.side, state.status == .inProgress, state.needsServerSelection else { continue }

@@ -50,7 +50,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     public var goldenPointEnabled: Bool
     /// When true, the player must choose who is serving at the start of each new set.
     public var askServeAtSetStart: Bool
-    /// When true, left is always server and right is always receiver; serve does not rotate.
+    /// When true, serve does not rotate after games; the side chosen at match start stays fixed.
     public var fixedServerPositions: Bool
     /// When true, score buttons show "Us" / "Them" instead of "Serving" / "Receiving".
     public var usThemLabels: Bool
