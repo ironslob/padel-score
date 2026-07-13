@@ -260,7 +260,14 @@ public struct ScoringEngine: Sendable {
         case .right: state.rightSetsWon += 1
         }
 
-        if state.leftSetsWon >= state.settings.setsToWin {
+        if state.settings.continuousPlay {
+            state.currentSet = .zero
+            state.currentGame = .zero
+            if state.settings.askServeAtSetStart, !state.settings.fixedServerPositions {
+                state.currentServer = nil
+                state.needsServerSelection = true
+            }
+        } else if state.leftSetsWon >= state.settings.setsToWin {
             state.winner = .left
             state.status = .completed
             state.finishedAt = state.events.last?.timestamp
@@ -281,6 +288,11 @@ public struct ScoringEngine: Sendable {
     }
 
     private func naturalWinner(of state: MatchState) -> Side? {
+        if state.settings.continuousPlay {
+            if state.leftSetsWon > state.rightSetsWon { return .left }
+            if state.rightSetsWon > state.leftSetsWon { return .right }
+            return nil
+        }
         if state.leftSetsWon >= state.settings.setsToWin { return .left }
         if state.rightSetsWon >= state.settings.setsToWin { return .right }
         return state.winner

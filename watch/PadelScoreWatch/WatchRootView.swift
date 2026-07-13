@@ -371,32 +371,42 @@ struct DuringPlayHelpView: View {
 struct MatchPreferenceToggles: View {
     @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
     var match: MatchState?
+    var showsHelperText = false
 
     var body: some View {
-        Toggle(
-            "Golden point",
+        MatchSetFormatPicker(match: match, showsHelperText: showsHelperText)
+        PreferenceToggleRow(
+            title: "Golden point",
+            helper: SettingsCopy.goldenPoint,
+            showsHelper: showsHelperText,
             isOn: Binding(
                 get: { match?.settings.goldenPointEnabled ?? sessionCoordinator.goldenPointEnabled },
                 set: { sessionCoordinator.setGoldenPointEnabled($0) }
             )
         )
         .disabled(match != nil)
-        Toggle(
-            "Us / Them labels",
+        PreferenceToggleRow(
+            title: "Us / Them labels",
+            helper: SettingsCopy.usThemLabels,
+            showsHelper: showsHelperText,
             isOn: Binding(
                 get: { match?.settings.usThemLabels ?? sessionCoordinator.usThemLabels },
                 set: { sessionCoordinator.setUsThemLabels($0) }
             )
         )
-        Toggle(
-            "Server always on the left",
+        PreferenceToggleRow(
+            title: "Server always on the left",
+            helper: SettingsCopy.fixedServerPositions,
+            showsHelper: showsHelperText,
             isOn: Binding(
                 get: { match?.settings.fixedServerPositions ?? sessionCoordinator.fixedServerPositions },
                 set: { sessionCoordinator.setFixedServerPositions($0) }
             )
         )
-        Toggle(
-            "Always ask for serve at the start of a set",
+        PreferenceToggleRow(
+            title: "Always ask for serve at the start of a set",
+            helper: SettingsCopy.askServeAtSetStart,
+            showsHelper: showsHelperText,
             isOn: Binding(
                 get: { match?.settings.askServeAtSetStart ?? sessionCoordinator.alwaysAskServeAtSetStart },
                 set: { sessionCoordinator.setAlwaysAskServeAtSetStart($0) }
@@ -410,13 +420,61 @@ struct MatchPreferenceToggles: View {
     }
 }
 
+struct MatchSetFormatPicker: View {
+    @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
+    var match: MatchState?
+    var showsHelperText = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Picker(
+                "Match length",
+                selection: Binding(
+                    get: { match?.settings.matchSetFormat ?? sessionCoordinator.matchSetFormat },
+                    set: { sessionCoordinator.setMatchSetFormat($0) }
+                )
+            ) {
+                ForEach(MatchSetFormat.allCases) { format in
+                    Text(format.label).tag(format)
+                }
+            }
+            if showsHelperText {
+                Text(SettingsCopy.matchSetFormat)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .disabled(match != nil)
+    }
+}
+
+private struct PreferenceToggleRow: View {
+    let title: String
+    let helper: String
+    let showsHelper: Bool
+    @Binding var isOn: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Toggle(title, isOn: $isOn)
+            if showsHelper {
+                Text(helper)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+}
+
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             List {
-                MatchPreferenceToggles()
+                MatchPreferenceToggles(showsHelperText: true)
             }
             .navigationTitle("Settings")
             .toolbar {

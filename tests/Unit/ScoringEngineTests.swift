@@ -299,6 +299,51 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.completedSets.count, 2)
     }
 
+    func testMatchBestOfOne() throws {
+        var settings = MatchSettings.default
+        settings.setsToWin = 1
+        var s = start(settings: settings)
+        for _ in 0..<6 {
+            s = try winGame(for: .left, from: s)
+        }
+        XCTAssertEqual(s.status, .completed)
+        XCTAssertEqual(s.winner, .left)
+        XCTAssertEqual(s.leftSetsWon, 1)
+        XCTAssertEqual(s.completedSets.count, 1)
+    }
+
+    func testContinuousPlayDoesNotAutoComplete() throws {
+        var settings = MatchSettings.default
+        settings.continuousPlay = true
+        var s = start(settings: settings)
+        for _ in 0..<3 {
+            for _ in 0..<6 {
+                s = try winGame(for: .left, from: s)
+            }
+        }
+        XCTAssertEqual(s.status, .inProgress)
+        XCTAssertNil(s.winner)
+        XCTAssertEqual(s.leftSetsWon, 3)
+        XCTAssertEqual(s.completedSets.count, 3)
+    }
+
+    func testContinuousPlayFinishUsesSetLeader() throws {
+        var settings = MatchSettings.default
+        settings.continuousPlay = true
+        var s = start(settings: settings)
+        for _ in 0..<6 {
+            s = try winGame(for: .left, from: s)
+        }
+        for _ in 0..<12 {
+            s = try winGame(for: .right, from: s)
+        }
+        s = try engine.apply(.finish, to: s)
+        XCTAssertEqual(s.status, .completed)
+        XCTAssertEqual(s.winner, .right)
+        XCTAssertEqual(s.leftSetsWon, 1)
+        XCTAssertEqual(s.rightSetsWon, 2)
+    }
+
     // MARK: - Tie-break
 
     func testSixSixStartsTieBreak() throws {

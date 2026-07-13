@@ -166,6 +166,16 @@ final class WorkoutSessionErrorTests: XCTestCase {
     }
 }
 
+final class SettingsCopyTests: XCTestCase {
+    func testSettingHelpersAreNonEmpty() {
+        XCTAssertFalse(SettingsCopy.goldenPoint.isEmpty)
+        XCTAssertFalse(SettingsCopy.usThemLabels.isEmpty)
+        XCTAssertFalse(SettingsCopy.fixedServerPositions.isEmpty)
+        XCTAssertFalse(SettingsCopy.askServeAtSetStart.isEmpty)
+        XCTAssertFalse(SettingsCopy.matchSetFormat.isEmpty)
+    }
+}
+
 final class DuringPlayAccessCopyTests: XCTestCase {
     func testFirstMatchTipMentionsDock() {
         XCTAssertTrue(DuringPlayAccessCopy.firstMatchTip.contains("Dock"))
@@ -243,5 +253,17 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
         XCTAssertTrue(store.goldenPointEnabled)
         store.setGoldenPointEnabled(false)
         XCTAssertFalse(store.goldenPointEnabled)
+    }
+
+    func testMatchSetFormatDefaultsBestOfThreeAndPersists() {
+        let suiteName = "ServeSelectionPreferenceStoreTests.matchSetFormat.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        let store = UserDefaultsServeSelectionPreferenceStore(defaults: defaults)
+
+        XCTAssertEqual(store.matchSetFormat, .bestOfThree)
+        store.setMatchSetFormat(.continuous)
+        XCTAssertEqual(store.matchSetFormat, .continuous)
+        store.setMatchSetFormat(.bestOfFive)
+        XCTAssertEqual(store.matchSetFormat, .bestOfFive)
     }
 }

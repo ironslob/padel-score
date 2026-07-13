@@ -39,6 +39,8 @@ public protocol ServeSelectionPreferenceStoring {
     func setUsThemLabels(_ value: Bool)
     var goldenPointEnabled: Bool { get }
     func setGoldenPointEnabled(_ value: Bool)
+    var matchSetFormat: MatchSetFormat { get }
+    func setMatchSetFormat(_ value: MatchSetFormat)
 }
 
 public struct UserDefaultsWristRaiseTipStore: WristRaiseTipStoring {
@@ -80,11 +82,15 @@ public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenc
     private let fixedServerKey = "fixedServerPositions"
     private let usThemLabelsKey = "usThemLabels"
     private let goldenPointKey = "goldenPointEnabled"
+    private let matchSetFormatKey = "matchSetFormat"
     private let defaults: UserDefaults
 
     public init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        defaults.register(defaults: [goldenPointKey: true])
+        defaults.register(defaults: [
+            goldenPointKey: true,
+            matchSetFormatKey: MatchSetFormat.bestOfThree.rawValue,
+        ])
     }
 
     public var alwaysAskServeAtSetStart: Bool {
@@ -118,6 +124,35 @@ public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenc
     public func setGoldenPointEnabled(_ value: Bool) {
         defaults.set(value, forKey: goldenPointKey)
     }
+
+    public var matchSetFormat: MatchSetFormat {
+        guard let raw = defaults.string(forKey: matchSetFormatKey),
+              let format = MatchSetFormat(rawValue: raw) else {
+            return .bestOfThree
+        }
+        return format
+    }
+
+    public func setMatchSetFormat(_ value: MatchSetFormat) {
+        defaults.set(value.rawValue, forKey: matchSetFormatKey)
+    }
+}
+
+public enum SettingsCopy {
+    public static let goldenPoint =
+        "After advantage is lost at deuce, the next point wins the game."
+
+    public static let usThemLabels =
+        "Score buttons show Us and Them instead of Serving and Receiving."
+
+    public static let fixedServerPositions =
+        "Left is always serving; serve does not rotate after each game."
+
+    public static let askServeAtSetStart =
+        "Choose who serves when each new set begins."
+
+    public static let matchSetFormat =
+        "How many sets decide the match. Continuous keeps scoring until you finish."
 }
 
 public enum DuringPlayAccessCopy {
