@@ -251,6 +251,9 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
 
     /// Role labels for the score screen (left / right).
     public var servingRoleLabels: (left: String, right: String) {
+        if settings.usThemLabels {
+            return ("Us", "Them")
+        }
         if settings.fixedServerPositions {
             return ("Serving", "Receiving")
         }

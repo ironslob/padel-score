@@ -222,6 +222,30 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.currentServer, .left)
     }
 
+    func testUsThemLabelsShowFixedTeamLabels() throws {
+        var settings = MatchSettings.default
+        settings.usThemLabels = true
+        var s = engine.startMatch(settings: settings)
+        s = try engine.apply(.selectServer(.left), to: s)
+        XCTAssertEqual(s.servingRoleLabels.left, "Us")
+        XCTAssertEqual(s.servingRoleLabels.right, "Them")
+
+        s = try winGame(for: .right, from: s)
+        XCTAssertEqual(s.currentServer, .right)
+        XCTAssertEqual(s.servingRoleLabels.left, "Us")
+        XCTAssertEqual(s.servingRoleLabels.right, "Them")
+    }
+
+    func testServingRoleLabelsSwapWhenUsThemLabelsDisabled() throws {
+        var s = start()
+        XCTAssertEqual(s.servingRoleLabels.left, "Serving")
+        XCTAssertEqual(s.servingRoleLabels.right, "Receiving")
+
+        s = try winGame(for: .right, from: s)
+        XCTAssertEqual(s.servingRoleLabels.left, "Receiving")
+        XCTAssertEqual(s.servingRoleLabels.right, "Serving")
+    }
+
     func testFixedServerPositionsKeepsServerOnLeft() throws {
         var settings = MatchSettings.default
         settings.fixedServerPositions = true

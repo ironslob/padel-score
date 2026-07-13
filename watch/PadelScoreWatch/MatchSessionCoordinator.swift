@@ -37,6 +37,7 @@ public final class MatchSessionCoordinator: ObservableObject {
     @Published public private(set) var workoutTrackingMode: WorkoutTrackingMode = .trackAsWorkout
     @Published public private(set) var alwaysAskServeAtSetStart = false
     @Published public private(set) var fixedServerPositions = false
+    @Published public private(set) var usThemLabels = false
     @Published public private(set) var isWorkoutSessionActive = false
     @Published public private(set) var isWorkoutPaused = false
     @Published public var workoutErrorMessage: String?
@@ -67,6 +68,7 @@ public final class MatchSessionCoordinator: ObservableObject {
         self.serveStore = serveStore
         self.alwaysAskServeAtSetStart = serveStore.alwaysAskServeAtSetStart
         self.fixedServerPositions = serveStore.fixedServerPositions
+        self.usThemLabels = serveStore.usThemLabels
         self.workoutManager.pauseStateHandler = { [weak self] isPaused in
             self?.isWorkoutPaused = isPaused
         }
@@ -90,6 +92,11 @@ public final class MatchSessionCoordinator: ObservableObject {
         serveStore.setFixedServerPositions(value)
     }
 
+    public func setUsThemLabels(_ value: Bool) {
+        usThemLabels = value
+        serveStore.setUsThemLabels(value)
+    }
+
     public func startMatch(goldenPointEnabled: Bool) async {
         guard service.activeMatch == nil else { return }
 
@@ -97,6 +104,7 @@ public final class MatchSessionCoordinator: ObservableObject {
         settings.goldenPointEnabled = goldenPointEnabled
         settings.askServeAtSetStart = alwaysAskServeAtSetStart
         settings.fixedServerPositions = fixedServerPositions
+        settings.usThemLabels = usThemLabels
         service.startMatch(settings: settings)
         publishSnapshot(for: service.activeMatch)
 

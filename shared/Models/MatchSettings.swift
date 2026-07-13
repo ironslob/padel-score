@@ -16,6 +16,8 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     public var askServeAtSetStart: Bool
     /// When true, left is always server and right is always receiver; serve does not rotate.
     public var fixedServerPositions: Bool
+    /// When true, score buttons show "Us" / "Them" instead of "Serving" / "Receiving".
+    public var usThemLabels: Bool
 
     public init(
         setsToWin: Int = 2,
@@ -23,7 +25,8 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         mustWinByTwoGames: Bool = true,
         goldenPointEnabled: Bool = true,
         askServeAtSetStart: Bool = false,
-        fixedServerPositions: Bool = false
+        fixedServerPositions: Bool = false,
+        usThemLabels: Bool = false
     ) {
         self.setsToWin = setsToWin
         self.gamesToWinSet = gamesToWinSet
@@ -31,6 +34,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         self.goldenPointEnabled = goldenPointEnabled
         self.askServeAtSetStart = askServeAtSetStart
         self.fixedServerPositions = fixedServerPositions
+        self.usThemLabels = usThemLabels
     }
 
     public static let `default` = MatchSettings()
@@ -42,6 +46,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         case goldenPointEnabled
         case askServeAtSetStart
         case fixedServerPositions
+        case usThemLabels
         case undoTimeoutSeconds
     }
 
@@ -53,6 +58,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         goldenPointEnabled = try container.decode(Bool.self, forKey: .goldenPointEnabled)
         askServeAtSetStart = try container.decodeIfPresent(Bool.self, forKey: .askServeAtSetStart) ?? false
         fixedServerPositions = try container.decodeIfPresent(Bool.self, forKey: .fixedServerPositions) ?? false
+        usThemLabels = try container.decodeIfPresent(Bool.self, forKey: .usThemLabels) ?? false
         // Legacy per-match value is ignored; timeout is always `quickUndoTimeoutSeconds`.
         _ = try container.decodeIfPresent(TimeInterval.self, forKey: .undoTimeoutSeconds)
     }
@@ -65,5 +71,6 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         try container.encode(goldenPointEnabled, forKey: .goldenPointEnabled)
         try container.encode(askServeAtSetStart, forKey: .askServeAtSetStart)
         try container.encode(fixedServerPositions, forKey: .fixedServerPositions)
+        try container.encode(usThemLabels, forKey: .usThemLabels)
     }
 }

@@ -35,6 +35,8 @@ public protocol ServeSelectionPreferenceStoring {
     func setAlwaysAskServeAtSetStart(_ value: Bool)
     var fixedServerPositions: Bool { get }
     func setFixedServerPositions(_ value: Bool)
+    var usThemLabels: Bool { get }
+    func setUsThemLabels(_ value: Bool)
 }
 
 public struct UserDefaultsWristRaiseTipStore: WristRaiseTipStoring {
@@ -74,6 +76,7 @@ public struct UserDefaultsWorkoutModePreferenceStore: WorkoutModePreferenceStori
 public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenceStoring {
     private let askServeKey = "alwaysAskServeAtSetStart"
     private let fixedServerKey = "fixedServerPositions"
+    private let usThemLabelsKey = "usThemLabels"
     private let defaults: UserDefaults
 
     public init(defaults: UserDefaults = .standard) {
@@ -94,6 +97,14 @@ public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenc
 
     public func setFixedServerPositions(_ value: Bool) {
         defaults.set(value, forKey: fixedServerKey)
+    }
+
+    public var usThemLabels: Bool {
+        defaults.bool(forKey: usThemLabelsKey)
+    }
+
+    public func setUsThemLabels(_ value: Bool) {
+        defaults.set(value, forKey: usThemLabelsKey)
     }
 }
 

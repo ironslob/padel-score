@@ -425,6 +425,13 @@ struct SettingsView: View {
         NavigationStack {
             List {
                 Toggle(
+                    "Us / Them labels",
+                    isOn: Binding(
+                        get: { sessionCoordinator.usThemLabels },
+                        set: { sessionCoordinator.setUsThemLabels($0) }
+                    )
+                )
+                Toggle(
                     "Server always on the left",
                     isOn: Binding(
                         get: { sessionCoordinator.fixedServerPositions },
