@@ -277,55 +277,33 @@ struct SelectServerView: View {
     }
 }
 
-private enum StartMatchPhase {
-    case idle
-    case choosingGoldenPoint
-}
-
 struct StartMatchView: View {
     @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
-    @State private var phase: StartMatchPhase = .idle
     @State private var isStarting = false
     @State private var showDuringPlayHelp = false
     @State private var showSettings = false
 
     var body: some View {
-        Group {
-            switch phase {
-            case .idle:
-                idleContent
-            case .choosingGoldenPoint:
-                GoldenPointChoiceView(
-                    isStarting: isStarting,
-                    onChoice: { goldenPointEnabled in
-                        Task { await startMatch(goldenPointEnabled: goldenPointEnabled) }
-                    }
-                )
-            }
-        }
-        .padding()
-        .sheet(isPresented: $showDuringPlayHelp) {
-            DuringPlayHelpView()
-        }
-        .sheet(isPresented: $showSettings) {
-            SettingsView()
-        }
-    }
-
-    private var idleContent: some View {
         VStack(spacing: 12) {
             Text("Padel Score")
                 .font(.headline)
                 .multilineTextAlignment(.center)
 
             Button {
-                phase = .choosingGoldenPoint
+                Task { await startMatch() }
             } label: {
-                Text("Start Match")
-                    .frame(maxWidth: .infinity)
+                Group {
+                    if isStarting {
+                        ProgressView()
+                    } else {
+                        Text("Start Match")
+                    }
+                }
+                .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
             .tint(.green)
+            .disabled(isStarting)
             .accessibilityLabel("Start Match")
 
             HStack(spacing: 8) {
@@ -344,49 +322,20 @@ struct StartMatchView: View {
                 .accessibilityLabel("Tips")
             }
         }
+        .padding()
+        .sheet(isPresented: $showDuringPlayHelp) {
+            DuringPlayHelpView()
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
     }
 
-    private func startMatch(goldenPointEnabled: Bool) async {
+    private func startMatch() async {
         guard !isStarting else { return }
         isStarting = true
         defer { isStarting = false }
-        await sessionCoordinator.startMatch(goldenPointEnabled: goldenPointEnabled)
-    }
-}
-
-struct GoldenPointChoiceView: View {
-    let isStarting: Bool
-    let onChoice: (Bool) -> Void
-
-    var body: some View {
-        VStack(spacing: 10) {
-            Text("Are you playing golden point?")
-                .font(.subheadline.weight(.semibold))
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity)
-                .accessibilityLabel("Are you playing golden point?")
-
-            if isStarting {
-                ProgressView()
-                    .frame(maxWidth: .infinity)
-            } else {
-                Button("Yes") {
-                    onChoice(true)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(.green)
-                .frame(maxWidth: .infinity)
-                .accessibilityLabel("Yes, play golden point")
-
-                Button("No") {
-                    onChoice(false)
-                }
-                .buttonStyle(.bordered)
-                .frame(maxWidth: .infinity)
-                .accessibilityLabel("No, use advantage and deuce only")
-            }
-        }
+        await sessionCoordinator.startMatch()
     }
 }
 
@@ -424,6 +373,14 @@ struct MatchPreferenceToggles: View {
     var match: MatchState?
 
     var body: some View {
+        Toggle(
+            "Golden point",
+            isOn: Binding(
+                get: { match?.settings.goldenPointEnabled ?? sessionCoordinator.goldenPointEnabled },
+                set: { sessionCoordinator.setGoldenPointEnabled($0) }
+            )
+        )
+        .disabled(match != nil)
         Toggle(
             "Us / Them labels",
             isOn: Binding(

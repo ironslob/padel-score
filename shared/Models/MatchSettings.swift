@@ -1,6 +1,6 @@
 import Foundation
 
-/// V1 defaults from product.md. `goldenPointEnabled` is chosen per match at start on Watch.
+/// V1 defaults from product.md. `goldenPointEnabled` is a persisted preference on Watch.
 public struct MatchSettings: Codable, Sendable, Equatable {
     /// Quick-undo window on the score screen and game interstitial. Not persisted per match.
     public static let quickUndoTimeoutSeconds: TimeInterval = 3

@@ -37,6 +37,8 @@ public protocol ServeSelectionPreferenceStoring {
     func setFixedServerPositions(_ value: Bool)
     var usThemLabels: Bool { get }
     func setUsThemLabels(_ value: Bool)
+    var goldenPointEnabled: Bool { get }
+    func setGoldenPointEnabled(_ value: Bool)
 }
 
 public struct UserDefaultsWristRaiseTipStore: WristRaiseTipStoring {
@@ -77,10 +79,12 @@ public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenc
     private let askServeKey = "alwaysAskServeAtSetStart"
     private let fixedServerKey = "fixedServerPositions"
     private let usThemLabelsKey = "usThemLabels"
+    private let goldenPointKey = "goldenPointEnabled"
     private let defaults: UserDefaults
 
     public init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        defaults.register(defaults: [goldenPointKey: true])
     }
 
     public var alwaysAskServeAtSetStart: Bool {
@@ -105,6 +109,14 @@ public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenc
 
     public func setUsThemLabels(_ value: Bool) {
         defaults.set(value, forKey: usThemLabelsKey)
+    }
+
+    public var goldenPointEnabled: Bool {
+        defaults.bool(forKey: goldenPointKey)
+    }
+
+    public func setGoldenPointEnabled(_ value: Bool) {
+        defaults.set(value, forKey: goldenPointKey)
     }
 }
 

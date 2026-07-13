@@ -234,4 +234,14 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
         store.setUsThemLabels(true)
         XCTAssertTrue(store.usThemLabels)
     }
+
+    func testGoldenPointEnabledDefaultsTrueAndPersists() {
+        let suiteName = "ServeSelectionPreferenceStoreTests.goldenPoint.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        let store = UserDefaultsServeSelectionPreferenceStore(defaults: defaults)
+
+        XCTAssertTrue(store.goldenPointEnabled)
+        store.setGoldenPointEnabled(false)
+        XCTAssertFalse(store.goldenPointEnabled)
+    }
 }
