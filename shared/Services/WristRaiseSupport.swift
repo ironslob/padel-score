@@ -30,6 +30,11 @@ public protocol WorkoutModePreferenceStoring {
     func setPreferredWorkoutTrackingModeRawValue(_ rawValue: String)
 }
 
+public protocol ServeSelectionPreferenceStoring {
+    var alwaysAskServeAtSetStart: Bool { get }
+    func setAlwaysAskServeAtSetStart(_ value: Bool)
+}
+
 public struct UserDefaultsWristRaiseTipStore: WristRaiseTipStoring {
     private let key = "hasSeenWristRaiseTip"
     private let defaults: UserDefaults
@@ -61,6 +66,23 @@ public struct UserDefaultsWorkoutModePreferenceStore: WorkoutModePreferenceStori
 
     public func setPreferredWorkoutTrackingModeRawValue(_ rawValue: String) {
         defaults.set(rawValue, forKey: key)
+    }
+}
+
+public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenceStoring {
+    private let key = "alwaysAskServeAtSetStart"
+    private let defaults: UserDefaults
+
+    public init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
+    public var alwaysAskServeAtSetStart: Bool {
+        defaults.bool(forKey: key)
+    }
+
+    public func setAlwaysAskServeAtSetStart(_ value: Bool) {
+        defaults.set(value, forKey: key)
     }
 }
 

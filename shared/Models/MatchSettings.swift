@@ -12,17 +12,21 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     public var gamesToWinSet: Int
     public var mustWinByTwoGames: Bool
     public var goldenPointEnabled: Bool
+    /// When true, the player must choose who is serving at the start of each new set.
+    public var askServeAtSetStart: Bool
 
     public init(
         setsToWin: Int = 2,
         gamesToWinSet: Int = 6,
         mustWinByTwoGames: Bool = true,
-        goldenPointEnabled: Bool = true
+        goldenPointEnabled: Bool = true,
+        askServeAtSetStart: Bool = false
     ) {
         self.setsToWin = setsToWin
         self.gamesToWinSet = gamesToWinSet
         self.mustWinByTwoGames = mustWinByTwoGames
         self.goldenPointEnabled = goldenPointEnabled
+        self.askServeAtSetStart = askServeAtSetStart
     }
 
     public static let `default` = MatchSettings()
@@ -32,6 +36,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         case gamesToWinSet
         case mustWinByTwoGames
         case goldenPointEnabled
+        case askServeAtSetStart
         case undoTimeoutSeconds
     }
 
@@ -41,6 +46,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         gamesToWinSet = try container.decode(Int.self, forKey: .gamesToWinSet)
         mustWinByTwoGames = try container.decode(Bool.self, forKey: .mustWinByTwoGames)
         goldenPointEnabled = try container.decode(Bool.self, forKey: .goldenPointEnabled)
+        askServeAtSetStart = try container.decodeIfPresent(Bool.self, forKey: .askServeAtSetStart) ?? false
         // Legacy per-match value is ignored; timeout is always `quickUndoTimeoutSeconds`.
         _ = try container.decodeIfPresent(TimeInterval.self, forKey: .undoTimeoutSeconds)
     }
@@ -51,5 +57,6 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         try container.encode(gamesToWinSet, forKey: .gamesToWinSet)
         try container.encode(mustWinByTwoGames, forKey: .mustWinByTwoGames)
         try container.encode(goldenPointEnabled, forKey: .goldenPointEnabled)
+        try container.encode(askServeAtSetStart, forKey: .askServeAtSetStart)
     }
 }

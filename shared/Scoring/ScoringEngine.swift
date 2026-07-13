@@ -264,8 +264,10 @@ public struct ScoringEngine: Sendable {
         } else {
             state.currentSet = .zero
             state.currentGame = .zero
-            state.currentServer = nil
-            state.needsServerSelection = true
+            if state.settings.askServeAtSetStart {
+                state.currentServer = nil
+                state.needsServerSelection = true
+            }
         }
     }
 

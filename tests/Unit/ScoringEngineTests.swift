@@ -172,8 +172,36 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.completedSets.count, 1)
         XCTAssertEqual(s.leftSetsWon, 1)
         XCTAssertEqual(s.currentSet.leftGames, 0)
+        XCTAssertFalse(s.needsServerSelection)
+        XCTAssertEqual(s.currentServer, .right)
+    }
+
+    func testSetStartRequiresServerSelectionWhenEnabled() throws {
+        var settings = MatchSettings.default
+        settings.askServeAtSetStart = true
+        var s = start(settings: settings)
+        for _ in 0..<5 {
+            s = try winGame(for: .left, from: s)
+            s = try winGame(for: .right, from: s)
+        }
+        s = try winGame(for: .left, from: s) // 6-5
+        s = try winGame(for: .left, from: s) // 7-5 set
         XCTAssertTrue(s.needsServerSelection)
         XCTAssertNil(s.currentServer)
+    }
+
+    func testServerContinuesAcrossSetBoundaryByDefault() throws {
+        var s = start()
+        for _ in 0..<5 {
+            s = try winGame(for: .left, from: s)
+            s = try winGame(for: .right, from: s)
+        }
+        s = try winGame(for: .left, from: s) // 6-5
+        s = try winGame(for: .left, from: s) // 7-5 set
+        XCTAssertFalse(s.needsServerSelection)
+        XCTAssertEqual(s.currentServer, .right)
+        s = try point(.left, s)
+        XCTAssertEqual(s.currentServer, .right)
     }
 
     func testServerAutoTogglesAfterEachCompletedGame() throws {
@@ -396,7 +424,6 @@ final class ScoringEngineTests: XCTestCase {
         for _ in 0..<6 {
             s = try winGame(for: .left, from: s)
         }
-        s = try engine.apply(.selectServer(.left), to: s)
         for _ in 0..<3 {
             s = try winGame(for: .left, from: s)
         }

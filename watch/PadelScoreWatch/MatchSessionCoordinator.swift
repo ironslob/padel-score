@@ -35,6 +35,7 @@ public final class MatchSessionCoordinator: ObservableObject {
     }
 
     @Published public private(set) var workoutTrackingMode: WorkoutTrackingMode = .trackAsWorkout
+    @Published public private(set) var alwaysAskServeAtSetStart = false
     @Published public private(set) var isWorkoutSessionActive = false
     @Published public private(set) var isWorkoutPaused = false
     @Published public var workoutErrorMessage: String?
@@ -45,6 +46,7 @@ public final class MatchSessionCoordinator: ObservableObject {
     private let workoutManager: WorkoutSessionManaging
     private let tipStore: WristRaiseTipStoring
     private let modeStore: WorkoutModePreferenceStoring
+    private let serveStore: ServeSelectionPreferenceStoring
     private let logger = Logger(subsystem: "com.padelscore", category: "MatchSession")
     private var cancellables = Set<AnyCancellable>()
     private var inactivityTask: Task<Void, Never>?
@@ -54,12 +56,15 @@ public final class MatchSessionCoordinator: ObservableObject {
         healthStore: HKHealthStore? = HKHealthStore.isHealthDataAvailable() ? HKHealthStore() : nil,
         workoutManager: WorkoutSessionManaging? = nil,
         tipStore: WristRaiseTipStoring = UserDefaultsWristRaiseTipStore(),
-        modeStore: WorkoutModePreferenceStoring = UserDefaultsWorkoutModePreferenceStore()
+        modeStore: WorkoutModePreferenceStoring = UserDefaultsWorkoutModePreferenceStore(),
+        serveStore: ServeSelectionPreferenceStoring = UserDefaultsServeSelectionPreferenceStore()
     ) {
         self.service = service
         self.workoutManager = workoutManager ?? HealthKitWorkoutSessionManager(healthStore: healthStore)
         self.tipStore = tipStore
         self.modeStore = modeStore
+        self.serveStore = serveStore
+        self.alwaysAskServeAtSetStart = serveStore.alwaysAskServeAtSetStart
         self.workoutManager.pauseStateHandler = { [weak self] isPaused in
             self?.isWorkoutPaused = isPaused
         }
@@ -73,11 +78,17 @@ public final class MatchSessionCoordinator: ObservableObject {
         modeStore.setPreferredWorkoutTrackingModeRawValue(mode.rawValue)
     }
 
+    public func setAlwaysAskServeAtSetStart(_ value: Bool) {
+        alwaysAskServeAtSetStart = value
+        serveStore.setAlwaysAskServeAtSetStart(value)
+    }
+
     public func startMatch(goldenPointEnabled: Bool) async {
         guard service.activeMatch == nil else { return }
 
         var settings = MatchSettings.default
         settings.goldenPointEnabled = goldenPointEnabled
+        settings.askServeAtSetStart = alwaysAskServeAtSetStart
         service.startMatch(settings: settings)
         publishSnapshot(for: service.activeMatch)
 

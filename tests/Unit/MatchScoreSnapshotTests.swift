@@ -203,3 +203,15 @@ final class WorkoutModePreferenceStoreTests: XCTestCase {
         XCTAssertEqual(store.preferredWorkoutTrackingModeRawValue, "trackAsWorkout")
     }
 }
+
+final class ServeSelectionPreferenceStoreTests: XCTestCase {
+    func testAlwaysAskServeAtSetStartDefaultsFalseAndPersists() {
+        let suiteName = "ServeSelectionPreferenceStoreTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        let store = UserDefaultsServeSelectionPreferenceStore(defaults: defaults)
+
+        XCTAssertFalse(store.alwaysAskServeAtSetStart)
+        store.setAlwaysAskServeAtSetStart(true)
+        XCTAssertTrue(store.alwaysAskServeAtSetStart)
+    }
+}

@@ -287,6 +287,7 @@ struct StartMatchView: View {
     @State private var phase: StartMatchPhase = .idle
     @State private var isStarting = false
     @State private var showDuringPlayHelp = false
+    @State private var showSettings = false
 
     var body: some View {
         Group {
@@ -306,6 +307,9 @@ struct StartMatchView: View {
         .sheet(isPresented: $showDuringPlayHelp) {
             DuringPlayHelpView()
         }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
     }
 
     private var idleContent: some View {
@@ -323,6 +327,13 @@ struct StartMatchView: View {
             .buttonStyle(.borderedProminent)
             .tint(.green)
             .accessibilityLabel("Start Match")
+
+            Button("Settings") {
+                showSettings = true
+            }
+            .font(.caption)
+            .buttonStyle(.plain)
+            .accessibilityLabel("Settings")
 
             Button("During play tips") {
                 showDuringPlayHelp = true
@@ -401,6 +412,31 @@ struct DuringPlayHelpView: View {
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done") { dismiss() }
+            }
+        }
+    }
+}
+
+struct SettingsView: View {
+    @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Toggle(
+                    "Always ask for serve at the start of a set",
+                    isOn: Binding(
+                        get: { sessionCoordinator.alwaysAskServeAtSetStart },
+                        set: { sessionCoordinator.setAlwaysAskServeAtSetStart($0) }
+                    )
+                )
+            }
+            .navigationTitle("Settings")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
             }
         }
     }
