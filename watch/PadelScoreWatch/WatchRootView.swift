@@ -425,12 +425,20 @@ struct SettingsView: View {
         NavigationStack {
             List {
                 Toggle(
+                    "Server always on the left",
+                    isOn: Binding(
+                        get: { sessionCoordinator.fixedServerPositions },
+                        set: { sessionCoordinator.setFixedServerPositions($0) }
+                    )
+                )
+                Toggle(
                     "Always ask for serve at the start of a set",
                     isOn: Binding(
                         get: { sessionCoordinator.alwaysAskServeAtSetStart },
                         set: { sessionCoordinator.setAlwaysAskServeAtSetStart($0) }
                     )
                 )
+                .disabled(sessionCoordinator.fixedServerPositions)
             }
             .navigationTitle("Settings")
             .toolbar {

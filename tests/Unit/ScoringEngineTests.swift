@@ -214,6 +214,54 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.currentServer, .left)
     }
 
+    func testFixedServerPositionsSkipsServerSelection() {
+        var settings = MatchSettings.default
+        settings.fixedServerPositions = true
+        let s = engine.startMatch(settings: settings)
+        XCTAssertFalse(s.needsServerSelection)
+        XCTAssertEqual(s.currentServer, .left)
+    }
+
+    func testFixedServerPositionsKeepsServerOnLeft() throws {
+        var settings = MatchSettings.default
+        settings.fixedServerPositions = true
+        var s = engine.startMatch(settings: settings)
+        XCTAssertEqual(s.currentServer, .left)
+        s = try winGame(for: .left, from: s)
+        XCTAssertEqual(s.currentServer, .left)
+        s = try winGame(for: .right, from: s)
+        XCTAssertEqual(s.currentServer, .left)
+    }
+
+    func testFixedServerPositionsNoTieBreakServeRotation() throws {
+        var settings = MatchSettings.default
+        settings.fixedServerPositions = true
+        var s = engine.startMatch(settings: settings)
+        s = try reachSixSix(from: s)
+        XCTAssertEqual(s.currentServer, .left)
+        s = try point(.left, s)
+        XCTAssertEqual(s.currentServer, .left)
+        s = try point(.right, s)
+        XCTAssertEqual(s.currentServer, .left)
+        s = try point(.left, s)
+        XCTAssertEqual(s.currentServer, .left)
+    }
+
+    func testFixedServerPositionsIgnoresAskServeAtSetStart() throws {
+        var settings = MatchSettings.default
+        settings.fixedServerPositions = true
+        settings.askServeAtSetStart = true
+        var s = engine.startMatch(settings: settings)
+        for _ in 0..<5 {
+            s = try winGame(for: .left, from: s)
+            s = try winGame(for: .right, from: s)
+        }
+        s = try winGame(for: .left, from: s) // 6-5
+        s = try winGame(for: .left, from: s) // 7-5 set
+        XCTAssertFalse(s.needsServerSelection)
+        XCTAssertEqual(s.currentServer, .left)
+    }
+
     func testMatchBestOfThree() throws {
         var s = start()
         for _ in 0..<2 {

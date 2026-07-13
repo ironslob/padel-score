@@ -24,7 +24,8 @@ public struct ScoringEngine: Sendable {
             status: .inProgress,
             events: [event],
             startedAt: date,
-            needsServerSelection: true
+            currentServer: settings.fixedServerPositions ? .left : nil,
+            needsServerSelection: !settings.fixedServerPositions
         )
     }
 
@@ -104,7 +105,7 @@ public struct ScoringEngine: Sendable {
         state.rightSetsWon = 0
         state.winner = nil
         state.currentServer = nil
-        state.needsServerSelection = true
+        state.needsServerSelection = !state.settings.fixedServerPositions
         state.finishedAt = nil
         state.status = .inProgress
 
@@ -114,7 +115,12 @@ public struct ScoringEngine: Sendable {
             case .matchStarted:
                 state.startedAt = event.timestamp
                 state.status = .inProgress
-                state.needsServerSelection = true
+                if state.settings.fixedServerPositions {
+                    state.currentServer = .left
+                    state.needsServerSelection = false
+                } else {
+                    state.needsServerSelection = true
+                }
 
             case .serverSelected:
                 guard let side = event.side, state.status == .inProgress, state.needsServerSelection else { continue }
@@ -192,7 +198,8 @@ public struct ScoringEngine: Sendable {
         let myPoints = state.currentGame.points(for: side)
         state.currentGame.setPoints(myPoints + 1, for: side)
 
-        if state.currentGame.tieBreakTotalPoints % 2 == 1 {
+        if state.currentGame.tieBreakTotalPoints % 2 == 1,
+           !state.settings.fixedServerPositions {
             state.currentServer = state.currentServer?.opposite
         }
 
@@ -226,7 +233,9 @@ public struct ScoringEngine: Sendable {
         if isSetWon(by: winner, set: state.currentSet, settings: state.settings) {
             completeSet(winner: winner, in: &state)
         } else {
-            state.currentServer = state.currentServer?.opposite
+            if !state.settings.fixedServerPositions {
+                state.currentServer = state.currentServer?.opposite
+            }
             state.currentGame = .zero
         }
     }
@@ -264,7 +273,7 @@ public struct ScoringEngine: Sendable {
         } else {
             state.currentSet = .zero
             state.currentGame = .zero
-            if state.settings.askServeAtSetStart {
+            if state.settings.askServeAtSetStart, !state.settings.fixedServerPositions {
                 state.currentServer = nil
                 state.needsServerSelection = true
             }

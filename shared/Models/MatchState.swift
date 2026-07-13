@@ -249,6 +249,25 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         (String(leftSetsWon), String(rightSetsWon))
     }
 
+    /// Role labels for the score screen (left / right).
+    public var servingRoleLabels: (left: String, right: String) {
+        if settings.fixedServerPositions {
+            return ("Serving", "Receiving")
+        }
+        switch currentServer {
+        case .left: return ("Serving", "Receiving")
+        case .right: return ("Receiving", "Serving")
+        case .none: return ("", "")
+        }
+    }
+
+    /// Tie-break notice for display, respecting fixed server positions.
+    public var activeTieBreakNotice: TieBreakNotice? {
+        guard let notice = currentGame.tieBreakNotice else { return nil }
+        if settings.fixedServerPositions, notice == .changeServe { return nil }
+        return notice
+    }
+
     /// Completed set lines plus the current set if the match is still in progress.
     public var setScoreLines: [String] {
         var lines = completedSets.map { "\($0.leftGames)-\($0.rightGames)" }

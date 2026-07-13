@@ -12,8 +12,8 @@ struct ScoreScreen: View {
     private var game: (left: String, right: String) { match.currentGame.displayPair }
     private var games: (left: String, right: String) { match.currentSet.displayPair }
     private var undoTimeout: TimeInterval { MatchSettings.quickUndoTimeoutSeconds }
-    private var leftRole: String { match.currentServer == .left ? "Serving" : "Receiving" }
-    private var rightRole: String { match.currentServer == .right ? "Serving" : "Receiving" }
+    private var leftRole: String { match.servingRoleLabels.left }
+    private var rightRole: String { match.servingRoleLabels.right }
 
     var body: some View {
         TimelineView(
@@ -61,7 +61,7 @@ struct ScoreScreen: View {
             }
         }
         .sensoryFeedback(.impact(flexibility: .solid, intensity: 0.8), trigger: match.events.count)
-        .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: match.currentGame.tieBreakNotice)
+        .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: match.activeTieBreakNotice)
         .onDisappear { clearUndoWindow() }
         .onChange(of: isLuminanceReduced) { _, reduced in
             if reduced {
@@ -84,7 +84,7 @@ struct ScoreScreen: View {
                 Text("TB")
                     .font(setScoreFont)
                     .foregroundStyle(.primary)
-                if let notice = match.currentGame.tieBreakNotice {
+                if let notice = match.activeTieBreakNotice {
                     Text(tieBreakNoticeAbbreviation(notice))
                         .font(.caption2.weight(.bold))
                         .foregroundStyle(.orange)
@@ -101,7 +101,7 @@ struct ScoreScreen: View {
                 Text("\(games.left) – \(games.right)")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
-                if let notice = match.currentGame.tieBreakNotice {
+                if let notice = match.activeTieBreakNotice {
                     Text(tieBreakNoticeLabel(notice))
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.orange)
@@ -119,7 +119,7 @@ struct ScoreScreen: View {
 
     private var tieBreakAccessibilityLabel: String {
         var parts = ["Tie-break, 6 games all"]
-        if let notice = match.currentGame.tieBreakNotice {
+        if let notice = match.activeTieBreakNotice {
             parts.append(tieBreakNoticeLabel(notice))
         }
         return parts.joined(separator: ", ")

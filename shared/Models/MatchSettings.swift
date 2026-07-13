@@ -14,19 +14,23 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     public var goldenPointEnabled: Bool
     /// When true, the player must choose who is serving at the start of each new set.
     public var askServeAtSetStart: Bool
+    /// When true, left is always server and right is always receiver; serve does not rotate.
+    public var fixedServerPositions: Bool
 
     public init(
         setsToWin: Int = 2,
         gamesToWinSet: Int = 6,
         mustWinByTwoGames: Bool = true,
         goldenPointEnabled: Bool = true,
-        askServeAtSetStart: Bool = false
+        askServeAtSetStart: Bool = false,
+        fixedServerPositions: Bool = false
     ) {
         self.setsToWin = setsToWin
         self.gamesToWinSet = gamesToWinSet
         self.mustWinByTwoGames = mustWinByTwoGames
         self.goldenPointEnabled = goldenPointEnabled
         self.askServeAtSetStart = askServeAtSetStart
+        self.fixedServerPositions = fixedServerPositions
     }
 
     public static let `default` = MatchSettings()
@@ -37,6 +41,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         case mustWinByTwoGames
         case goldenPointEnabled
         case askServeAtSetStart
+        case fixedServerPositions
         case undoTimeoutSeconds
     }
 
@@ -47,6 +52,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         mustWinByTwoGames = try container.decode(Bool.self, forKey: .mustWinByTwoGames)
         goldenPointEnabled = try container.decode(Bool.self, forKey: .goldenPointEnabled)
         askServeAtSetStart = try container.decodeIfPresent(Bool.self, forKey: .askServeAtSetStart) ?? false
+        fixedServerPositions = try container.decodeIfPresent(Bool.self, forKey: .fixedServerPositions) ?? false
         // Legacy per-match value is ignored; timeout is always `quickUndoTimeoutSeconds`.
         _ = try container.decodeIfPresent(TimeInterval.self, forKey: .undoTimeoutSeconds)
     }
@@ -58,5 +64,6 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         try container.encode(mustWinByTwoGames, forKey: .mustWinByTwoGames)
         try container.encode(goldenPointEnabled, forKey: .goldenPointEnabled)
         try container.encode(askServeAtSetStart, forKey: .askServeAtSetStart)
+        try container.encode(fixedServerPositions, forKey: .fixedServerPositions)
     }
 }
