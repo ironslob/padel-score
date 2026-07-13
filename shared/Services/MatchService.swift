@@ -7,16 +7,19 @@ import os
 public final class MatchService: ObservableObject {
     @Published public private(set) var activeMatch: MatchState?
     @Published public private(set) var archivedMatches: [MatchState] = []
+    @Published public private(set) var isRestored = false
 
     private let engine: ScoringEngine
     private let store: MatchStore
     private let logger = Logger(subsystem: "com.padelscore", category: "MatchService")
     private var syncHandler: ((MatchState?, [MatchState]) -> Void)?
 
-    public init(store: MatchStore, engine: ScoringEngine = ScoringEngine()) {
+    public init(store: MatchStore, engine: ScoringEngine = ScoringEngine(), autoRestore: Bool = true) {
         self.store = store
         self.engine = engine
-        restore()
+        if autoRestore {
+            restore()
+        }
     }
 
     /// Optional callback invoked after every persistence write (used by WatchConnectivity).
@@ -29,12 +32,38 @@ public final class MatchService: ObservableObject {
             activeMatch = try store.loadActiveMatch()
             archivedMatches = try store.loadArchivedMatches().filter { $0.status != .discarded }
             logger.info("Restored active=\(self.activeMatch != nil) archive=\(self.archivedMatches.count)")
-            expireInactiveMatchIfNeeded()
+            finishRestore()
         } catch {
             logger.error("Restore failed: \(error.localizedDescription)")
             activeMatch = nil
             archivedMatches = []
+            isRestored = true
         }
+    }
+
+    public func restore() async {
+        do {
+            let store = self.store
+            let (active, archive) = try await Task.detached(priority: .userInitiated) {
+                let active = try store.loadActiveMatch()
+                let archive = try store.loadArchivedMatches()
+                return (active, archive)
+            }.value
+            activeMatch = active
+            archivedMatches = archive.filter { $0.status != .discarded }
+            logger.info("Restored active=\(self.activeMatch != nil) archive=\(self.archivedMatches.count)")
+            finishRestore()
+        } catch {
+            logger.error("Restore failed: \(error.localizedDescription)")
+            activeMatch = nil
+            archivedMatches = []
+            isRestored = true
+        }
+    }
+
+    private func finishRestore() {
+        isRestored = true
+        expireInactiveMatchIfNeeded()
     }
 
     public func startMatch(settings: MatchSettings = .default) {

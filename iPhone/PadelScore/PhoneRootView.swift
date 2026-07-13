@@ -1,40 +1,23 @@
 import SwiftUI
 
 struct PhoneRootView: View {
+    @EnvironmentObject private var appModel: PhoneAppModel
     @EnvironmentObject private var service: MatchService
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         NavigationStack {
-            List {
-                if let active = service.activeMatch, active.status == .inProgress || active.status.isTerminal {
-                    Section("Active Match") {
-                        NavigationLink {
-                            MatchDetailView(match: active)
-                        } label: {
-                            ActiveMatchRow(match: active)
-                        }
-                    }
-                }
-
-                Section("History") {
-                    if service.archivedMatches.isEmpty {
-                        Text("No completed matches yet.")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        ForEach(service.archivedMatches) { match in
-                            NavigationLink {
-                                MatchDetailView(match: match)
-                            } label: {
-                                MatchHistoryRow(match: match)
-                            }
-                        }
-                    }
+            Group {
+                if service.isRestored {
+                    matchList
+                } else {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
             .navigationTitle("Padel Score")
             .overlay {
-                if service.activeMatch == nil && service.archivedMatches.isEmpty {
+                if service.isRestored, service.activeMatch == nil, service.archivedMatches.isEmpty {
                     ContentUnavailableView(
                         "No Matches Yet",
                         systemImage: "applewatch",
@@ -46,9 +29,42 @@ struct PhoneRootView: View {
                 service.restore()
             }
         }
+        .task {
+            await appModel.bootstrap()
+        }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 service.expireInactiveMatchIfNeeded()
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var matchList: some View {
+        List {
+            if let active = service.activeMatch, active.status == .inProgress || active.status.isTerminal {
+                Section("Active Match") {
+                    NavigationLink {
+                        MatchDetailView(match: active)
+                    } label: {
+                        ActiveMatchRow(match: active)
+                    }
+                }
+            }
+
+            Section("History") {
+                if service.archivedMatches.isEmpty {
+                    Text("No completed matches yet.")
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(service.archivedMatches) { match in
+                        NavigationLink {
+                            MatchDetailView(match: match)
+                        } label: {
+                            MatchHistoryRow(match: match)
+                        }
+                    }
+                }
             }
         }
     }

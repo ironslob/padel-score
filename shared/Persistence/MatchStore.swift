@@ -23,7 +23,7 @@ public final class FileMatchStore: MatchStore {
         self.directory = directory
         self.fileManager = fileManager
         self.encoder = JSONEncoder()
-        self.encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        self.encoder.outputFormatting = [.sortedKeys]
         self.encoder.dateEncodingStrategy = .iso8601
         self.decoder = JSONDecoder()
         self.decoder.dateDecodingStrategy = .iso8601
