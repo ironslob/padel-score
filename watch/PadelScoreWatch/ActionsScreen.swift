@@ -10,6 +10,8 @@ struct ActionsScreen: View {
 
     var body: some View {
         List {
+            MatchPreferenceToggles(match: match)
+
             Button {
                 showDuringPlayHelp = true
             } label: {

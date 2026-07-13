@@ -85,16 +85,27 @@ public final class MatchSessionCoordinator: ObservableObject {
     public func setAlwaysAskServeAtSetStart(_ value: Bool) {
         alwaysAskServeAtSetStart = value
         serveStore.setAlwaysAskServeAtSetStart(value)
+        syncPreferencesToActiveMatch()
     }
 
     public func setFixedServerPositions(_ value: Bool) {
         fixedServerPositions = value
         serveStore.setFixedServerPositions(value)
+        syncPreferencesToActiveMatch()
     }
 
     public func setUsThemLabels(_ value: Bool) {
         usThemLabels = value
         serveStore.setUsThemLabels(value)
+        syncPreferencesToActiveMatch()
+    }
+
+    private func syncPreferencesToActiveMatch() {
+        service.syncActiveMatchPreferences(
+            usThemLabels: usThemLabels,
+            fixedServerPositions: fixedServerPositions,
+            askServeAtSetStart: alwaysAskServeAtSetStart
+        )
     }
 
     public func startMatch(goldenPointEnabled: Bool) async {

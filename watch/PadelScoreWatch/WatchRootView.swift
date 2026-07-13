@@ -328,19 +328,21 @@ struct StartMatchView: View {
             .tint(.green)
             .accessibilityLabel("Start Match")
 
-            Button("Settings") {
-                showSettings = true
-            }
-            .font(.caption)
-            .buttonStyle(.plain)
-            .accessibilityLabel("Settings")
+            HStack(spacing: 8) {
+                Button("Settings") {
+                    showSettings = true
+                }
+                .buttonStyle(.bordered)
+                .frame(maxWidth: .infinity)
+                .accessibilityLabel("Settings")
 
-            Button("During play tips") {
-                showDuringPlayHelp = true
+                Button("Tips") {
+                    showDuringPlayHelp = true
+                }
+                .buttonStyle(.bordered)
+                .frame(maxWidth: .infinity)
+                .accessibilityLabel("Tips")
             }
-            .font(.caption)
-            .buttonStyle(.plain)
-            .accessibilityLabel("During play tips")
         }
     }
 
@@ -417,35 +419,47 @@ struct DuringPlayHelpView: View {
     }
 }
 
-struct SettingsView: View {
+struct MatchPreferenceToggles: View {
     @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
+    var match: MatchState?
+
+    var body: some View {
+        Toggle(
+            "Us / Them labels",
+            isOn: Binding(
+                get: { match?.settings.usThemLabels ?? sessionCoordinator.usThemLabels },
+                set: { sessionCoordinator.setUsThemLabels($0) }
+            )
+        )
+        Toggle(
+            "Server always on the left",
+            isOn: Binding(
+                get: { match?.settings.fixedServerPositions ?? sessionCoordinator.fixedServerPositions },
+                set: { sessionCoordinator.setFixedServerPositions($0) }
+            )
+        )
+        Toggle(
+            "Always ask for serve at the start of a set",
+            isOn: Binding(
+                get: { match?.settings.askServeAtSetStart ?? sessionCoordinator.alwaysAskServeAtSetStart },
+                set: { sessionCoordinator.setAlwaysAskServeAtSetStart($0) }
+            )
+        )
+        .disabled(fixedServerPositionsEnabled)
+    }
+
+    private var fixedServerPositionsEnabled: Bool {
+        match?.settings.fixedServerPositions ?? sessionCoordinator.fixedServerPositions
+    }
+}
+
+struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             List {
-                Toggle(
-                    "Us / Them labels",
-                    isOn: Binding(
-                        get: { sessionCoordinator.usThemLabels },
-                        set: { sessionCoordinator.setUsThemLabels($0) }
-                    )
-                )
-                Toggle(
-                    "Server always on the left",
-                    isOn: Binding(
-                        get: { sessionCoordinator.fixedServerPositions },
-                        set: { sessionCoordinator.setFixedServerPositions($0) }
-                    )
-                )
-                Toggle(
-                    "Always ask for serve at the start of a set",
-                    isOn: Binding(
-                        get: { sessionCoordinator.alwaysAskServeAtSetStart },
-                        set: { sessionCoordinator.setAlwaysAskServeAtSetStart($0) }
-                    )
-                )
-                .disabled(sessionCoordinator.fixedServerPositions)
+                MatchPreferenceToggles()
             }
             .navigationTitle("Settings")
             .toolbar {

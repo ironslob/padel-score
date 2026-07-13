@@ -122,6 +122,20 @@ public final class MatchService: ObservableObject {
         return match.events.contains { $0.kind == .pointWon }
     }
 
+    /// Updates in-match preference toggles without affecting scoring rules chosen at start.
+    public func syncActiveMatchPreferences(
+        usThemLabels: Bool,
+        fixedServerPositions: Bool,
+        askServeAtSetStart: Bool
+    ) {
+        guard var match = activeMatch, match.status == .inProgress else { return }
+        match.settings.usThemLabels = usThemLabels
+        match.settings.fixedServerPositions = fixedServerPositions
+        match.settings.askServeAtSetStart = askServeAtSetStart
+        activeMatch = match
+        persist()
+    }
+
     public func finishMatch() {
         guard var match = activeMatch, match.status == .inProgress else { return }
         do {
