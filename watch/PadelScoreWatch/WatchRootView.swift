@@ -278,56 +278,71 @@ struct SelectServerView: View {
 }
 
 struct StartMatchView: View {
+    @EnvironmentObject private var service: MatchService
     @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
     @State private var isStarting = false
     @State private var showDuringPlayHelp = false
     @State private var showSettings = false
+    @State private var showHistory = false
 
     var body: some View {
-        VStack(spacing: 12) {
-            Text("Padel Score")
-                .font(.headline)
-                .multilineTextAlignment(.center)
+        ScrollView {
+            VStack(spacing: 12) {
+                Text("Padel Score")
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
 
-            Button {
-                Task { await startMatch() }
-            } label: {
-                Group {
-                    if isStarting {
-                        ProgressView()
-                    } else {
-                        Text("Start Match")
+                Button {
+                    Task { await startMatch() }
+                } label: {
+                    Group {
+                        if isStarting {
+                            ProgressView()
+                        } else {
+                            Text("Start Match")
+                        }
                     }
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.green)
-            .disabled(isStarting)
-            .accessibilityLabel("Start Match")
+                .buttonStyle(.borderedProminent)
+                .tint(.green)
+                .disabled(isStarting)
+                .accessibilityLabel("Start Match")
 
-            HStack(spacing: 8) {
-                Button("Settings") {
-                    showSettings = true
+                Button("History") {
+                    showHistory = true
                 }
                 .buttonStyle(.bordered)
                 .frame(maxWidth: .infinity)
-                .accessibilityLabel("Settings")
+                .accessibilityLabel("Match History")
+                .accessibilityHint(historyAccessibilityHint)
 
-                Button("Tips") {
-                    showDuringPlayHelp = true
+                HStack(spacing: 8) {
+                    Button("Settings") {
+                        showSettings = true
+                    }
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityLabel("Settings")
+
+                    Button("Tips") {
+                        showDuringPlayHelp = true
+                    }
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityLabel("Tips")
                 }
-                .buttonStyle(.bordered)
-                .frame(maxWidth: .infinity)
-                .accessibilityLabel("Tips")
             }
+            .padding()
         }
-        .padding()
         .sheet(isPresented: $showDuringPlayHelp) {
             DuringPlayHelpView()
         }
         .sheet(isPresented: $showSettings) {
             SettingsView()
+        }
+        .sheet(isPresented: $showHistory) {
+            WatchMatchHistoryView()
         }
     }
 
@@ -336,6 +351,167 @@ struct StartMatchView: View {
         isStarting = true
         defer { isStarting = false }
         await sessionCoordinator.startMatch()
+    }
+
+    private var historyAccessibilityHint: String {
+        if service.archivedMatches.isEmpty {
+            return "No completed matches yet"
+        }
+        return "\(service.archivedMatches.count) completed matches"
+    }
+}
+
+struct WatchMatchHistoryView: View {
+    @EnvironmentObject private var service: MatchService
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if service.archivedMatches.isEmpty {
+                    VStack(spacing: 8) {
+                        Text("No History")
+                            .font(.headline)
+                        Text("Completed matches will appear here.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
+                } else {
+                    List {
+                        ForEach(service.archivedMatches) { match in
+                            NavigationLink {
+                                WatchMatchHistoryDetailView(match: match)
+                            } label: {
+                                WatchMatchHistoryRow(match: match)
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("History")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+private struct WatchMatchHistoryRow: View {
+    let match: MatchState
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(match.startedAt.formatted(date: .abbreviated, time: .shortened))
+                    .font(.caption.weight(.semibold))
+                Spacer()
+                Text(matchStatusLabel)
+                    .font(.caption2)
+                    .foregroundStyle(statusColor)
+            }
+            Text(scoreSummary)
+                .font(.headline.monospacedDigit())
+            Text(DurationFormatter.detailed(match.duration))
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 2)
+    }
+
+    private var scoreSummary: String {
+        match.finalScoreSummary.isEmpty ? "\(match.leftSetsWon)–\(match.rightSetsWon)" : match.finalScoreSummary
+    }
+
+    private var matchStatusLabel: String {
+        switch match.status {
+        case .completed:
+            if match.winner == .left { return "Won" }
+            if match.winner == .right { return "Lost" }
+            return "Complete"
+        case .endedEarly: return "Ended"
+        case .inProgress: return "Live"
+        case .discarded: return "Discarded"
+        }
+    }
+
+    private var statusColor: Color {
+        switch match.status {
+        case .completed:
+            if match.winner == .left { return .green }
+            if match.winner == .right { return .orange }
+            return .secondary
+        case .endedEarly: return .orange
+        case .inProgress: return .blue
+        case .discarded: return .secondary
+        }
+    }
+}
+
+private struct WatchMatchHistoryDetailView: View {
+    let match: MatchState
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(title)
+                    .font(.headline)
+
+                Text(scoreSummary)
+                    .font(.title3.weight(.semibold).monospacedDigit())
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                labeled("Date", match.startedAt.formatted(date: .abbreviated, time: .shortened))
+                labeled("Duration", DurationFormatter.detailed(match.duration))
+                labeled("Scoring", match.settings.goldenPointEnabled ? "Golden point" : "Advantage")
+                labeled("Format", match.settings.matchSetFormat.label)
+
+                if !match.completedSets.isEmpty {
+                    Text("Sets")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    ForEach(Array(match.completedSets.enumerated()), id: \.offset) { index, set in
+                        Text("Set \(index + 1): \(set.leftGames)–\(set.rightGames)")
+                            .font(.caption.monospacedDigit())
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 4)
+        }
+        .navigationTitle("Match")
+    }
+
+    private var title: String {
+        switch match.status {
+        case .completed:
+            if match.winner == .left { return "Won" }
+            if match.winner == .right { return "Lost" }
+            return "Complete"
+        case .endedEarly:
+            return "Ended Early"
+        default:
+            return match.status.displayName
+        }
+    }
+
+    private var scoreSummary: String {
+        match.finalScoreSummary.isEmpty ? "\(match.leftSetsWon)–\(match.rightSetsWon)" : match.finalScoreSummary
+    }
+
+    private func labeled(_ title: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.caption.weight(.semibold))
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title) \(value)")
     }
 }
 
