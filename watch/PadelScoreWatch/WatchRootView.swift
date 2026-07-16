@@ -281,7 +281,6 @@ struct StartMatchView: View {
     @EnvironmentObject private var service: MatchService
     @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
     @State private var isStarting = false
-    @State private var showDuringPlayHelp = false
     @State private var showSettings = false
     @State private var showHistory = false
 
@@ -309,14 +308,6 @@ struct StartMatchView: View {
                 .disabled(isStarting)
                 .accessibilityLabel("Start Match")
 
-                Button("History") {
-                    showHistory = true
-                }
-                .buttonStyle(.bordered)
-                .frame(maxWidth: .infinity)
-                .accessibilityLabel("Match History")
-                .accessibilityHint(historyAccessibilityHint)
-
                 HStack(spacing: 8) {
                     Button("Settings") {
                         showSettings = true
@@ -325,18 +316,16 @@ struct StartMatchView: View {
                     .frame(maxWidth: .infinity)
                     .accessibilityLabel("Settings")
 
-                    Button("Tips") {
-                        showDuringPlayHelp = true
+                    Button("History") {
+                        showHistory = true
                     }
                     .buttonStyle(.bordered)
                     .frame(maxWidth: .infinity)
-                    .accessibilityLabel("Tips")
+                    .accessibilityLabel("Match History")
+                    .accessibilityHint(historyAccessibilityHint)
                 }
             }
             .padding()
-        }
-        .sheet(isPresented: $showDuringPlayHelp) {
-            DuringPlayHelpView()
         }
         .sheet(isPresented: $showSettings) {
             SettingsView()
@@ -646,10 +635,16 @@ private struct PreferenceToggleRow: View {
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @State private var showDuringPlayHelp = false
 
     var body: some View {
         NavigationStack {
             List {
+                Button("Tips") {
+                    showDuringPlayHelp = true
+                }
+                .accessibilityLabel("Tips")
+
                 MatchPreferenceToggles(showsHelperText: true)
             }
             .navigationTitle("Settings")
@@ -657,6 +652,9 @@ struct SettingsView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
                 }
+            }
+            .sheet(isPresented: $showDuringPlayHelp) {
+                DuringPlayHelpView()
             }
         }
     }
