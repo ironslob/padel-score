@@ -1,0 +1,53 @@
+---
+description: Ensure new features are designed and implemented for both Apple Watch and Garmin
+alwaysApply: true
+---
+
+# Dual-platform watch apps
+
+Padel Score ships on **two watch platforms**:
+
+| Platform | Path | Stack |
+|----------|------|-------|
+| Apple Watch | `watch/`, `shared/` | Swift, SwiftUI, WatchConnectivity |
+| Garmin | `garmin/` | Monkey C, Connect IQ |
+
+The **iPhone app** (`iPhone/`) is an Apple companion only — not a third primary target.
+
+## When adding or changing a feature
+
+Before finishing work, answer:
+
+1. **Does this belong in shared domain logic?** (scoring rules, match lifecycle, persistence shape, product behaviour)
+   - If yes: update **both** `shared/` (Swift) and `garmin/source/` (Monkey C), and extend tests in `tests/Unit/` and `garmin/source/ScoringEngineTests.mc`.
+2. **Is this watch UX?** Implement on both platforms where APIs allow, or document a deliberate gap.
+3. **Is this Apple-only?** (HealthKit, complications, Live Activities, WatchConnectivity) — note the Garmin equivalent or mark as deferred in `docs/DECISIONS.md`.
+4. **Is this Garmin-only?** (Connect IQ widgets, FIT recording, BLE via Garmin Connect Mobile) — note the Apple equivalent or mark as deferred.
+
+## Scoring parity (non-negotiable)
+
+Scoring behaviour must stay identical across platforms:
+
+- Swift source of truth: `shared/Scoring/ScoringEngine.swift`, `shared/Models/`
+- Garmin port: `garmin/source/ScoringEngine.mc`, `garmin/source/Models.mc`
+- Spec reference: `spec/product.md`
+
+When changing scoring rules, update both engines and add/adjust tests on both sides.
+
+## Platform mapping
+
+| Concern | Apple | Garmin |
+|---------|-------|--------|
+| Scoring engine | `shared/Scoring/` | `garmin/source/ScoringEngine.mc` |
+| Match service | `shared/Services/MatchService.swift` | `garmin/source/MatchService.mc` |
+| Persistence | `shared/Persistence/` | `garmin/source/MatchStore.mc` |
+| Watch UI | `watch/PadelScoreWatch/` | `garmin/source/*View.mc` |
+| Glance / complication | `watch/PadelScoreComplications/` | `garmin/` widget (not yet built) |
+| Phone sync | `shared/Sync/` | Connect IQ Mobile SDK (not yet built) |
+| Workout tracking | HealthKit | FIT / activity APIs (not yet built) |
+
+## If parity isn't feasible now
+
+- Ship on one platform only when blocked by missing APIs or scope.
+- Record the gap in `docs/DECISIONS.md` with platform, reason, and follow-up.
+- Do not silently diverge product behaviour between platforms.

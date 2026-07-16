@@ -111,6 +111,17 @@ To pair a Watch simulator with an iPhone simulator: in Xcode, Window → Devices
 
 Scoring works offline on the Watch alone. When the phone is reachable, WatchConnectivity pushes the active match and history to the iPhone companion.
 
+## CI
+
+Separate GitHub Actions workflows (path-filtered so each platform only builds when relevant):
+
+| Workflow | Path | What it checks |
+|----------|------|----------------|
+| [Apple](.github/workflows/apple.yml) | `watch/`, `iPhone/`, `shared/`, `tests/` | Unit tests, Watch + iPhone compile (unsigned) |
+| [Garmin](.github/workflows/garmin.yml) | `garmin/` | Connect IQ compile for touchscreen devices + Monkey C tests |
+
+Neither workflow requires secrets for compile checks. For a stable Garmin signing key in CI, set `GARMIN_DEVELOPER_KEY_BASE64` (see [`garmin/README.md`](garmin/README.md)).
+
 ## Project layout
 
 ```text
@@ -118,8 +129,10 @@ spec/           Product, architecture, implementation, infrastructure specs
 shared/         Scoring engine, models, persistence, services, sync
 watch/          Watch SwiftUI app
 iPhone/         iPhone companion SwiftUI app
+garmin/         Garmin Connect IQ watch app (Monkey C)
 tests/Unit/     Scoring + persistence unit tests
 docs/           Decision log
+.github/        CI workflows (Apple + Garmin)
 project.yml     XcodeGen manifest
 PadelScore.xcodeproj
 ```

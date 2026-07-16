@@ -1,0 +1,8 @@
+# Ignore Connect IQ build outputs and local signing keys
+bin/
+internal/
+*.prg
+*.iq
+*.mir
+developer_key.der
+developer_key.pem

@@ -1,0 +1,84 @@
+# Garmin Connect IQ CI — compile (+ optional unit tests) for touchscreen targets.
+# No repo secrets required for compile checks (ephemeral developer key).
+# Optional: set GARMIN_DEVELOPER_KEY_BASE64 to reuse a stable signing key.
+
+name: Garmin
+
+on:
+  push:
+    paths:
+      - "garmin/**"
+      - ".github/workflows/garmin.yml"
+  pull_request:
+    paths:
+      - "garmin/**"
+      - ".github/workflows/garmin.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: garmin-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (${{ matrix.device }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Primary touchscreen targets from garmin/manifest.xml
+        device: [venu3, venu3s, fr965, fr265, vivoactive5]
+    container:
+      image: ghcr.io/matco/connectiq-tester:latest
+      options: --entrypoint ""
+    defaults:
+      run:
+        working-directory: garmin
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Developer key
+        env:
+          GARMIN_DEVELOPER_KEY_BASE64: ${{ secrets.GARMIN_DEVELOPER_KEY_BASE64 }}
+        run: |
+          if [ -n "${GARMIN_DEVELOPER_KEY_BASE64:-}" ]; then
+            echo "$GARMIN_DEVELOPER_KEY_BASE64" | base64 -d > developer_key.der
+            echo "Using GARMIN_DEVELOPER_KEY_BASE64 secret"
+          else
+            openssl genrsa -out developer_key.pem 4096
+            openssl pkcs8 -topk8 -inform PEM -outform DER \
+              -in developer_key.pem -out developer_key.der -nocrypt
+            echo "Generated ephemeral developer key (compile-only)"
+          fi
+
+      - name: Compile
+        run: |
+          mkdir -p bin
+          monkeyc \
+            -f monkey.jungle \
+            -o "bin/PadelScore-${{ matrix.device }}.prg" \
+            -y developer_key.der \
+            -d "${{ matrix.device }}" \
+            -w
+
+      - name: Upload .prg
+        uses: actions/upload-artifact@v4
+        with:
+          name: padel-score-${{ matrix.device }}
+          path: garmin/bin/PadelScore-${{ matrix.device }}.prg
+          if-no-files-found: error
+
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Connect IQ tests
+        uses: matco/action-connectiq-tester@v1
+        with:
+          path: garmin
+          device: venu3

@@ -1,0 +1,173 @@
+# Apple Watch / iOS CI — build and unit tests (no signing required).
+# Optional: enable in repo Settings → Actions if disabled.
+
+name: Apple
+
+on:
+  push:
+    paths:
+      - "watch/**"
+      - "iPhone/**"
+      - "shared/**"
+      - "tests/**"
+      - "project.yml"
+      - "Config/**"
+      - "PadelScore.xcodeproj/**"
+      - ".github/workflows/apple.yml"
+  pull_request:
+    paths:
+      - "watch/**"
+      - "iPhone/**"
+      - "shared/**"
+      - "tests/**"
+      - "project.yml"
+      - "Config/**"
+      - "PadelScore.xcodeproj/**"
+      - ".github/workflows/apple.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: apple-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Unit tests
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          # Prefer a recent Xcode; fall back to the runner default.
+          if [ -d "/Applications/Xcode_16.4.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.4.app
+          elif [ -d "/Applications/Xcode_16.3.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.3.app
+          fi
+          xcodebuild -version
+
+      - name: Install tools
+        run: brew install xcodegen xcbeautify
+
+      - name: Stub Signing.xcconfig
+        run: cp Config/Signing.xcconfig.example Config/Signing.xcconfig
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Resolve iPhone simulator destination
+        id: ios_dest
+        run: |
+          NAME=$(
+            xcrun simctl list devices available \
+              | grep -E 'iPhone (1[6-7]|SE)' \
+              | head -1 \
+              | sed -E 's/.*iPhone/iPhone/; s/ \([A-F0-9-]+\).*//' \
+              | xargs
+          )
+          if [ -z "$NAME" ]; then
+            NAME=$(
+              xcrun simctl list devices available \
+                | grep iPhone \
+                | head -1 \
+                | sed -E 's/.*iPhone/iPhone/; s/ \([A-F0-9-]+\).*//' \
+                | xargs
+            )
+          fi
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "Using simulator: $NAME"
+
+      - name: Run PadelScoreTests
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -scheme PadelScoreTests \
+            -destination "platform=iOS Simulator,name=${{ steps.ios_dest.outputs.name }}" \
+            CODE_SIGNING_ALLOWED=NO \
+            test \
+            | xcbeautify --quieter
+
+  build-watch:
+    name: Build Watch
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          if [ -d "/Applications/Xcode_16.4.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.4.app
+          elif [ -d "/Applications/Xcode_16.3.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.3.app
+          fi
+          xcodebuild -version
+
+      - name: Install tools
+        run: brew install xcodegen xcbeautify
+
+      - name: Stub Signing.xcconfig
+        run: cp Config/Signing.xcconfig.example Config/Signing.xcconfig
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build Watch (simulator SDK)
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -scheme PadelScoreWatch \
+            -destination 'generic/platform=watchOS Simulator' \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            build \
+            | xcbeautify --quieter
+
+      - name: Build Watch (device SDK)
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -scheme PadelScoreWatch \
+            -sdk watchos \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            build \
+            | xcbeautify --quieter
+
+  build-iphone:
+    name: Build iPhone
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          if [ -d "/Applications/Xcode_16.4.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.4.app
+          elif [ -d "/Applications/Xcode_16.3.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.3.app
+          fi
+          xcodebuild -version
+
+      - name: Install tools
+        run: brew install xcodegen xcbeautify
+
+      - name: Stub Signing.xcconfig
+        run: cp Config/Signing.xcconfig.example Config/Signing.xcconfig
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build iPhone (simulator SDK)
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -scheme PadelScore \
+            -destination 'generic/platform=iOS Simulator' \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            build \
+            | xcbeautify --quieter

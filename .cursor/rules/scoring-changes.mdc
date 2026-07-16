@@ -1,0 +1,25 @@
+---
+description: Scoring and match-domain changes must stay in sync across Swift and Monkey C
+globs: shared/Scoring/**,shared/Models/**,shared/Services/MatchService.swift,garmin/source/ScoringEngine.mc,garmin/source/Models.mc,garmin/source/MatchService.mc,tests/Unit/ScoringEngineTests.swift,garmin/source/ScoringEngineTests.mc,spec/product.md
+alwaysApply: false
+---
+
+# Scoring & match domain changes
+
+These files define behaviour that **must match** on Apple Watch and Garmin.
+
+## Required steps for any change
+
+1. Read `spec/product.md` for intended behaviour.
+2. Implement in `shared/Scoring/ScoringEngine.swift` (and related models/services).
+3. Mirror the same logic in `garmin/source/ScoringEngine.mc` and `garmin/source/Models.mc`.
+4. Add or update tests:
+   - `tests/Unit/ScoringEngineTests.swift`
+   - `garmin/source/ScoringEngineTests.mc`
+5. Call out any intentional platform difference in `docs/DECISIONS.md`.
+
+## Design constraints
+
+- Keep the scoring engine pure — no UI, persistence, or networking inside it.
+- Event-sourced model: `MatchEvent` stream is authoritative; derived state comes from replay.
+- Prefer fixing divergence by aligning implementations, not by documenting drift.
