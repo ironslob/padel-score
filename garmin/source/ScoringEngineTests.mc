@@ -140,3 +140,39 @@ function testFinalScoreSummaryFinishMidSetAfterCompletedSet(logger as Logger) as
     Test.assert(state.displaysIncompleteSet());
     return true;
 }
+
+(:test)
+function testScoreScreenSidesSwapWhenServeRotates(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var settings = new MatchSettings();
+    var state = engine.startMatch(settings, "test-7", 0);
+    state = engine.applySelectServer(state, Side.LEFT, 1);
+    Test.assertEqual(Side.LEFT, state.scoreScreenSides()[0]);
+    Test.assertEqual("Us", state.servingRoleLabels()[0]);
+    Test.assertEqual("Them", state.servingRoleLabels()[1]);
+
+    for (var p = 0; p < 4; p += 1) {
+        state = engine.applyPointWon(state, Side.LEFT, 10 + p);
+    }
+    Test.assertEqual(Side.RIGHT, state.currentServer);
+    Test.assertEqual(Side.RIGHT, state.scoreScreenSides()[0]);
+    Test.assertEqual("Them", state.servingRoleLabels()[0]);
+    Test.assertEqual("Us", state.servingRoleLabels()[1]);
+    Test.assertEqual(Side.RIGHT, state.logicalSideForVisual(Side.LEFT));
+    return true;
+}
+
+(:test)
+function testFixedServerPositionsKeepsServer(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var settings = new MatchSettings();
+    settings.fixedServerPositions = true;
+    var state = engine.startMatch(settings, "test-8", 0);
+    state = engine.applySelectServer(state, Side.LEFT, 1);
+    for (var p = 0; p < 4; p += 1) {
+        state = engine.applyPointWon(state, Side.LEFT, 10 + p);
+    }
+    Test.assertEqual(Side.LEFT, state.currentServer);
+    Test.assertEqual(Side.LEFT, state.scoreScreenSides()[0]);
+    return true;
+}

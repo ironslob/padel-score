@@ -43,9 +43,10 @@ class MatchPagerView extends WatchUi.View {
     private function drawScorePage(dc as Dc, match as MatchState) as Void {
         var width = dc.getWidth();
         var height = dc.getHeight();
-        var game = match.currentGame.displayPair();
-        var games = match.currentSet.displayPair();
+        var game = match.scoreScreenGameDisplay();
+        var games = match.scoreScreenSetDisplay();
         var roles = match.servingRoleLabels();
+        var sides = match.scoreScreenSides();
 
         if (match.currentGame.isTieBreak) {
             dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
@@ -68,11 +69,12 @@ class MatchPagerView extends WatchUi.View {
         var buttonH = height / 2 - 30;
         var buttonW = width / 2 - 10;
 
-        var leftServing = match.currentServer == Side.LEFT;
-        var rightServing = match.currentServer == Side.RIGHT;
+        var leftColor = sides[0] == Side.LEFT ? UiHelpers.COLOR_LEFT : UiHelpers.COLOR_RIGHT;
+        var rightColor = sides[1] == Side.LEFT ? UiHelpers.COLOR_LEFT : UiHelpers.COLOR_RIGHT;
+        var leftServing = match.currentServer != null;
 
-        drawScoreButton(dc, game[0], roles[0], 6, buttonY, buttonW, buttonH, UiHelpers.COLOR_LEFT, leftServing);
-        drawScoreButton(dc, game[1], roles[1], width / 2 + 4, buttonY, buttonW, buttonH, UiHelpers.COLOR_RIGHT, rightServing);
+        drawScoreButton(dc, game[0], roles[0], 6, buttonY, buttonW, buttonH, leftColor, leftServing);
+        drawScoreButton(dc, game[1], roles[1], width / 2 + 4, buttonY, buttonW, buttonH, rightColor, false);
     }
 
     private function drawScoreButton(dc as Dc, score as String, role as String, x as Number, y as Number, w as Number, h as Number, color as Number, isServing as Boolean) as Void {
@@ -172,7 +174,8 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
             return false;
         }
 
-        var side = x < width / 2 ? Side.LEFT : Side.RIGHT;
+        var visual = x < width / 2 ? Side.LEFT : Side.RIGHT;
+        var side = match.logicalSideForVisual(visual);
         var now = Time.now().value();
 
         if (undoSide == side && undoStartedAt != null && (now - undoStartedAt) < MatchSettings.QUICK_UNDO_TIMEOUT_MS) {

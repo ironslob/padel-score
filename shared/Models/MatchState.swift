@@ -249,15 +249,52 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         (String(leftSetsWon), String(rightSetsWon))
     }
 
-    /// Role labels for the score screen (left / right).
+    /// Logical sides mapped onto score-screen positions (serving always visual left).
+    public var scoreScreenSides: (left: Side, right: Side) {
+        switch currentServer {
+        case .right: return (.right, .left)
+        case .left, .none: return (.left, .right)
+        }
+    }
+
+    /// Game point labels oriented for the score screen.
+    public var scoreScreenGameDisplay: (left: String, right: String) {
+        remapForScoreScreen(currentGame.displayPair)
+    }
+
+    /// Set games labels oriented for the score screen.
+    public var scoreScreenSetDisplay: (left: String, right: String) {
+        remapForScoreScreen(currentSet.displayPair)
+    }
+
+    /// Role labels for the score screen (visual left / right; serving always left).
     public var servingRoleLabels: (left: String, right: String) {
         if settings.usThemLabels {
-            return ("Us", "Them")
+            let sides = scoreScreenSides
+            return (sides.left.displayName, sides.right.displayName)
         }
         switch currentServer {
-        case .left: return ("Serving", "Receiving")
-        case .right: return ("Receiving", "Serving")
         case .none: return ("", "")
+        default: return ("Serving", "Receiving")
+        }
+    }
+
+    /// Maps a visual score-button side to the logical scoring side.
+    public func logicalSide(forVisual visual: Side) -> Side {
+        let sides = scoreScreenSides
+        return visual == .left ? sides.left : sides.right
+    }
+
+    /// Maps a logical scoring side to the visual score-button side.
+    public func visualSide(forLogical logical: Side) -> Side {
+        let sides = scoreScreenSides
+        return sides.left == logical ? .left : .right
+    }
+
+    private func remapForScoreScreen(_ pair: (left: String, right: String)) -> (left: String, right: String) {
+        switch currentServer {
+        case .right: return (pair.right, pair.left)
+        case .left, .none: return pair
         }
     }
 

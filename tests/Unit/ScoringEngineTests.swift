@@ -228,18 +228,22 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertNil(s.currentServer)
     }
 
-    func testUsThemLabelsShowFixedTeamLabels() throws {
+    func testUsThemLabelsFollowServeOrientation() throws {
         var s = start()
         XCTAssertEqual(s.servingRoleLabels.left, "Us")
         XCTAssertEqual(s.servingRoleLabels.right, "Them")
+        XCTAssertEqual(s.scoreScreenSides.left, .left)
+        XCTAssertEqual(s.scoreScreenSides.right, .right)
 
         s = try winGame(for: .right, from: s)
         XCTAssertEqual(s.currentServer, .right)
-        XCTAssertEqual(s.servingRoleLabels.left, "Us")
-        XCTAssertEqual(s.servingRoleLabels.right, "Them")
+        XCTAssertEqual(s.servingRoleLabels.left, "Them")
+        XCTAssertEqual(s.servingRoleLabels.right, "Us")
+        XCTAssertEqual(s.scoreScreenSides.left, .right)
+        XCTAssertEqual(s.scoreScreenSides.right, .left)
     }
 
-    func testServingRoleLabelsSwapWhenUsThemLabelsDisabled() throws {
+    func testServingRoleLabelsStayServingLeftWhenUsThemLabelsDisabled() throws {
         var settings = MatchSettings.default
         settings.usThemLabels = false
         var s = start(settings: settings)
@@ -247,8 +251,32 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.servingRoleLabels.right, "Receiving")
 
         s = try winGame(for: .right, from: s)
-        XCTAssertEqual(s.servingRoleLabels.left, "Receiving")
-        XCTAssertEqual(s.servingRoleLabels.right, "Serving")
+        XCTAssertEqual(s.currentServer, .right)
+        XCTAssertEqual(s.servingRoleLabels.left, "Serving")
+        XCTAssertEqual(s.servingRoleLabels.right, "Receiving")
+    }
+
+    func testScoreScreenDisplayRemapsWhenRightServes() throws {
+        var s = start()
+        s = try point(.left, s)
+        s = try point(.left, s)
+        s = try point(.right, s)
+        XCTAssertEqual(s.scoreScreenGameDisplay.left, "30")
+        XCTAssertEqual(s.scoreScreenGameDisplay.right, "15")
+
+        s = try point(.left, s)
+        s = try point(.left, s) // Us wins game; serve rotates to Them
+        XCTAssertEqual(s.currentServer, .right)
+
+        s = try point(.left, s)
+        s = try point(.right, s)
+        s = try point(.right, s)
+        // Logical: Us 15, Them 30 — visual left is Them (serving)
+        XCTAssertEqual(s.scoreScreenGameDisplay.left, "30")
+        XCTAssertEqual(s.scoreScreenGameDisplay.right, "15")
+        XCTAssertEqual(s.logicalSide(forVisual: .left), .right)
+        XCTAssertEqual(s.logicalSide(forVisual: .right), .left)
+        XCTAssertEqual(s.visualSide(forLogical: .right), .left)
     }
 
     func testFixedServerPositionsKeepsChosenServer() throws {
@@ -264,6 +292,7 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.currentServer, .left)
         XCTAssertEqual(s.servingRoleLabels.left, "Serving")
         XCTAssertEqual(s.servingRoleLabels.right, "Receiving")
+        XCTAssertEqual(s.scoreScreenSides.left, .left)
     }
 
     func testFixedServerPositionsKeepsRightServerWhenChosen() throws {
@@ -273,11 +302,14 @@ final class ScoringEngineTests: XCTestCase {
         var s = engine.startMatch(settings: settings)
         s = try engine.apply(.selectServer(.right), to: s)
         XCTAssertEqual(s.currentServer, .right)
-        XCTAssertEqual(s.servingRoleLabels.left, "Receiving")
-        XCTAssertEqual(s.servingRoleLabels.right, "Serving")
+        // Serving always visual left, so labels stay Serving / Receiving
+        XCTAssertEqual(s.servingRoleLabels.left, "Serving")
+        XCTAssertEqual(s.servingRoleLabels.right, "Receiving")
+        XCTAssertEqual(s.scoreScreenSides.left, .right)
         s = try winGame(for: .left, from: s)
         XCTAssertEqual(s.currentServer, .right)
-        XCTAssertEqual(s.servingRoleLabels.right, "Serving")
+        XCTAssertEqual(s.servingRoleLabels.left, "Serving")
+        XCTAssertEqual(s.scoreScreenSides.left, .right)
     }
 
     func testFixedServerPositionsNoTieBreakServeRotation() throws {

@@ -176,6 +176,23 @@ class MatchService {
         Application.Properties.setValue("goldenPointEnabled", enabled);
     }
 
+    // Rotate serve is the user-facing inverse of fixedServerPositions.
+    function getRotateServeEnabled() as Boolean {
+        var value = Application.Properties.getValue("rotateServeEnabled");
+        if (value == null) {
+            return true;
+        }
+        return value as Boolean;
+    }
+
+    function setRotateServeEnabled(enabled as Boolean) as Void {
+        Application.Properties.setValue("rotateServeEnabled", enabled);
+        if (activeMatch != null && activeMatch.status == MatchStatus.IN_PROGRESS) {
+            activeMatch.settings.fixedServerPositions = !enabled;
+            persist();
+        }
+    }
+
     private function finalizeActiveMatch() as Void {
         if (activeMatch == null) {
             return;

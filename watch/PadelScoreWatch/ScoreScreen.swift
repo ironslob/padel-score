@@ -9,11 +9,12 @@ struct ScoreScreen: View {
     @State private var undoStartedAt: Date?
     @State private var undoClearTask: Task<Void, Never>?
 
-    private var game: (left: String, right: String) { match.currentGame.displayPair }
-    private var games: (left: String, right: String) { match.currentSet.displayPair }
+    private var game: (left: String, right: String) { match.scoreScreenGameDisplay }
+    private var games: (left: String, right: String) { match.scoreScreenSetDisplay }
     private var undoTimeout: TimeInterval { MatchSettings.quickUndoTimeoutSeconds }
     private var leftRole: String { match.servingRoleLabels.left }
     private var rightRole: String { match.servingRoleLabels.right }
+    private var scoreSides: (left: Side, right: Side) { match.scoreScreenSides }
 
     var body: some View {
         TimelineView(
@@ -38,18 +39,20 @@ struct ScoreScreen: View {
 
                 HStack(spacing: 8) {
                     scoreButton(
-                        side: .left,
+                        logicalSide: scoreSides.left,
                         score: game.left,
                         role: leftRole,
-                        tint: .blue,
-                        progress: isLuminanceReduced ? 0 : (undoSide == .left ? progress : 0)
+                        tint: teamTint(for: scoreSides.left),
+                        showsServeIndicator: match.currentServer != nil,
+                        progress: isLuminanceReduced ? 0 : (undoSide == scoreSides.left ? progress : 0)
                     )
                     scoreButton(
-                        side: .right,
+                        logicalSide: scoreSides.right,
                         score: game.right,
                         role: rightRole,
-                        tint: .red,
-                        progress: isLuminanceReduced ? 0 : (undoSide == .right ? progress : 0)
+                        tint: teamTint(for: scoreSides.right),
+                        showsServeIndicator: false,
+                        progress: isLuminanceReduced ? 0 : (undoSide == scoreSides.right ? progress : 0)
                     )
                 }
             }
@@ -68,6 +71,10 @@ struct ScoreScreen: View {
                 clearUndoWindow()
             }
         }
+    }
+
+    private func teamTint(for logicalSide: Side) -> Color {
+        logicalSide == .left ? .blue : .red
     }
 
     private var setScoreFont: Font {
@@ -162,14 +169,15 @@ struct ScoreScreen: View {
     }
 
     private func scoreButton(
-        side: Side,
+        logicalSide: Side,
         score: String,
         role: String,
         tint: Color,
+        showsServeIndicator: Bool,
         progress: Double
     ) -> some View {
         Button {
-            handleTap(side)
+            handleTap(logicalSide)
         } label: {
             ZStack {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -198,7 +206,7 @@ struct ScoreScreen: View {
                 }
                 .padding(.vertical, isLuminanceReduced ? 6 : 8)
 
-                if match.currentServer == side {
+                if showsServeIndicator {
                     Image(systemName: "tennisball.fill")
                         .font(.caption2)
                         .foregroundStyle(.yellow)
@@ -211,27 +219,27 @@ struct ScoreScreen: View {
         .buttonStyle(.plain)
         .accessibilityLabel("\(role) \(score)")
         .accessibilityHint(
-            undoSide == side
+            undoSide == logicalSide
                 ? "Double tap again to cancel the last point"
                 : "Awards a point"
         )
     }
 
-    private func handleTap(_ side: Side) {
-        if undoSide == side {
+    private func handleTap(_ logicalSide: Side) {
+        if undoSide == logicalSide {
             service.undoLastPoint()
             clearUndoWindow()
             return
         }
 
         let previousMatch = service.activeMatch
-        service.awardPoint(to: side)
+        service.awardPoint(to: logicalSide)
         let updatedMatch = service.activeMatch
 
         // For points that end a game, we show a dedicated Game interstitial with undo
         // instead of keeping the in-button quick undo active.
         if !didPointEndGame(previous: previousMatch, updated: updatedMatch) {
-            beginUndoWindow(for: side)
+            beginUndoWindow(for: logicalSide)
         } else {
             clearUndoWindow()
         }

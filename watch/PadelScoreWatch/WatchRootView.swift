@@ -564,12 +564,14 @@ struct MatchPreferenceToggles: View {
             )
         )
         PreferenceToggleRow(
-            title: "Don't rotate serve",
+            title: "Rotate serve",
             helper: SettingsCopy.fixedServerPositions,
             showsHelper: showsHelperText,
             isOn: Binding(
-                get: { match?.settings.fixedServerPositions ?? sessionCoordinator.fixedServerPositions },
-                set: { sessionCoordinator.setFixedServerPositions($0) }
+                get: {
+                    !(match?.settings.fixedServerPositions ?? sessionCoordinator.fixedServerPositions)
+                },
+                set: { sessionCoordinator.setFixedServerPositions(!$0) }
             )
         )
         PreferenceToggleRow(

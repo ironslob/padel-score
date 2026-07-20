@@ -18,13 +18,17 @@ class SettingsView extends WatchUi.View {
         UiHelpers.drawHeader(dc, "Settings");
 
         var goldenPoint = service.getGoldenPointEnabled();
-        var label = goldenPoint ? "Golden Point: On" : "Golden Point: Off";
-        var color = goldenPoint ? Graphics.COLOR_GREEN : Graphics.COLOR_DK_GRAY;
+        var goldenLabel = goldenPoint ? "Golden Point: On" : "Golden Point: Off";
+        var goldenColor = goldenPoint ? Graphics.COLOR_GREEN : Graphics.COLOR_DK_GRAY;
+        UiHelpers.drawPrimaryButton(dc, goldenLabel, 16, 40, width - 32, 44, goldenColor);
 
-        UiHelpers.drawPrimaryButton(dc, label, 16, 40, width - 32, 44, color);
+        var rotateServe = service.getRotateServeEnabled();
+        var rotateLabel = rotateServe ? "Rotate Serve: On" : "Rotate Serve: Off";
+        var rotateColor = rotateServe ? Graphics.COLOR_GREEN : Graphics.COLOR_DK_GRAY;
+        UiHelpers.drawPrimaryButton(dc, rotateLabel, 16, 96, width - 32, 44, rotateColor);
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
-        dc.drawText(width / 2, 100, Graphics.FONT_XTINY, "Tap to toggle", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 156, Graphics.FONT_XTINY, "Tap to toggle", Graphics.TEXT_JUSTIFY_CENTER);
         dc.drawText(width / 2, dc.getHeight() - 20, Graphics.FONT_XTINY, "Swipe right to close", Graphics.TEXT_JUSTIFY_CENTER);
     }
 }
@@ -42,6 +46,11 @@ class SettingsDelegate extends WatchUi.BehaviorDelegate {
         var y = coords[1];
         if (y >= 40 && y <= 84) {
             service.setGoldenPointEnabled(!service.getGoldenPointEnabled());
+            WatchUi.requestUpdate();
+            return true;
+        }
+        if (y >= 96 && y <= 140) {
+            service.setRotateServeEnabled(!service.getRotateServeEnabled());
             WatchUi.requestUpdate();
             return true;
         }

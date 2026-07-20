@@ -339,16 +339,11 @@ The serving side is always displayed on the **left**.
 
 The receiving side is always displayed on the **right**.
 
-Version 1 does **not** track serving rotation.
+The application tracks who is serving. After each game (when rotate serve is enabled), serve switches to the other team and the score buttons swap so the new server stays on the left.
 
-The application does not know which team is serving.
+When rotate serve is disabled, the side chosen at match start stays fixed for the whole match.
 
-Instead, the user is expected to mentally map:
-
-- left = serving side
-- right = receiving side
-
-This keeps score presentation consistent without introducing serving logic.
+Default labels are Us / Them (following the logical teams as they move). Serving / Receiving labels are available as an alternative and always read left = Serving, right = Receiving.
 
 ---
 

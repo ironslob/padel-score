@@ -49,6 +49,7 @@ class StartDelegate extends WatchUi.BehaviorDelegate {
         if (x >= width / 2 - 80 && x <= width / 2 + 80 && y >= height / 2 && y <= height / 2 + 50) {
             var settings = new MatchSettings();
             settings.goldenPointEnabled = service.getGoldenPointEnabled();
+            settings.fixedServerPositions = !service.getRotateServeEnabled();
             service.startMatch(settings);
             WatchUi.popView(WatchUi.SLIDE_LEFT);
             WatchUi.pushView(new SelectServerView(service), new SelectServerDelegate(service), WatchUi.SLIDE_LEFT);

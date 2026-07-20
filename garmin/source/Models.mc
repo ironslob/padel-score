@@ -283,16 +283,48 @@ class MatchState {
         return [leftSetsWon.toString(), rightSetsWon.toString()] as Array<String>;
     }
 
+    // Logical sides mapped onto score-screen positions (serving always visual left).
+    function scoreScreenSides() as Array<Side> {
+        if (currentServer == Side.RIGHT) {
+            return [Side.RIGHT, Side.LEFT] as Array<Side>;
+        }
+        return [Side.LEFT, Side.RIGHT] as Array<Side>;
+    }
+
+    function scoreScreenGameDisplay() as Array<String> {
+        return remapForScoreScreen(currentGame.displayPair());
+    }
+
+    function scoreScreenSetDisplay() as Array<String> {
+        return remapForScoreScreen(currentSet.displayPair());
+    }
+
     function servingRoleLabels() as Array<String> {
         if (settings.usThemLabels) {
-            return ["Us", "Them"] as Array<String>;
+            var sides = scoreScreenSides();
+            return [sideDisplayName(sides[0]), sideDisplayName(sides[1])] as Array<String>;
         }
-        if (currentServer == Side.LEFT) {
-            return ["Serving", "Receiving"] as Array<String>;
-        } else if (currentServer == Side.RIGHT) {
-            return ["Receiving", "Serving"] as Array<String>;
+        if (currentServer == null) {
+            return ["", ""] as Array<String>;
         }
-        return ["", ""] as Array<String>;
+        return ["Serving", "Receiving"] as Array<String>;
+    }
+
+    function logicalSideForVisual(visual as Side) as Side {
+        var sides = scoreScreenSides();
+        return visual == Side.LEFT ? sides[0] : sides[1];
+    }
+
+    function visualSideForLogical(logical as Side) as Side {
+        var sides = scoreScreenSides();
+        return sides[0] == logical ? Side.LEFT : Side.RIGHT;
+    }
+
+    private function remapForScoreScreen(pair as Array<String>) as Array<String> {
+        if (currentServer == Side.RIGHT) {
+            return [pair[1], pair[0]] as Array<String>;
+        }
+        return pair;
     }
 
     function setScoreLines() as Array<String> {
