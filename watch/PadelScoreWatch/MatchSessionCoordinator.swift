@@ -271,14 +271,15 @@ public final class MatchSessionCoordinator: ObservableObject {
 
 // MARK: - Workout session abstraction
 
+@MainActor
 public protocol WorkoutSessionManaging: AnyObject {
     var isRunning: Bool { get }
     var isPaused: Bool { get }
     var pauseStateHandler: ((Bool) -> Void)? { get set }
-    @MainActor func startWorkout(activityType: HKWorkoutActivityType, metadata: [String: String]) async throws
-    @MainActor func endWorkout(save: Bool) async throws
-    @MainActor func pauseWorkout()
-    @MainActor func resumeWorkout()
+    func startWorkout(activityType: HKWorkoutActivityType, metadata: [String: String]) async throws
+    func endWorkout(save: Bool) async throws
+    func pauseWorkout()
+    func resumeWorkout()
 }
 
 @MainActor
