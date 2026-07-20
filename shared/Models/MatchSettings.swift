@@ -63,7 +63,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         goldenPointEnabled: Bool = true,
         askServeAtSetStart: Bool = false,
         fixedServerPositions: Bool = false,
-        usThemLabels: Bool = false
+        usThemLabels: Bool = true
     ) {
         self.setsToWin = setsToWin
         self.continuousPlay = continuousPlay
@@ -107,7 +107,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         goldenPointEnabled = try container.decode(Bool.self, forKey: .goldenPointEnabled)
         askServeAtSetStart = try container.decodeIfPresent(Bool.self, forKey: .askServeAtSetStart) ?? false
         fixedServerPositions = try container.decodeIfPresent(Bool.self, forKey: .fixedServerPositions) ?? false
-        usThemLabels = try container.decodeIfPresent(Bool.self, forKey: .usThemLabels) ?? false
+        usThemLabels = try container.decodeIfPresent(Bool.self, forKey: .usThemLabels) ?? true
         // Legacy per-match value is ignored; timeout is always `quickUndoTimeoutSeconds`.
         _ = try container.decodeIfPresent(TimeInterval.self, forKey: .undoTimeoutSeconds)
     }

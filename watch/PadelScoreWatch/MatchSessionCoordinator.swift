@@ -37,7 +37,7 @@ public final class MatchSessionCoordinator: ObservableObject {
     @Published public private(set) var workoutTrackingMode: WorkoutTrackingMode = .trackAsWorkout
     @Published public private(set) var alwaysAskServeAtSetStart = false
     @Published public private(set) var fixedServerPositions = false
-    @Published public private(set) var usThemLabels = false
+    @Published public private(set) var usThemLabels = true
     @Published public private(set) var goldenPointEnabled = true
     @Published public private(set) var matchSetFormat: MatchSetFormat = .bestOfThree
     @Published public private(set) var isWorkoutSessionActive = false

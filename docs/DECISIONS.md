@@ -40,6 +40,6 @@ Documented decisions that were not fully prescribed by `/spec`.
 
 ## UI labels
 
-**Choice:** Score buttons show the current game point with smaller "Serving" (left) and "Receiving" (right) captions. Games won in the current set appear above the buttons; set wins are omitted from the score page (available on Overview).
+**Choice:** Score buttons default to "Us" (left) / "Them" (right). Users can switch to "Serving" / "Receiving" in settings. Games won in the current set appear above the buttons; set wins are omitted from the score page (available on Overview).
 
-**Why:** Aligns with product orientation (serving/receiving) without implementing serve tracking in V1, and keeps the live scoring surface minimal.
+**Why:** Matches the product score-screen mockup and keeps team identity stable when serve rotates. Serving/Receiving remains available for players who prefer orientation-by-serve.

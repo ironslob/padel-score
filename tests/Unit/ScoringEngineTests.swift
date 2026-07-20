@@ -229,10 +229,7 @@ final class ScoringEngineTests: XCTestCase {
     }
 
     func testUsThemLabelsShowFixedTeamLabels() throws {
-        var settings = MatchSettings.default
-        settings.usThemLabels = true
-        var s = engine.startMatch(settings: settings)
-        s = try engine.apply(.selectServer(.left), to: s)
+        var s = start()
         XCTAssertEqual(s.servingRoleLabels.left, "Us")
         XCTAssertEqual(s.servingRoleLabels.right, "Them")
 
@@ -243,7 +240,9 @@ final class ScoringEngineTests: XCTestCase {
     }
 
     func testServingRoleLabelsSwapWhenUsThemLabelsDisabled() throws {
-        var s = start()
+        var settings = MatchSettings.default
+        settings.usThemLabels = false
+        var s = start(settings: settings)
         XCTAssertEqual(s.servingRoleLabels.left, "Serving")
         XCTAssertEqual(s.servingRoleLabels.right, "Receiving")
 
@@ -255,6 +254,7 @@ final class ScoringEngineTests: XCTestCase {
     func testFixedServerPositionsKeepsChosenServer() throws {
         var settings = MatchSettings.default
         settings.fixedServerPositions = true
+        settings.usThemLabels = false
         var s = engine.startMatch(settings: settings)
         s = try engine.apply(.selectServer(.left), to: s)
         XCTAssertEqual(s.currentServer, .left)
@@ -269,6 +269,7 @@ final class ScoringEngineTests: XCTestCase {
     func testFixedServerPositionsKeepsRightServerWhenChosen() throws {
         var settings = MatchSettings.default
         settings.fixedServerPositions = true
+        settings.usThemLabels = false
         var s = engine.startMatch(settings: settings)
         s = try engine.apply(.selectServer(.right), to: s)
         XCTAssertEqual(s.currentServer, .right)

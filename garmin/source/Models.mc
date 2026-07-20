@@ -59,7 +59,7 @@ class MatchSettings {
         goldenPointEnabled = true;
         askServeAtSetStart = false;
         fixedServerPositions = false;
-        usThemLabels = false;
+        usThemLabels = true;
     }
 
     function copy() as MatchSettings {

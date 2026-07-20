@@ -89,6 +89,7 @@ public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenc
         self.defaults = defaults
         defaults.register(defaults: [
             goldenPointKey: true,
+            usThemLabelsKey: true,
             matchSetFormatKey: MatchSetFormat.bestOfThree.rawValue,
         ])
     }
