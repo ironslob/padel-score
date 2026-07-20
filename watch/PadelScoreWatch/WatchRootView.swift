@@ -661,8 +661,8 @@ struct SettingsView: View {
 }
 
 private enum ActiveMatchPage: Int, Hashable {
-    case score = 0
-    case overview = 1
+    case overview = 0
+    case score = 1
     case actions = 2
 }
 
@@ -676,10 +676,10 @@ struct ActiveMatchPager: View {
 
     var body: some View {
         TabView(selection: $selectedPage) {
-            ScoreScreen(match: match)
-                .tag(ActiveMatchPage.score)
             MatchOverviewScreen(match: match)
                 .tag(ActiveMatchPage.overview)
+            ScoreScreen(match: match)
+                .tag(ActiveMatchPage.score)
             ActionsScreen(match: match)
                 .tag(ActiveMatchPage.actions)
         }

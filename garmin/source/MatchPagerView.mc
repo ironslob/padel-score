@@ -4,7 +4,7 @@ import Toybox.Lang;
 import Toybox.Timer;
 import Toybox.WatchUi;
 
-// Three-page pager: score (0), overview (1), actions (2).
+// Three-page pager: overview (0), score (1), actions (2).
 class MatchPagerView extends WatchUi.View {
     var service as MatchService;
     var page as Number;
@@ -30,9 +30,9 @@ class MatchPagerView extends WatchUi.View {
         }
 
         if (page == 0) {
-            drawScorePage(dc, match);
-        } else if (page == 1) {
             drawOverviewPage(dc, match);
+        } else if (page == 1) {
+            drawScorePage(dc, match);
         } else {
             drawActionsPage(dc, match);
         }
@@ -157,7 +157,7 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
         var width = System.getDeviceSettings().screenWidth;
         var height = System.getDeviceSettings().screenHeight;
 
-        if (view.page == 0) {
+        if (view.page == 1) {
             return handleScoreTap(x, y, width, height, match);
         } else if (view.page == 2) {
             return handleActionsTap(x, y, width);
