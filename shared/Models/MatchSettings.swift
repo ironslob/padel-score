@@ -51,6 +51,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     /// When true, the player must choose who is serving at the start of each new set.
     public var askServeAtSetStart: Bool
     /// When true, serve does not rotate after games; the side chosen at match start stays fixed.
+    /// Default true (UI "Rotate serve" off).
     public var fixedServerPositions: Bool
     /// When true, score buttons show "Us" / "Them" instead of "Serving" / "Receiving".
     public var usThemLabels: Bool
@@ -62,7 +63,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         mustWinByTwoGames: Bool = true,
         goldenPointEnabled: Bool = true,
         askServeAtSetStart: Bool = false,
-        fixedServerPositions: Bool = false,
+        fixedServerPositions: Bool = true,
         usThemLabels: Bool = true
     ) {
         self.setsToWin = setsToWin
@@ -106,7 +107,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         mustWinByTwoGames = try container.decode(Bool.self, forKey: .mustWinByTwoGames)
         goldenPointEnabled = try container.decode(Bool.self, forKey: .goldenPointEnabled)
         askServeAtSetStart = try container.decodeIfPresent(Bool.self, forKey: .askServeAtSetStart) ?? false
-        fixedServerPositions = try container.decodeIfPresent(Bool.self, forKey: .fixedServerPositions) ?? false
+        fixedServerPositions = try container.decodeIfPresent(Bool.self, forKey: .fixedServerPositions) ?? true
         usThemLabels = try container.decodeIfPresent(Bool.self, forKey: .usThemLabels) ?? true
         // Legacy per-match value is ignored; timeout is always `quickUndoTimeoutSeconds`.
         _ = try container.decodeIfPresent(TimeInterval.self, forKey: .undoTimeoutSeconds)

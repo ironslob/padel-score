@@ -58,7 +58,7 @@ class MatchSettings {
         mustWinByTwoGames = true;
         goldenPointEnabled = true;
         askServeAtSetStart = false;
-        fixedServerPositions = false;
+        fixedServerPositions = true;
         usThemLabels = true;
     }
 

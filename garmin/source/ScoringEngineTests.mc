@@ -145,6 +145,7 @@ function testFinalScoreSummaryFinishMidSetAfterCompletedSet(logger as Logger) as
 function testScoreScreenSidesSwapWhenServeRotates(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
     var settings = new MatchSettings();
+    settings.fixedServerPositions = false;
     var state = engine.startMatch(settings, "test-7", 0);
     state = engine.applySelectServer(state, Side.LEFT, 1);
     Test.assertEqual(Side.LEFT, state.scoreScreenSides()[0]);

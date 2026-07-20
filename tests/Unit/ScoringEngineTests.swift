@@ -4,13 +4,20 @@ import XCTest
 final class ScoringEngineTests: XCTestCase {
     private let engine = ScoringEngine()
 
-    private func start(settings: MatchSettings = .default) -> MatchState {
-        let initial = engine.startMatch(settings: settings)
+    /// Defaults with rotate serve on — most scoring tests assume server flips after games.
+    private var rotatingSettings: MatchSettings {
+        var settings = MatchSettings.default
+        settings.fixedServerPositions = false
+        return settings
+    }
+
+    private func start(settings: MatchSettings? = nil) -> MatchState {
+        let initial = engine.startMatch(settings: settings ?? rotatingSettings)
         return (try? engine.apply(.selectServer(.left), to: initial)) ?? initial
     }
 
-    private func startUnselected() -> MatchState {
-        engine.startMatch()
+    private func startUnselected(settings: MatchSettings? = nil) -> MatchState {
+        engine.startMatch(settings: settings ?? rotatingSettings)
     }
 
     private func point(_ side: Side, _ state: MatchState) throws -> MatchState {
@@ -178,6 +185,7 @@ final class ScoringEngineTests: XCTestCase {
 
     func testSetStartRequiresServerSelectionWhenEnabled() throws {
         var settings = MatchSettings.default
+        settings.fixedServerPositions = false
         settings.askServeAtSetStart = true
         var s = start(settings: settings)
         for _ in 0..<5 {
@@ -245,6 +253,7 @@ final class ScoringEngineTests: XCTestCase {
 
     func testServingRoleLabelsStayServingLeftWhenUsThemLabelsDisabled() throws {
         var settings = MatchSettings.default
+        settings.fixedServerPositions = false
         settings.usThemLabels = false
         var s = start(settings: settings)
         XCTAssertEqual(s.servingRoleLabels.left, "Serving")

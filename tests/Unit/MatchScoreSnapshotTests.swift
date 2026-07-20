@@ -225,14 +225,14 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
         XCTAssertTrue(store.alwaysAskServeAtSetStart)
     }
 
-    func testFixedServerPositionsDefaultsFalseAndPersists() {
+    func testFixedServerPositionsDefaultsTrueAndPersists() {
         let suiteName = "ServeSelectionPreferenceStoreTests.fixed.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         let store = UserDefaultsServeSelectionPreferenceStore(defaults: defaults)
 
-        XCTAssertFalse(store.fixedServerPositions)
-        store.setFixedServerPositions(true)
         XCTAssertTrue(store.fixedServerPositions)
+        store.setFixedServerPositions(false)
+        XCTAssertFalse(store.fixedServerPositions)
     }
 
     func testUsThemLabelsDefaultsTrueAndPersists() {

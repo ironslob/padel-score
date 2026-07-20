@@ -180,7 +180,7 @@ class MatchService {
     function getRotateServeEnabled() as Boolean {
         var value = Application.Properties.getValue("rotateServeEnabled");
         if (value == null) {
-            return true;
+            return false;
         }
         return value as Boolean;
     }
