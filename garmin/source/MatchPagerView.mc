@@ -68,13 +68,20 @@ class MatchPagerView extends WatchUi.View {
         var buttonH = height / 2 - 30;
         var buttonW = width / 2 - 10;
 
-        drawScoreButton(dc, game[0], roles[0], 6, buttonY, buttonW, buttonH, UiHelpers.COLOR_LEFT);
-        drawScoreButton(dc, game[1], roles[1], width / 2 + 4, buttonY, buttonW, buttonH, UiHelpers.COLOR_RIGHT);
+        var leftServing = match.currentServer == Side.LEFT;
+        var rightServing = match.currentServer == Side.RIGHT;
+
+        drawScoreButton(dc, game[0], roles[0], 6, buttonY, buttonW, buttonH, UiHelpers.COLOR_LEFT, leftServing);
+        drawScoreButton(dc, game[1], roles[1], width / 2 + 4, buttonY, buttonW, buttonH, UiHelpers.COLOR_RIGHT, rightServing);
     }
 
-    private function drawScoreButton(dc as Dc, score as String, role as String, x as Number, y as Number, w as Number, h as Number, color as Number) as Void {
+    private function drawScoreButton(dc as Dc, score as String, role as String, x as Number, y as Number, w as Number, h as Number, color as Number, isServing as Boolean) as Void {
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
         dc.fillRoundedRectangle(x, y, w, h, 14);
+        if (isServing) {
+            dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
+            dc.fillCircle(x + w / 2, y + 14, 4);
+        }
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         dc.drawText(x + w / 2, y + h / 2 - 16, Graphics.FONT_NUMBER_HOT, score, Graphics.TEXT_JUSTIFY_CENTER);
         if (role.length() > 0) {

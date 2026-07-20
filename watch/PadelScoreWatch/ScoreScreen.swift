@@ -197,6 +197,14 @@ struct ScoreScreen: View {
                     }
                 }
                 .padding(.vertical, isLuminanceReduced ? 6 : 8)
+
+                if match.currentServer == side {
+                    Image(systemName: "tennisball.fill")
+                        .font(.caption2)
+                        .foregroundStyle(.yellow)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                        .padding(.top, 6)
+                }
             }
             .frame(maxWidth: .infinity, minHeight: isLuminanceReduced ? 64 : 72)
         }
