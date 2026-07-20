@@ -1,6 +1,6 @@
 import Foundation
 
-/// Court orientation: serving side left, receiving side right (product convention).
+/// Logical team side: left = Us, right = Them. Visual layout may remap when swap-sides is on.
 public enum Side: String, Codable, Sendable, CaseIterable, Equatable {
     case left
     case right

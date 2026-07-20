@@ -333,17 +333,16 @@ Pressing either immediately awards a point.
 
 # 12. Score Orientation
 
-To ensure consistency with how scores are announced on court:
+The application always tracks who is serving and rotates serve after each game (and during tie-breaks) per padel rules.
 
-The serving side is always displayed on the **left**.
+The serve indicator (tennis ball) appears on the button for the side that is serving.
 
-The receiving side is always displayed on the **right**.
+**Swap sides each game** (defaults off) controls button layout only:
 
-The application tracks who is serving. The serve indicator stays on the left. When "Swap sides each game" is enabled, the point buttons swap after each game so the serving team stays on the left.
+- **Off:** Us and Them stay where they were chosen at match start. The serve indicator moves to whichever team is serving.
+- **On:** After each game, the point buttons swap so the serving team stays on the **left** (receiving on the right). The serve indicator stays on the left.
 
-Swap sides each game defaults to off: Us and Them stay where they were chosen at match start unless the setting is enabled.
-
-Default labels are Us / Them (following the logical teams as they move). Serving / Receiving labels are available as an alternative and always read left = Serving, right = Receiving.
+Default labels are Us / Them. Serving / Receiving labels are available as an alternative and follow whichever team is serving on each button.
 
 ---
 

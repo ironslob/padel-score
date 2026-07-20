@@ -149,7 +149,7 @@ class GameScore {
         return null;
     }
 
-    function tieBreakNotice(fixedServerPositions as Boolean) as String or Null {
+    function tieBreakNotice() as String or Null {
         if (!isTieBreak) {
             return null;
         }
@@ -160,7 +160,7 @@ class GameScore {
         if (total % 6 == 0) {
             return "Change sides";
         }
-        if (total % 2 == 1 && !fixedServerPositions) {
+        if (total % 2 == 1) {
             return "Change serve";
         }
         return null;
@@ -283,8 +283,13 @@ class MatchState {
         return [leftSetsWon.toString(), rightSetsWon.toString()] as Array<String>;
     }
 
-    // Logical sides mapped onto score-screen positions (serving always visual left).
+    // Logical sides mapped onto score-screen positions.
+    // When swap-sides is on (fixedServerPositions == false), serving team is visual left.
+    // When off, Us/Them stay fixed as logical left/right.
     function scoreScreenSides() as Array<Side> {
+        if (settings.fixedServerPositions) {
+            return [Side.LEFT, Side.RIGHT] as Array<Side>;
+        }
         if (currentServer == Side.RIGHT) {
             return [Side.RIGHT, Side.LEFT] as Array<Side>;
         }
@@ -307,7 +312,10 @@ class MatchState {
         if (currentServer == null) {
             return ["", ""] as Array<String>;
         }
-        return ["Serving", "Receiving"] as Array<String>;
+        var sides = scoreScreenSides();
+        var leftLabel = sides[0] == currentServer ? "Serving" : "Receiving";
+        var rightLabel = sides[1] == currentServer ? "Serving" : "Receiving";
+        return [leftLabel, rightLabel] as Array<String>;
     }
 
     function logicalSideForVisual(visual as Side) as Side {
@@ -321,6 +329,9 @@ class MatchState {
     }
 
     private function remapForScoreScreen(pair as Array<String>) as Array<String> {
+        if (settings.fixedServerPositions) {
+            return pair;
+        }
         if (currentServer == Side.RIGHT) {
             return [pair[1], pair[0]] as Array<String>;
         }

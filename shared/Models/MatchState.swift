@@ -249,8 +249,13 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         (String(leftSetsWon), String(rightSetsWon))
     }
 
-    /// Logical sides mapped onto score-screen positions (serving always visual left).
+    /// Logical sides mapped onto score-screen positions.
+    /// When swap-sides is on (`fixedServerPositions == false`), serving team is visual left.
+    /// When off, Us/Them stay fixed as logical left/right.
     public var scoreScreenSides: (left: Side, right: Side) {
+        if settings.fixedServerPositions {
+            return (.left, .right)
+        }
         switch currentServer {
         case .right: return (.right, .left)
         case .left, .none: return (.left, .right)
@@ -267,16 +272,18 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         remapForScoreScreen(currentSet.displayPair)
     }
 
-    /// Role labels for the score screen (visual left / right; serving always left).
+    /// Role labels for the score screen (visual left / right).
     public var servingRoleLabels: (left: String, right: String) {
         if settings.usThemLabels {
             let sides = scoreScreenSides
             return (sides.left.displayName, sides.right.displayName)
         }
-        switch currentServer {
-        case .none: return ("", "")
-        default: return ("Serving", "Receiving")
-        }
+        guard let server = currentServer else { return ("", "") }
+        let sides = scoreScreenSides
+        return (
+            sides.left == server ? "Serving" : "Receiving",
+            sides.right == server ? "Serving" : "Receiving"
+        )
     }
 
     /// Maps a visual score-button side to the logical scoring side.
@@ -292,17 +299,18 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
     }
 
     private func remapForScoreScreen(_ pair: (left: String, right: String)) -> (left: String, right: String) {
+        if settings.fixedServerPositions {
+            return pair
+        }
         switch currentServer {
         case .right: return (pair.right, pair.left)
         case .left, .none: return pair
         }
     }
 
-    /// Tie-break notice for display, respecting fixed server positions.
+    /// Tie-break notice for display.
     public var activeTieBreakNotice: TieBreakNotice? {
-        guard let notice = currentGame.tieBreakNotice else { return nil }
-        if settings.fixedServerPositions, notice == .changeServe { return nil }
-        return notice
+        currentGame.tieBreakNotice
     }
 
     /// Completed set lines plus the current set while in progress or when a terminal match left it unfinished.

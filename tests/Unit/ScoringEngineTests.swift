@@ -288,55 +288,64 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.visualSide(forLogical: .right), .left)
     }
 
-    func testFixedServerPositionsKeepsChosenServer() throws {
+    func testFixedServerPositionsRotatesServeButKeepsButtonLayout() throws {
         var settings = MatchSettings.default
         settings.fixedServerPositions = true
-        settings.usThemLabels = false
+        settings.usThemLabels = true
         var s = engine.startMatch(settings: settings)
         s = try engine.apply(.selectServer(.left), to: s)
         XCTAssertEqual(s.currentServer, .left)
+        XCTAssertEqual(s.scoreScreenSides.left, .left)
+        XCTAssertEqual(s.servingRoleLabels.left, "Us")
+        XCTAssertEqual(s.servingRoleLabels.right, "Them")
+
         s = try winGame(for: .left, from: s)
-        XCTAssertEqual(s.currentServer, .left)
+        XCTAssertEqual(s.currentServer, .right)
+        XCTAssertEqual(s.scoreScreenSides.left, .left)
+        XCTAssertEqual(s.scoreScreenSides.right, .right)
+        XCTAssertEqual(s.servingRoleLabels.left, "Us")
+        XCTAssertEqual(s.servingRoleLabels.right, "Them")
+
         s = try winGame(for: .right, from: s)
         XCTAssertEqual(s.currentServer, .left)
-        XCTAssertEqual(s.servingRoleLabels.left, "Serving")
-        XCTAssertEqual(s.servingRoleLabels.right, "Receiving")
         XCTAssertEqual(s.scoreScreenSides.left, .left)
     }
 
-    func testFixedServerPositionsKeepsRightServerWhenChosen() throws {
+    func testFixedServerPositionsKeepsLayoutWhenRightServes() throws {
         var settings = MatchSettings.default
         settings.fixedServerPositions = true
         settings.usThemLabels = false
         var s = engine.startMatch(settings: settings)
         s = try engine.apply(.selectServer(.right), to: s)
         XCTAssertEqual(s.currentServer, .right)
-        // Serving always visual left, so labels stay Serving / Receiving
+        XCTAssertEqual(s.scoreScreenSides.left, .left)
+        XCTAssertEqual(s.scoreScreenSides.right, .right)
+        XCTAssertEqual(s.servingRoleLabels.left, "Receiving")
+        XCTAssertEqual(s.servingRoleLabels.right, "Serving")
+
+        s = try winGame(for: .left, from: s)
+        XCTAssertEqual(s.currentServer, .left)
+        XCTAssertEqual(s.scoreScreenSides.left, .left)
         XCTAssertEqual(s.servingRoleLabels.left, "Serving")
         XCTAssertEqual(s.servingRoleLabels.right, "Receiving")
-        XCTAssertEqual(s.scoreScreenSides.left, .right)
-        s = try winGame(for: .left, from: s)
-        XCTAssertEqual(s.currentServer, .right)
-        XCTAssertEqual(s.servingRoleLabels.left, "Serving")
-        XCTAssertEqual(s.scoreScreenSides.left, .right)
     }
 
-    func testFixedServerPositionsNoTieBreakServeRotation() throws {
+    func testFixedServerPositionsStillRotatesServeInTieBreak() throws {
         var settings = MatchSettings.default
         settings.fixedServerPositions = true
         var s = engine.startMatch(settings: settings)
         s = try engine.apply(.selectServer(.left), to: s)
         s = try reachSixSix(from: s)
-        XCTAssertEqual(s.currentServer, .left)
+        XCTAssertEqual(s.currentServer, .right)
         s = try point(.left, s)
         XCTAssertEqual(s.currentServer, .left)
         s = try point(.right, s)
         XCTAssertEqual(s.currentServer, .left)
         s = try point(.left, s)
-        XCTAssertEqual(s.currentServer, .left)
+        XCTAssertEqual(s.currentServer, .right)
     }
 
-    func testFixedServerPositionsIgnoresAskServeAtSetStart() throws {
+    func testAskServeAtSetStartWorksWithFixedServerPositions() throws {
         var settings = MatchSettings.default
         settings.fixedServerPositions = true
         settings.askServeAtSetStart = true
@@ -348,8 +357,8 @@ final class ScoringEngineTests: XCTestCase {
         }
         s = try winGame(for: .left, from: s) // 6-5
         s = try winGame(for: .left, from: s) // 7-5 set
-        XCTAssertFalse(s.needsServerSelection)
-        XCTAssertEqual(s.currentServer, .left)
+        XCTAssertTrue(s.needsServerSelection)
+        XCTAssertNil(s.currentServer)
     }
 
     func testMatchBestOfThree() throws {

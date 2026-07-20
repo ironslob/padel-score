@@ -193,8 +193,7 @@ public struct ScoringEngine: Sendable {
         let myPoints = state.currentGame.points(for: side)
         state.currentGame.setPoints(myPoints + 1, for: side)
 
-        if state.currentGame.tieBreakTotalPoints % 2 == 1,
-           !state.settings.fixedServerPositions {
+        if state.currentGame.tieBreakTotalPoints % 2 == 1 {
             state.currentServer = state.currentServer?.opposite
         }
 
@@ -228,9 +227,7 @@ public struct ScoringEngine: Sendable {
         if isSetWon(by: winner, set: state.currentSet, settings: state.settings) {
             completeSet(winner: winner, in: &state)
         } else {
-            if !state.settings.fixedServerPositions {
-                state.currentServer = state.currentServer?.opposite
-            }
+            state.currentServer = state.currentServer?.opposite
             state.currentGame = .zero
         }
     }
@@ -258,7 +255,7 @@ public struct ScoringEngine: Sendable {
         if state.settings.continuousPlay {
             state.currentSet = .zero
             state.currentGame = .zero
-            if state.settings.askServeAtSetStart, !state.settings.fixedServerPositions {
+            if state.settings.askServeAtSetStart {
                 state.currentServer = nil
                 state.needsServerSelection = true
             }
@@ -275,7 +272,7 @@ public struct ScoringEngine: Sendable {
         } else {
             state.currentSet = .zero
             state.currentGame = .zero
-            if state.settings.askServeAtSetStart, !state.settings.fixedServerPositions {
+            if state.settings.askServeAtSetStart {
                 state.currentServer = nil
                 state.needsServerSelection = true
             }

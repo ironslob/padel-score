@@ -181,7 +181,7 @@ class ScoringEngine {
         var myPoints = state.currentGame.pointsFor(side);
         state.currentGame.setPoints(myPoints + 1, side);
 
-        if (state.currentGame.tieBreakTotalPoints() % 2 == 1 && !state.settings.fixedServerPositions) {
+        if (state.currentGame.tieBreakTotalPoints() % 2 == 1) {
             if (state.currentServer != null) {
                 state.currentServer = oppositeSide(state.currentServer);
             }
@@ -219,7 +219,7 @@ class ScoringEngine {
         if (isSetWon(winner, state.currentSet, state.settings)) {
             completeSet(winner, state);
         } else {
-            if (!state.settings.fixedServerPositions && state.currentServer != null) {
+            if (state.currentServer != null) {
                 state.currentServer = oppositeSide(state.currentServer);
             }
             state.currentGame = new GameScore();
@@ -252,7 +252,7 @@ class ScoringEngine {
         if (state.settings.continuousPlay) {
             state.currentSet = new SetScore();
             state.currentGame = new GameScore();
-            if (state.settings.askServeAtSetStart && !state.settings.fixedServerPositions) {
+            if (state.settings.askServeAtSetStart) {
                 state.currentServer = null;
                 state.needsServerSelection = true;
             }
@@ -269,7 +269,7 @@ class ScoringEngine {
         } else {
             state.currentSet = new SetScore();
             state.currentGame = new GameScore();
-            if (state.settings.askServeAtSetStart && !state.settings.fixedServerPositions) {
+            if (state.settings.askServeAtSetStart) {
                 state.currentServer = null;
                 state.needsServerSelection = true;
             }

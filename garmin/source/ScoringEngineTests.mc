@@ -164,7 +164,7 @@ function testScoreScreenSidesSwapWhenServeRotates(logger as Logger) as Boolean {
 }
 
 (:test)
-function testFixedServerPositionsKeepsServer(logger as Logger) as Boolean {
+function testFixedServerPositionsRotatesServeButKeepsLayout(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
     var settings = new MatchSettings();
     settings.fixedServerPositions = true;
@@ -173,7 +173,10 @@ function testFixedServerPositionsKeepsServer(logger as Logger) as Boolean {
     for (var p = 0; p < 4; p += 1) {
         state = engine.applyPointWon(state, Side.LEFT, 10 + p);
     }
-    Test.assertEqual(Side.LEFT, state.currentServer);
+    Test.assertEqual(Side.RIGHT, state.currentServer);
     Test.assertEqual(Side.LEFT, state.scoreScreenSides()[0]);
+    Test.assertEqual(Side.RIGHT, state.scoreScreenSides()[1]);
+    Test.assertEqual("Us", state.servingRoleLabels()[0]);
+    Test.assertEqual("Them", state.servingRoleLabels()[1]);
     return true;
 }

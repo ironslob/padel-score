@@ -59,7 +59,7 @@ class MatchPagerView extends WatchUi.View {
             dc.drawText(width / 2, 16, Graphics.FONT_SMALL, games[0] + " – " + games[1], Graphics.TEXT_JUSTIFY_CENTER);
         }
 
-        var notice = match.currentGame.tieBreakNotice(match.settings.fixedServerPositions);
+        var notice = match.currentGame.tieBreakNotice();
         if (notice != null) {
             dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
             dc.drawText(width / 2, 32, Graphics.FONT_XTINY, notice, Graphics.TEXT_JUSTIFY_CENTER);
@@ -71,10 +71,11 @@ class MatchPagerView extends WatchUi.View {
 
         var leftColor = sides[0] == Side.LEFT ? UiHelpers.COLOR_LEFT : UiHelpers.COLOR_RIGHT;
         var rightColor = sides[1] == Side.LEFT ? UiHelpers.COLOR_LEFT : UiHelpers.COLOR_RIGHT;
-        var leftServing = match.currentServer != null;
+        var leftServing = match.currentServer != null && match.currentServer == sides[0];
+        var rightServing = match.currentServer != null && match.currentServer == sides[1];
 
         drawScoreButton(dc, game[0], roles[0], 6, buttonY, buttonW, buttonH, leftColor, leftServing);
-        drawScoreButton(dc, game[1], roles[1], width / 2 + 4, buttonY, buttonW, buttonH, rightColor, false);
+        drawScoreButton(dc, game[1], roles[1], width / 2 + 4, buttonY, buttonW, buttonH, rightColor, rightServing);
     }
 
     private function drawScoreButton(dc as Dc, score as String, role as String, x as Number, y as Number, w as Number, h as Number, color as Number, isServing as Boolean) as Void {

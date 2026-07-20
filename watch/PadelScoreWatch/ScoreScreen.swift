@@ -43,7 +43,7 @@ struct ScoreScreen: View {
                         score: game.left,
                         role: leftRole,
                         tint: teamTint(for: scoreSides.left),
-                        showsServeIndicator: match.currentServer != nil,
+                        showsServeIndicator: match.currentServer == scoreSides.left,
                         progress: isLuminanceReduced ? 0 : (undoSide == scoreSides.left ? progress : 0)
                     )
                     scoreButton(
@@ -51,7 +51,7 @@ struct ScoreScreen: View {
                         score: game.right,
                         role: rightRole,
                         tint: teamTint(for: scoreSides.right),
-                        showsServeIndicator: false,
+                        showsServeIndicator: match.currentServer == scoreSides.right,
                         progress: isLuminanceReduced ? 0 : (undoSide == scoreSides.right ? progress : 0)
                     )
                 }

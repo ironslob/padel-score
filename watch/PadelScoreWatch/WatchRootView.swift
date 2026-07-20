@@ -583,11 +583,6 @@ struct MatchPreferenceToggles: View {
                 set: { sessionCoordinator.setAlwaysAskServeAtSetStart($0) }
             )
         )
-        .disabled(fixedServerPositionsEnabled)
-    }
-
-    private var fixedServerPositionsEnabled: Bool {
-        match?.settings.fixedServerPositions ?? sessionCoordinator.fixedServerPositions
     }
 }
 
