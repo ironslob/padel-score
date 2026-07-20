@@ -40,6 +40,6 @@ Documented decisions that were not fully prescribed by `/spec`.
 
 ## UI labels
 
-**Choice:** Score buttons default to "Us" / "Them" labels, oriented so the **serving team is always on the left** (receiving on the right). "Rotate serve" defaults **off**, so the side chosen at match start stays fixed. When enabled, sides swap after each game so Us/Them move with the serve. Users can switch labels to "Serving" / "Receiving" (also always left/right when a server is known). Games won in the current set appear above the buttons; set wins are omitted from the score page (available on Overview).
+**Choice:** Score buttons default to "Us" / "Them" labels, oriented so the **serving team is always on the left** (receiving on the right). The serve ball stays on the left; "Swap sides each game" defaults **off**, so Us/Them stay where they were chosen. When enabled, the point buttons swap after each game so Us/Them follow the server. Users can switch labels to "Serving" / "Receiving" (also always left/right when a server is known). Games won in the current set appear above the buttons; set wins are omitted from the score page (available on Overview).
 
-**Why:** Matches court announcement order (server first) and product score-screen orientation. Fixed serve positions are the simpler default for wrist scoring; rotate serve is opt-in when players want sides to follow the server.
+**Why:** Matches court announcement order (server first) and product score-screen orientation. Fixed button positions are the simpler default for wrist scoring; swapping sides is opt-in when players want Us/Them to follow the server.

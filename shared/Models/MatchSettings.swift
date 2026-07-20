@@ -51,7 +51,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     /// When true, the player must choose who is serving at the start of each new set.
     public var askServeAtSetStart: Bool
     /// When true, serve does not rotate after games; the side chosen at match start stays fixed.
-    /// Default true (UI "Rotate serve" off).
+    /// Default true (UI "Swap sides each game" off).
     public var fixedServerPositions: Bool
     /// When true, score buttons show "Us" / "Them" instead of "Serving" / "Receiving".
     public var usThemLabels: Bool

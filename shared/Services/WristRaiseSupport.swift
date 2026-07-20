@@ -148,7 +148,7 @@ public enum SettingsCopy {
         "Score buttons show Us and Them instead of Serving and Receiving."
 
     public static let fixedServerPositions =
-        "After each game, serve moves to the other side and the score buttons swap."
+        "After each game, Us and Them swap so the serving team stays on the left."
 
     public static let askServeAtSetStart =
         "Choose who serves when each new set begins."

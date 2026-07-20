@@ -339,9 +339,9 @@ The serving side is always displayed on the **left**.
 
 The receiving side is always displayed on the **right**.
 
-The application tracks who is serving. After each game (when rotate serve is enabled), serve switches to the other team and the score buttons swap so the new server stays on the left.
+The application tracks who is serving. The serve indicator stays on the left. When "Swap sides each game" is enabled, the point buttons swap after each game so the serving team stays on the left.
 
-Rotate serve defaults to off: the side chosen at match start stays fixed for the whole match unless the setting is enabled.
+Swap sides each game defaults to off: Us and Them stay where they were chosen at match start unless the setting is enabled.
 
 Default labels are Us / Them (following the logical teams as they move). Serving / Receiving labels are available as an alternative and always read left = Serving, right = Receiving.
 

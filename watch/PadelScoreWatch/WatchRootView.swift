@@ -564,7 +564,7 @@ struct MatchPreferenceToggles: View {
             )
         )
         PreferenceToggleRow(
-            title: "Rotate serve",
+            title: "Swap sides each game",
             helper: SettingsCopy.fixedServerPositions,
             showsHelper: showsHelperText,
             isOn: Binding(

@@ -4,7 +4,7 @@ import XCTest
 final class ScoringEngineTests: XCTestCase {
     private let engine = ScoringEngine()
 
-    /// Defaults with rotate serve on — most scoring tests assume server flips after games.
+    /// Defaults with sides swapping after each game — most scoring tests assume server flips.
     private var rotatingSettings: MatchSettings {
         var settings = MatchSettings.default
         settings.fixedServerPositions = false

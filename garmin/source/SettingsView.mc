@@ -23,7 +23,7 @@ class SettingsView extends WatchUi.View {
         UiHelpers.drawPrimaryButton(dc, goldenLabel, 16, 40, width - 32, 44, goldenColor);
 
         var rotateServe = service.getRotateServeEnabled();
-        var rotateLabel = rotateServe ? "Rotate Serve: On" : "Rotate Serve: Off";
+        var rotateLabel = rotateServe ? "Swap Sides: On" : "Swap Sides: Off";
         var rotateColor = rotateServe ? Graphics.COLOR_GREEN : Graphics.COLOR_DK_GRAY;
         UiHelpers.drawPrimaryButton(dc, rotateLabel, 16, 96, width - 32, 44, rotateColor);
 

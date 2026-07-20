@@ -176,7 +176,7 @@ class MatchService {
         Application.Properties.setValue("goldenPointEnabled", enabled);
     }
 
-    // Rotate serve is the user-facing inverse of fixedServerPositions.
+    // Swap-sides-each-game is the user-facing inverse of fixedServerPositions.
     function getRotateServeEnabled() as Boolean {
         var value = Application.Properties.getValue("rotateServeEnabled");
         if (value == null) {
