@@ -292,7 +292,6 @@ public final class HealthKitWorkoutSessionManager: NSObject, WorkoutSessionManag
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
     private var startContinuation: CheckedContinuation<Void, Error>?
-    private var endContinuation: CheckedContinuation<Void, Error>?
 
     public init(healthStore: HKHealthStore?) {
         self.healthStore = healthStore
@@ -322,7 +321,7 @@ public final class HealthKitWorkoutSessionManager: NSObject, WorkoutSessionManag
             for (key, value) in metadata {
                 hkMetadata[key] = value
             }
-            builder.addMetadata(hkMetadata) { _, _ in }
+            try await builder.addMetadata(hkMetadata)
         }
 
         session.delegate = self
@@ -360,38 +359,19 @@ public final class HealthKitWorkoutSessionManager: NSObject, WorkoutSessionManag
         }
 
         let endDate = Date()
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            self.endContinuation = continuation
-            session.end()
-            builder.endCollection(withEnd: endDate) { _, error in
-                Task { @MainActor in
-                    if let error {
-                        self.endContinuation?.resume(throwing: error)
-                        self.endContinuation = nil
-                        self.cleanup()
-                        return
-                    }
+        session.end()
 
-                    if save {
-                        builder.finishWorkout { _, finishError in
-                            Task { @MainActor in
-                                if let finishError {
-                                    self.endContinuation?.resume(throwing: finishError)
-                                } else {
-                                    self.endContinuation?.resume()
-                                }
-                                self.endContinuation = nil
-                                self.cleanup()
-                            }
-                        }
-                    } else {
-                        builder.discardWorkout()
-                        self.endContinuation?.resume()
-                        self.endContinuation = nil
-                        self.cleanup()
-                    }
-                }
+        do {
+            try await builder.endCollection(at: endDate)
+            if save {
+                _ = try await builder.finishWorkout()
+            } else {
+                builder.discardWorkout()
             }
+            cleanup()
+        } catch {
+            cleanup()
+            throw error
         }
     }
 
@@ -460,8 +440,6 @@ extension HealthKitWorkoutSessionManager: HKWorkoutSessionDelegate {
             }
             startContinuation?.resume(throwing: workoutError)
             startContinuation = nil
-            endContinuation?.resume(throwing: workoutError)
-            endContinuation = nil
             cleanup()
         }
     }
