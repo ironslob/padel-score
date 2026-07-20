@@ -301,7 +301,7 @@ class MatchState {
             var set = completedSets[i];
             lines.add(set.leftGames.toString() + "-" + set.rightGames.toString());
         }
-        if (status == MatchStatus.IN_PROGRESS || status == MatchStatus.ENDED_EARLY) {
+        if (status == MatchStatus.IN_PROGRESS || status == MatchStatus.ENDED_EARLY || status == MatchStatus.COMPLETED) {
             if (!currentSet.isComplete) {
                 lines.add(currentSet.leftGames.toString() + "-" + currentSet.rightGames.toString());
             }
@@ -315,15 +315,28 @@ class MatchState {
             var set = completedSets[i];
             lines.add(set.leftGames.toString() + "-" + set.rightGames.toString());
         }
-        var partial = partialSetLineForEarlyEnd();
+        var partial = partialSetLineForIncompleteTerminal();
         if (partial != null) {
             lines.add(partial);
         }
         return joinLines(lines);
     }
 
-    private function partialSetLineForEarlyEnd() as String or Null {
-        if (status != MatchStatus.ENDED_EARLY || currentSet.isComplete) {
+    function displaysIncompleteSet() as Boolean {
+        if (currentSet.isComplete) {
+            return false;
+        }
+        if (status == MatchStatus.IN_PROGRESS) {
+            return true;
+        }
+        if (status == MatchStatus.COMPLETED || status == MatchStatus.ENDED_EARLY) {
+            return currentSet.leftGames > 0 || currentSet.rightGames > 0 || hasInProgressGameScore();
+        }
+        return false;
+    }
+
+    private function partialSetLineForIncompleteTerminal() as String or Null {
+        if ((status != MatchStatus.ENDED_EARLY && status != MatchStatus.COMPLETED) || currentSet.isComplete) {
             return null;
         }
         if (currentSet.leftGames == 0 && currentSet.rightGames == 0 && !hasInProgressGameScore()) {

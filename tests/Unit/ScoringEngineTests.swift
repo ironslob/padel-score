@@ -603,4 +603,55 @@ final class ScoringEngineTests: XCTestCase {
 
         XCTAssertEqual(s.finalScoreSummary, "")
     }
+
+    func testFinalScoreSummaryFinishMidSetIncludesPartial() throws {
+        var s = start()
+        for _ in 0..<3 {
+            s = try winGame(for: .left, from: s)
+        }
+        for _ in 0..<2 {
+            s = try winGame(for: .right, from: s)
+        }
+        s = try point(.left, s)
+        s = try point(.left, s)
+        s = try point(.left, s)
+        s = try point(.right, s)
+        s = try engine.apply(.finish, to: s)
+
+        XCTAssertEqual(s.status, .completed)
+        XCTAssertEqual(s.finalScoreSummary, "3-2 (40-15)")
+        XCTAssertTrue(s.displaysIncompleteSet)
+        XCTAssertEqual(s.setScoreLines, ["3-2"])
+    }
+
+    func testFinalScoreSummaryFinishMidSetAfterCompletedSet() throws {
+        var s = start()
+        for _ in 0..<6 {
+            s = try winGame(for: .left, from: s)
+        }
+        for _ in 0..<3 {
+            s = try winGame(for: .left, from: s)
+        }
+        for _ in 0..<2 {
+            s = try winGame(for: .right, from: s)
+        }
+        s = try point(.left, s)
+        s = try point(.left, s)
+        s = try point(.right, s)
+        s = try engine.apply(.finish, to: s)
+
+        XCTAssertEqual(s.status, .completed)
+        XCTAssertEqual(s.finalScoreSummary, "6-0, 3-2 (30-15)")
+        XCTAssertTrue(s.displaysIncompleteSet)
+        XCTAssertEqual(s.setScoreLines, ["6-0", "3-2"])
+    }
+
+    func testFinalScoreSummaryFinishWithNoScoreOmitsPartial() throws {
+        var s = start()
+        s = try engine.apply(.finish, to: s)
+
+        XCTAssertEqual(s.status, .completed)
+        XCTAssertEqual(s.finalScoreSummary, "")
+        XCTAssertFalse(s.displaysIncompleteSet)
+    }
 }

@@ -458,12 +458,16 @@ private struct WatchMatchHistoryDetailView: View {
                 labeled("Scoring", match.settings.goldenPointEnabled ? "Golden point" : "Advantage")
                 labeled("Format", match.settings.matchSetFormat.label)
 
-                if !match.completedSets.isEmpty {
+                if !match.completedSets.isEmpty || match.displaysIncompleteSet {
                     Text("Sets")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                     ForEach(Array(match.completedSets.enumerated()), id: \.offset) { index, set in
                         Text("Set \(index + 1): \(set.leftGames)–\(set.rightGames)")
+                            .font(.caption.monospacedDigit())
+                    }
+                    if match.displaysIncompleteSet {
+                        Text("Set \(match.completedSets.count + 1): \(match.currentSet.leftGames)–\(match.currentSet.rightGames)")
                             .font(.caption.monospacedDigit())
                     }
                 }

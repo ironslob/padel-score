@@ -27,8 +27,8 @@ struct MatchDetailView: View {
                     Text("Set \(index + 1): \(set.leftGames)–\(set.rightGames)")
                         .monospacedDigit()
                 }
-                if match.status == .inProgress || match.status == .endedEarly {
-                    Text("Current: \(match.currentSet.leftGames)–\(match.currentSet.rightGames) (Game \(match.currentGame.displayPair.left)–\(match.currentGame.displayPair.right))")
+                if match.displaysIncompleteSet {
+                    Text("\(incompleteSetLabel): \(match.currentSet.leftGames)–\(match.currentSet.rightGames) (Game \(match.currentGame.displayPair.left)–\(match.currentGame.displayPair.right))")
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
                 }
@@ -54,6 +54,10 @@ struct MatchDetailView: View {
     private var scoreText: String {
         let summary = match.finalScoreSummary
         return summary.isEmpty ? "\(match.leftSetsWon)–\(match.rightSetsWon)" : summary
+    }
+
+    private var incompleteSetLabel: String {
+        match.status == .inProgress ? "Current" : "Set \(match.completedSets.count + 1)"
     }
 
     private func eventLabel(_ event: MatchEvent) -> String {

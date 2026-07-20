@@ -268,10 +268,10 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         return notice
     }
 
-    /// Completed set lines plus the current set if the match is still in progress.
+    /// Completed set lines plus the current set while in progress or when a terminal match left it unfinished.
     public var setScoreLines: [String] {
         var lines = completedSets.map { "\($0.leftGames)-\($0.rightGames)" }
-        if status == .inProgress || status == .endedEarly {
+        if status == .inProgress || status == .endedEarly || status == .completed {
             if !currentSet.isComplete {
                 lines.append("\(currentSet.leftGames)-\(currentSet.rightGames)")
             }
@@ -281,15 +281,28 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
 
     public var finalScoreSummary: String {
         var lines = completedSets.map { "\($0.leftGames)-\($0.rightGames)" }
-        if let partialSetLine = partialSetLineForEarlyEnd {
+        if let partialSetLine = partialSetLineForIncompleteTerminal {
             lines.append(partialSetLine)
         }
         return lines.joined(separator: ", ")
     }
 
-    /// Games in the incomplete set when a match ends early, including the in-progress game if any.
-    private var partialSetLineForEarlyEnd: String? {
-        guard status == .endedEarly, !currentSet.isComplete else { return nil }
+    /// Whether set lists should show the unfinished current set (live or after a mid-set end).
+    public var displaysIncompleteSet: Bool {
+        guard !currentSet.isComplete else { return false }
+        switch status {
+        case .inProgress:
+            return true
+        case .completed, .endedEarly:
+            return currentSet.leftGames > 0 || currentSet.rightGames > 0 || hasInProgressGameScore
+        default:
+            return false
+        }
+    }
+
+    /// Games in the incomplete set when a match finishes mid-set, including the in-progress game if any.
+    private var partialSetLineForIncompleteTerminal: String? {
+        guard status == .endedEarly || status == .completed, !currentSet.isComplete else { return nil }
         guard currentSet.leftGames > 0 || currentSet.rightGames > 0 || hasInProgressGameScore else {
             return nil
         }
