@@ -10,14 +10,6 @@ struct ActionsScreen: View {
 
     var body: some View {
         List {
-            MatchPreferenceToggles(match: match)
-
-            Button {
-                showDuringPlayHelp = true
-            } label: {
-                Label("During play tips", systemImage: "questionmark.circle")
-            }
-
             Button {
                 service.undoLastPoint()
             } label: {
@@ -29,6 +21,14 @@ struct ActionsScreen: View {
                 confirmEndMatch = true
             } label: {
                 Label("End Match", systemImage: "flag.checkered")
+            }
+
+            MatchPreferenceToggles(match: match)
+
+            Button {
+                showDuringPlayHelp = true
+            } label: {
+                Label("During play tips", systemImage: "questionmark.circle")
             }
 
             Button(role: .destructive) {
