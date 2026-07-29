@@ -1,6 +1,6 @@
 name: PadelScore
 options:
-  bundleIdPrefix: com.callmematt.padelscore
+  bundleIdPrefix: com.codebrewery.padelscore
   deploymentTarget:
     iOS: "18.0"
     watchOS: "11.0"
@@ -27,7 +27,7 @@ targets:
         excludes:
           - "**/*Tests*"
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.callmematt.padelscore
+      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.padelscore
       GENERATE_INFOPLIST_FILE: YES
       INFOPLIST_KEY_CFBundleDisplayName: Padel Score
       INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
@@ -43,7 +43,7 @@ targets:
       App Groups:
         enabled: true
         groups:
-          - group.com.callmematt.padelscore
+          - group.com.codebrewery.padelscores
     dependencies:
       - target: PadelScoreWatch
         embed: true
@@ -67,7 +67,7 @@ targets:
         excludes:
           - "**/*Tests*"
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.callmematt.padelscore.liveactivity
+      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.padelscore.liveactivity
       GENERATE_INFOPLIST_FILE: NO
       INFOPLIST_FILE: iPhone/PadelScoreLiveActivity/Info.plist
       CODE_SIGN_ENTITLEMENTS: iPhone/PadelScoreLiveActivity/PadelScoreLiveActivity.entitlements
@@ -78,7 +78,7 @@ targets:
       App Groups:
         enabled: true
         groups:
-          - group.com.callmematt.padelscore
+          - group.com.codebrewery.padelscores
     scheme: {}
 
   PadelScoreWatch:
@@ -93,10 +93,10 @@ targets:
         excludes:
           - "**/*Tests*"
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.callmematt.padelscore.watchkitapp
+      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.padelscore.watchkitapp
       GENERATE_INFOPLIST_FILE: YES
       INFOPLIST_KEY_CFBundleDisplayName: Padel Score
-      INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.callmematt.padelscore
+      INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.codebrewery.padelscore
       INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp: YES
       INFOPLIST_KEY_WKSupportsAlwaysOnDisplay: YES
       INFOPLIST_KEY_WKBackgroundModes:
@@ -118,7 +118,7 @@ targets:
       App Groups:
         enabled: true
         groups:
-          - group.com.callmematt.padelscore
+          - group.com.codebrewery.padelscores
       HealthKit:
         enabled: true
     scheme: {}
@@ -137,7 +137,7 @@ targets:
         excludes:
           - "**/*Tests*"
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.callmematt.padelscore.watchkitapp.complications
+      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.padelscore.watchkitapp.complications
       GENERATE_INFOPLIST_FILE: NO
       INFOPLIST_FILE: watch/PadelScoreComplications/Info.plist
       CODE_SIGN_ENTITLEMENTS: watch/PadelScoreComplications/PadelScoreComplications.entitlements
@@ -150,7 +150,7 @@ targets:
       App Groups:
         enabled: true
         groups:
-          - group.com.callmematt.padelscore
+          - group.com.codebrewery.padelscores
     scheme: {}
 
   PadelScoreTests:
@@ -166,7 +166,7 @@ targets:
           - "**/*Tests*"
     settings:
       GENERATE_INFOPLIST_FILE: YES
-      PRODUCT_BUNDLE_IDENTIFIER: com.callmematt.padelscore.tests
+      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.padelscore.tests
       TARGETED_DEVICE_FAMILY: "1"
       # Hostless unit tests — shared sources compiled into the test bundle.
       TEST_HOST: ""

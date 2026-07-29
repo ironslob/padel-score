@@ -6,7 +6,7 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.callmematt.padelscore</string>
+		<string>group.com.codebrewery.padelscores</string>
 	</array>
 </dict>
 </plist>
