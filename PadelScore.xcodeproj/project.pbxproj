@@ -28,6 +28,7 @@
 		237C88A89C80EA16421FA5C4 /* MatchLiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FCE07AE677E1B7FE1702AD1 /* MatchLiveActivityManager.swift */; };
 		24263AA00F1D34F114F52971 /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AE16A34EFD9E8C139CDB82 /* MatchSettings.swift */; };
 		26D0ADDF62A10E701511778B /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */; };
+		27022B2D2921EE928A0FB720 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 28AB730EEDD36D17F4FCCE64 /* Assets.xcassets */; };
 		2D107A3BEEDD6C0FD0845CE0 /* PhoneRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22CC73634E156D71C6D5919E /* PhoneRootView.swift */; };
 		2D1CE91BB767A2BE61394410 /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */; };
 		2D56650F632ED40535BC21E0 /* WristRaiseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6655781AD5469BC748B7FC /* WristRaiseSupport.swift */; };
@@ -76,6 +77,7 @@
 		A4AB22CF8A715F5698D930E5 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F39A6BB8A9C87682706C31 /* Side.swift */; };
 		A7B58122276B14213B16A718 /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB0B8A61BC8E866C82DE480 /* ScoringEngine.swift */; };
 		A7DC2D4D4BEE89559EEA0448 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F39A6BB8A9C87682706C31 /* Side.swift */; };
+		A823F4F61F7FD143EF3F84B4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 864E2F147507D3F815A808AE /* Assets.xcassets */; };
 		AB0D62D446D04A41BC058C02 /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5280AF8EE3046E27284AC07 /* MatchScoreSnapshot.swift */; };
 		AF9A29F298B82C273E6695DB /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */; };
 		B548E8CE5FFABBF5666F2475 /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */; };
@@ -169,6 +171,7 @@
 		122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSyncCoordinator.swift; sourceTree = "<group>"; };
 		12F39A6BB8A9C87682706C31 /* Side.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Side.swift; sourceTree = "<group>"; };
 		22CC73634E156D71C6D5919E /* PhoneRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneRootView.swift; sourceTree = "<group>"; };
+		28AB730EEDD36D17F4FCCE64 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		33F839A16B12716B5C4C16F8 /* MatchDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDetailView.swift; sourceTree = "<group>"; };
 		3DF20D1E4C32A866863ADBBB /* PadelScoreComplications.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PadelScoreComplications.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FCE07AE677E1B7FE1702AD1 /* MatchLiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLiveActivityManager.swift; sourceTree = "<group>"; };
@@ -180,6 +183,7 @@
 		7784767F602335AA12F76C2F /* MatchOverviewScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverviewScreen.swift; sourceTree = "<group>"; };
 		7EECBA3C216DC597AF5042BA /* PadelScoreWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PadelScoreWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		814FBB77004712A10C28A4C1 /* ScoreScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreScreen.swift; sourceTree = "<group>"; };
+		864E2F147507D3F815A808AE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8A33452D4B6D5430B73DE194 /* PadelScoreComplications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadelScoreComplications.swift; sourceTree = "<group>"; };
 		8F667B5CAD398361E2A01A9D /* MatchEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchEvent.swift; sourceTree = "<group>"; };
 		96129224EF231025063149C3 /* PadelScoreComplications.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PadelScoreComplications.entitlements; sourceTree = "<group>"; };
@@ -229,6 +233,7 @@
 			isa = PBXGroup;
 			children = (
 				C830D43DC864380321C452BB /* ActionsScreen.swift */,
+				28AB730EEDD36D17F4FCCE64 /* Assets.xcassets */,
 				5534DDF606242531FBBB7534 /* MatchCompleteView.swift */,
 				7784767F602335AA12F76C2F /* MatchOverviewScreen.swift */,
 				D1B58B293D12B0633725EF30 /* MatchSessionCoordinator.swift */,
@@ -290,6 +295,7 @@
 		9DCAB4832985C50E28476988 /* PadelScore */ = {
 			isa = PBXGroup;
 			children = (
+				864E2F147507D3F815A808AE /* Assets.xcassets */,
 				33F839A16B12716B5C4C16F8 /* MatchDetailView.swift */,
 				3FCE07AE677E1B7FE1702AD1 /* MatchLiveActivityManager.swift */,
 				B595ED7E7254DF7811498847 /* PadelScore.entitlements */,
@@ -399,6 +405,7 @@
 			buildConfigurationList = 5B0819D7B4C37DE3E3417790 /* Build configuration list for PBXNativeTarget "PadelScoreWatch" */;
 			buildPhases = (
 				69434BF84CC4FB3301A045F4 /* Sources */,
+				18C32012BE8D6ABA913AF3DF /* Resources */,
 				EB41339655753B2DE4DC209A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
@@ -452,6 +459,7 @@
 			buildConfigurationList = 8C0B968DEE136FB3AF729E8F /* Build configuration list for PBXNativeTarget "PadelScore" */;
 			buildPhases = (
 				B0F61FF0DDB792E9121BACAC /* Sources */,
+				7BEFA593C9AC5B553320C556 /* Resources */,
 				A0BC3379E3A3BF2CA07A96BC /* Embed Foundation Extensions */,
 				BF31C8D20AB6E3584A0960E5 /* Embed Watch Content */,
 			);
@@ -538,6 +546,25 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		18C32012BE8D6ABA913AF3DF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				27022B2D2921EE928A0FB720 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7BEFA593C9AC5B553320C556 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A823F4F61F7FD143EF3F84B4 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		69434BF84CC4FB3301A045F4 /* Sources */ = {
@@ -752,18 +779,12 @@
 				CODE_SIGN_ENTITLEMENTS = watch/PadelScoreWatch/PadelScoreWatch.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = watch/PadelScoreWatch/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Padel Score";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Padel Score reads workout data when you choose to track a match as a workout.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Padel Score saves workout duration when you track a match as a workout.";
-				INFOPLIST_KEY_SupportsLaunchForLiveActivityAttributeTypes = (
-					MatchActivityAttributes,
-				);
-				INFOPLIST_KEY_WKBackgroundModes = (
-					"workout-processing",
-				);
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.codebrewery.padelscore;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
-				INFOPLIST_KEY_WKSupportsAlwaysOnDisplay = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.padelscore.watchkitapp;
 				SDKROOT = watchos;
@@ -947,6 +968,7 @@
 				CODE_SIGN_ENTITLEMENTS = iPhone/PadelScore/PadelScore.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iPhone/PadelScore/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Padel Score";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -972,18 +994,12 @@
 				CODE_SIGN_ENTITLEMENTS = watch/PadelScoreWatch/PadelScoreWatch.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = watch/PadelScoreWatch/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Padel Score";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Padel Score reads workout data when you choose to track a match as a workout.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Padel Score saves workout duration when you track a match as a workout.";
-				INFOPLIST_KEY_SupportsLaunchForLiveActivityAttributeTypes = (
-					MatchActivityAttributes,
-				);
-				INFOPLIST_KEY_WKBackgroundModes = (
-					"workout-processing",
-				);
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.codebrewery.padelscore;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
-				INFOPLIST_KEY_WKSupportsAlwaysOnDisplay = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.padelscore.watchkitapp;
 				SDKROOT = watchos;
@@ -1001,6 +1017,7 @@
 				CODE_SIGN_ENTITLEMENTS = iPhone/PadelScore/PadelScore.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iPhone/PadelScore/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Padel Score";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Keys here have no INFOPLIST_KEY_ equivalent that Xcode honours, so they
+	     must be declared literally. Remaining keys are generated from
+	     INFOPLIST_KEY_ settings in project.yml and merged into this file. -->
+	<key>CFBundleIconName</key>
+	<string>AppIcon</string>
+	<key>WKBackgroundModes</key>
+	<array>
+		<string>workout-processing</string>
+	</array>
+	<key>WKSupportsAlwaysOnDisplay</key>
+	<true/>
+	<key>SupportsLaunchForLiveActivityAttributeTypes</key>
+	<array>
+		<string>MatchActivityAttributes</string>
+	</array>
+</dict>
+</plist>
