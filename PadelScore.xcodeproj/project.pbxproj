@@ -176,14 +176,14 @@
 		5534DDF606242531FBBB7534 /* MatchCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCompleteView.swift; sourceTree = "<group>"; };
 		5C3A3C1839AE335315C3B2EC /* ScoringEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoringEngineTests.swift; sourceTree = "<group>"; };
 		5DAE2617B6059D58700143F9 /* MatchStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchStore.swift; sourceTree = "<group>"; };
-		5EC885D5139C7BFEEEA3D62A /* PadelScoreLiveActivity.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = PadelScoreLiveActivity.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EC885D5139C7BFEEEA3D62A /* PadelScoreLiveActivity.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PadelScoreLiveActivity.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		7784767F602335AA12F76C2F /* MatchOverviewScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverviewScreen.swift; sourceTree = "<group>"; };
 		7EECBA3C216DC597AF5042BA /* PadelScoreWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PadelScoreWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		814FBB77004712A10C28A4C1 /* ScoreScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreScreen.swift; sourceTree = "<group>"; };
 		8A33452D4B6D5430B73DE194 /* PadelScoreComplications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadelScoreComplications.swift; sourceTree = "<group>"; };
 		8F667B5CAD398361E2A01A9D /* MatchEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchEvent.swift; sourceTree = "<group>"; };
 		96129224EF231025063149C3 /* PadelScoreComplications.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PadelScoreComplications.entitlements; sourceTree = "<group>"; };
-		97D26C0DE07BCE5013AF252D /* PadelScore.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PadelScore.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		97D26C0DE07BCE5013AF252D /* PadelScore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PadelScore.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		99CC8397F215F09A6AC2A53E /* MatchState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchState.swift; sourceTree = "<group>"; };
 		A0C3B2561AD78B79ABA7948E /* PadelScoreLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadelScoreLiveActivity.swift; sourceTree = "<group>"; };
 		A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPauseResumeLogic.swift; sourceTree = "<group>"; };
@@ -198,7 +198,7 @@
 		D1B58B293D12B0633725EF30 /* MatchSessionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSessionCoordinator.swift; sourceTree = "<group>"; };
 		DF6655781AD5469BC748B7FC /* WristRaiseSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WristRaiseSupport.swift; sourceTree = "<group>"; };
 		E3429803BAEF2F899EDA8F51 /* MatchServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchServiceTests.swift; sourceTree = "<group>"; };
-		E3E4A0CD22466BE9A79A6DEE /* PadelScoreTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PadelScoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E3E4A0CD22466BE9A79A6DEE /* PadelScoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PadelScoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E89612FA01E3330D57011549 /* PadelScoreApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadelScoreApp.swift; sourceTree = "<group>"; };
 		E8F9E3CF93B6EA45A583A60F /* WatchRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRootView.swift; sourceTree = "<group>"; };
 		EC88226DEFCD298F1B0BD27F /* MatchStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchStatus.swift; sourceTree = "<group>"; };
@@ -495,7 +495,6 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					41F8D84B854F63B981445495 = {
-						DevelopmentTeam = TGX22822SP;
 						ProvisioningStyle = Automatic;
 					};
 					6DE7DC2CD4868FD5F7BC0713 = {
@@ -751,21 +750,18 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = watch/PadelScoreWatch/PadelScoreWatch.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TGX22822SP;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Padel Score";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Padel Score reads workout data when you choose to track a match as a workout.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Padel Score saves workout duration when you track a match as a workout.";
-				INFOPLIST_KEY_SupportsLaunchForLiveActivityAttributeTypes = (
-					MatchActivityAttributes,
-				);
-				INFOPLIST_KEY_WKBackgroundModes = (
-					"workout-processing",
-				);
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.matthewwilson.padelscore;
+				INFOPLIST_KEY_SupportsLaunchForLiveActivityAttributeTypes = MatchActivityAttributes;
+				INFOPLIST_KEY_WKBackgroundModes = "workout-processing";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.callmematt.padelscore;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
 				INFOPLIST_KEY_WKSupportsAlwaysOnDisplay = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwilson.padelscore.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.callmematt.padelscore.watchkitapp;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";
@@ -787,7 +783,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwilson.padelscore.watchkitapp.complications;
+				PRODUCT_BUNDLE_IDENTIFIER = com.callmematt.padelscore.watchkitapp.complications;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";
@@ -809,7 +805,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwilson.padelscore.liveactivity;
+				PRODUCT_BUNDLE_IDENTIFIER = com.callmematt.padelscore.liveactivity;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -890,7 +886,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwilson.padelscore.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.callmematt.padelscore.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "";
@@ -911,7 +907,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwilson.padelscore.liveactivity;
+				PRODUCT_BUNDLE_IDENTIFIER = com.callmematt.padelscore.liveactivity;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -931,7 +927,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwilson.padelscore.watchkitapp.complications;
+				PRODUCT_BUNDLE_IDENTIFIER = com.callmematt.padelscore.watchkitapp.complications;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";
@@ -957,7 +953,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwilson.padelscore;
+				PRODUCT_BUNDLE_IDENTIFIER = com.callmematt.padelscore;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -971,21 +967,18 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = watch/PadelScoreWatch/PadelScoreWatch.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TGX22822SP;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Padel Score";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Padel Score reads workout data when you choose to track a match as a workout.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Padel Score saves workout duration when you track a match as a workout.";
-				INFOPLIST_KEY_SupportsLaunchForLiveActivityAttributeTypes = (
-					MatchActivityAttributes,
-				);
-				INFOPLIST_KEY_WKBackgroundModes = (
-					"workout-processing",
-				);
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.matthewwilson.padelscore;
+				INFOPLIST_KEY_SupportsLaunchForLiveActivityAttributeTypes = MatchActivityAttributes;
+				INFOPLIST_KEY_WKBackgroundModes = "workout-processing";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.callmematt.padelscore;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
 				INFOPLIST_KEY_WKSupportsAlwaysOnDisplay = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwilson.padelscore.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.callmematt.padelscore.watchkitapp;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";
@@ -1011,7 +1004,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwilson.padelscore;
+				PRODUCT_BUNDLE_IDENTIFIER = com.callmematt.padelscore;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1029,7 +1022,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.matthewwilson.padelscore.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.callmematt.padelscore.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "";

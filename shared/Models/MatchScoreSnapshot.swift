@@ -98,7 +98,7 @@ public struct MatchScoreSnapshot: Codable, Sendable, Equatable {
 
 /// Persists score snapshots for the watch app and complications via app group.
 public enum MatchScoreSnapshotStore {
-    public static let appGroupID = "group.com.matthewwilson.padelscore"
+    public static let appGroupID = "group.com.callmematt.padelscore"
 
     public static func save(_ snapshot: MatchScoreSnapshot, defaults: UserDefaults? = nil) {
         let store = defaults ?? UserDefaults(suiteName: appGroupID)
