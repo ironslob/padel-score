@@ -777,7 +777,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = watch/PadelScoreWatch/PadelScoreWatch.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = watch/PadelScoreWatch/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Padel Score";
@@ -799,7 +799,7 @@
 			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = watch/PadelScoreComplications/PadelScoreComplications.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = watch/PadelScoreComplications/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -821,7 +821,7 @@
 			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = iPhone/PadelScoreLiveActivity/PadelScoreLiveActivity.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = iPhone/PadelScoreLiveActivity/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -923,7 +923,7 @@
 			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = iPhone/PadelScoreLiveActivity/PadelScoreLiveActivity.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = iPhone/PadelScoreLiveActivity/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -943,7 +943,7 @@
 			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = watch/PadelScoreComplications/PadelScoreComplications.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = watch/PadelScoreComplications/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -966,7 +966,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = iPhone/PadelScore/PadelScore.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iPhone/PadelScore/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Padel Score";
@@ -992,7 +992,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = watch/PadelScoreWatch/PadelScoreWatch.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = watch/PadelScoreWatch/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Padel Score";
@@ -1015,7 +1015,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = iPhone/PadelScore/PadelScore.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iPhone/PadelScore/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Padel Score";
