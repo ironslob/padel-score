@@ -66,10 +66,10 @@ struct WatchRootView: View {
         } message: {
             Text("Apple Watch supports one active workout at a time. Keep this match as Score only, or cancel and end the other workout first.")
         }
-        .alert("Quick tip", isPresented: $sessionCoordinator.showWristRaiseTip) {
-            Button("Got it") { sessionCoordinator.dismissWristRaiseTip() }
-        } message: {
-            Text(DuringPlayAccessCopy.firstMatchTip)
+        .sheet(isPresented: $sessionCoordinator.showFirstLaunchTip) {
+            FirstLaunchTipView {
+                sessionCoordinator.dismissFirstLaunchTip()
+            }
         }
     }
 
@@ -333,6 +333,9 @@ struct StartMatchView: View {
         .sheet(isPresented: $showHistory) {
             WatchMatchHistoryView()
         }
+        .onAppear {
+            sessionCoordinator.presentFirstLaunchTipIfNeeded()
+        }
     }
 
     private func startMatch() async {
@@ -505,6 +508,37 @@ private struct WatchMatchHistoryDetailView: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(title) \(value)")
+    }
+}
+
+struct FirstLaunchTipView: View {
+    let onDismiss: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    ForEach(Array(FirstLaunchTipCopy.tipSections.enumerated()), id: \.offset) { _, section in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(section.title)
+                                .font(.headline)
+                            Text(section.body)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 4)
+            }
+            .navigationTitle(FirstLaunchTipCopy.title)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Got it") { onDismiss() }
+                }
+            }
+        }
     }
 }
 

@@ -176,12 +176,24 @@ final class SettingsCopyTests: XCTestCase {
     }
 }
 
-final class DuringPlayAccessCopyTests: XCTestCase {
-    func testFirstMatchTipMentionsDock() {
-        XCTAssertTrue(DuringPlayAccessCopy.firstMatchTip.contains("Dock"))
-        XCTAssertTrue(DuringPlayAccessCopy.firstMatchTip.contains("swipe up"))
+final class FirstLaunchTipCopyTests: XCTestCase {
+    func testFirstLaunchTipMentionsHealthAndSettings() {
+        XCTAssertEqual(FirstLaunchTipCopy.title, "Before you start")
+        XCTAssertTrue(
+            FirstLaunchTipCopy.tipSections.contains { $0.title == "Health" && $0.body.contains("Health access") }
+        )
+        XCTAssertTrue(
+            FirstLaunchTipCopy.tipSections.contains { $0.title == "Settings" && $0.body.contains("Settings") }
+        )
     }
 
+    func testTipSectionsAreNonEmpty() {
+        XCTAssertFalse(FirstLaunchTipCopy.tipSections.isEmpty)
+        XCTAssertTrue(FirstLaunchTipCopy.tipSections.allSatisfy { !$0.title.isEmpty && !$0.body.isEmpty })
+    }
+}
+
+final class DuringPlayAccessCopyTests: XCTestCase {
     func testHelpSectionsAreNonEmpty() {
         XCTAssertFalse(DuringPlayAccessCopy.helpSections.isEmpty)
         XCTAssertTrue(DuringPlayAccessCopy.helpSections.allSatisfy { !$0.title.isEmpty && !$0.body.isEmpty })

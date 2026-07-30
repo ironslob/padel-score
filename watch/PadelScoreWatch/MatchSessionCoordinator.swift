@@ -43,7 +43,7 @@ public final class MatchSessionCoordinator: ObservableObject {
     @Published public private(set) var isWorkoutSessionActive = false
     @Published public private(set) var isWorkoutPaused = false
     @Published public var workoutErrorMessage: String?
-    @Published public var showWristRaiseTip = false
+    @Published public var showFirstLaunchTip = false
     @Published public var showWorkoutConflictPrompt = false
 
     private let service: MatchService
@@ -135,15 +135,16 @@ public final class MatchSessionCoordinator: ObservableObject {
         publishSnapshot(for: service.activeMatch)
 
         await startWorkoutSession()
-
-        if tipStore.shouldShowTip {
-            showWristRaiseTip = true
-            tipStore.markTipSeen()
-        }
     }
 
-    public func dismissWristRaiseTip() {
-        showWristRaiseTip = false
+    public func presentFirstLaunchTipIfNeeded() {
+        guard tipStore.shouldShowTip else { return }
+        showFirstLaunchTip = true
+        tipStore.markTipSeen()
+    }
+
+    public func dismissFirstLaunchTip() {
+        showFirstLaunchTip = false
     }
 
     public func handleScenePhaseChange(_ phase: ScenePhase) {

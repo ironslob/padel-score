@@ -157,11 +157,22 @@ public enum SettingsCopy {
         "How many sets decide the match. Continuous keeps scoring until you finish."
 }
 
-public enum DuringPlayAccessCopy {
-    public static let firstMatchTip =
-        "Pin Padel Score in your Dock, then swipe up from the watch face to reopen. " +
-        "Add the Match Glance widget to your Smart Stack for score and elapsed time between points."
+public enum FirstLaunchTipCopy {
+    public static let title = "Before you start"
 
+    public static let tipSections: [(title: String, body: String)] = [
+        (
+            "Health",
+            "Padel Score needs Health access to track the match as a workout so it can return when you raise your wrist."
+        ),
+        (
+            "Settings",
+            "Match length, golden point, labels, and serve options are in Settings on the home screen—set them before you start a match."
+        ),
+    ]
+}
+
+public enum DuringPlayAccessCopy {
     public static let scoreOnlyConsequence =
         "Scores the match without starting a Health workout."
 
