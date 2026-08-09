@@ -7,6 +7,7 @@ struct MatchDetailView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var isConfirmingDelete = false
+    @State private var isHistoryExpanded = false
 
     var body: some View {
         List {
@@ -39,16 +40,26 @@ struct MatchDetailView: View {
                 }
             }
 
-            Section("Scoring History") {
-                ForEach(Array(match.events.enumerated()), id: \.element.id) { index, event in
-                    HStack {
-                        Text(eventLabel(event))
-                        Spacer()
-                        Text(event.timestamp.formatted(date: .omitted, time: .standard))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+            Section {
+                DisclosureGroup(isExpanded: $isHistoryExpanded) {
+                    ForEach(Array(match.events.enumerated()), id: \.element.id) { index, event in
+                        HStack {
+                            Text(eventLabel(event))
+                            Spacer()
+                            Text(event.timestamp.formatted(date: .omitted, time: .standard))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .accessibilityLabel("Event \(index + 1): \(eventLabel(event))")
                     }
-                    .accessibilityLabel("Event \(index + 1): \(eventLabel(event))")
+                } label: {
+                    HStack {
+                        Text("Scoring History")
+                        Spacer()
+                        Text("\(match.events.count)")
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
                 }
             }
         }
