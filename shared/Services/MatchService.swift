@@ -8,6 +8,7 @@ public final class MatchService: ObservableObject {
     @Published public private(set) var activeMatch: MatchState?
     @Published public private(set) var archivedMatches: [MatchState] = []
     @Published public private(set) var deletedMatchIDs: Set<UUID> = []
+    @Published public private(set) var matchNotes: [UUID: String] = [:]
     @Published public private(set) var isRestored = false
 
     private let engine: ScoringEngine
@@ -31,6 +32,7 @@ public final class MatchService: ObservableObject {
     public func restore() {
         do {
             deletedMatchIDs = try store.loadDeletedMatchIDs()
+            matchNotes = try store.loadMatchNotes()
             activeMatch = try store.loadActiveMatch()
             archivedMatches = visibleArchive(try store.loadArchivedMatches())
             logger.info("Restored active=\(self.activeMatch != nil) archive=\(self.archivedMatches.count)")
@@ -46,13 +48,15 @@ public final class MatchService: ObservableObject {
     public func restore() async {
         do {
             let store = self.store
-            let (active, archive, deleted) = try await Task.detached(priority: .userInitiated) {
+            let (active, archive, deleted, notes) = try await Task.detached(priority: .userInitiated) {
                 let active = try store.loadActiveMatch()
                 let archive = try store.loadArchivedMatches()
                 let deleted = try store.loadDeletedMatchIDs()
-                return (active, archive, deleted)
+                let notes = try store.loadMatchNotes()
+                return (active, archive, deleted, notes)
             }.value
             deletedMatchIDs = deleted
+            matchNotes = notes
             activeMatch = active
             archivedMatches = visibleArchive(archive)
             logger.info("Restored active=\(self.activeMatch != nil) archive=\(self.archivedMatches.count)")
@@ -220,8 +224,37 @@ public final class MatchService: ObservableObject {
         try? store.saveDeletedMatchIDs(deletedMatchIDs)
         try? store.deleteArchivedMatch(id: id)
         archivedMatches.removeAll { $0.id == id }
+        if matchNotes.removeValue(forKey: id) != nil {
+            try? store.saveMatchNotes(matchNotes)
+        }
         notifySync()
         logger.info("Deleted archived match \(id.uuidString)")
+    }
+
+    /// Free text the user attached to a match on the phone. Notes live outside the
+    /// synced `MatchState`, so they survive the Watch replacing the archive wholesale.
+    public func note(for id: UUID) -> String {
+        matchNotes[id] ?? ""
+    }
+
+    public func setNote(_ text: String, for id: UUID) {
+        // A detail view saves its draft as it disappears, which includes being dismissed
+        // by a delete — that must not resurrect the note it just pruned.
+        guard !deletedMatchIDs.contains(id) else { return }
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let existing = matchNotes[id]
+        if trimmed.isEmpty {
+            guard existing != nil else { return }
+            matchNotes.removeValue(forKey: id)
+        } else {
+            guard existing != trimmed else { return }
+            matchNotes[id] = trimmed
+        }
+        do {
+            try store.saveMatchNotes(matchNotes)
+        } catch {
+            logger.error("Saving note failed: \(error.localizedDescription)")
+        }
     }
 
     /// Used by the phone when receiving Watch sync payloads.

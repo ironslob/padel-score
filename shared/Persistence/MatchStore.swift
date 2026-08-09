@@ -10,6 +10,10 @@ public protocol MatchStore: AnyObject {
     /// Tombstones for matches the user deleted, so a remote snapshot cannot resurrect them.
     func loadDeletedMatchIDs() throws -> Set<UUID>
     func saveDeletedMatchIDs(_ ids: Set<UUID>) throws
+    /// Phone-authored free text keyed by match id, kept outside `MatchState` so a
+    /// remote snapshot cannot overwrite it.
+    func loadMatchNotes() throws -> [UUID: String]
+    func saveMatchNotes(_ notes: [UUID: String]) throws
 }
 
 /// JSON file-backed store. Active match is a single file; archive is one file of completed/ended matches.
@@ -50,6 +54,10 @@ public final class FileMatchStore: MatchStore {
 
     private var deletedURL: URL {
         directory.appendingPathComponent("deleted-matches.json")
+    }
+
+    private var notesURL: URL {
+        directory.appendingPathComponent("match-notes.json")
     }
 
     public func loadActiveMatch() throws -> MatchState? {
@@ -105,6 +113,25 @@ public final class FileMatchStore: MatchStore {
         let data = try encoder.encode(ids.sorted { $0.uuidString < $1.uuidString })
         try data.write(to: deletedURL, options: [.atomic])
     }
+
+    public func loadMatchNotes() throws -> [UUID: String] {
+        guard fileManager.fileExists(atPath: notesURL.path) else { return [:] }
+        let data = try Data(contentsOf: notesURL)
+        if data.isEmpty { return [:] }
+        // Keyed by uuidString so the file stays a plain JSON object.
+        let raw = try decoder.decode([String: String].self, from: data)
+        return raw.reduce(into: [:]) { result, entry in
+            if let id = UUID(uuidString: entry.key) { result[id] = entry.value }
+        }
+    }
+
+    public func saveMatchNotes(_ notes: [UUID: String]) throws {
+        let raw = notes.reduce(into: [String: String]()) { result, entry in
+            result[entry.key.uuidString] = entry.value
+        }
+        let data = try encoder.encode(raw)
+        try data.write(to: notesURL, options: [.atomic])
+    }
 }
 
 /// In-memory store for unit tests.
@@ -112,6 +139,7 @@ public final class InMemoryMatchStore: MatchStore {
     public var active: MatchState?
     public var archive: [MatchState] = []
     public var deletedIDs: Set<UUID> = []
+    public var notes: [UUID: String] = [:]
 
     public init() {}
 
@@ -139,4 +167,8 @@ public final class InMemoryMatchStore: MatchStore {
     public func loadDeletedMatchIDs() throws -> Set<UUID> { deletedIDs }
 
     public func saveDeletedMatchIDs(_ ids: Set<UUID>) throws { deletedIDs = ids }
+
+    public func loadMatchNotes() throws -> [UUID: String] { notes }
+
+    public func saveMatchNotes(_ notes: [UUID: String]) throws { self.notes = notes }
 }

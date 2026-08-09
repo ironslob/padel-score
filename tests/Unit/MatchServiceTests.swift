@@ -274,6 +274,65 @@ final class MatchServiceTests: XCTestCase {
         XCTAssertEqual(try FileMatchStore(directory: dir).loadDeletedMatchIDs(), ids)
     }
 
+    func testNoteIsStoredTrimmedAndClearedWhenBlank() throws {
+        let store = InMemoryMatchStore()
+        let engine = ScoringEngine()
+        let match = try engine.apply(.endEarly, to: engine.startMatch())
+        store.archive = [match]
+        let service = MatchService(store: store)
+
+        service.setNote("  Played with Sam, windy court\n", for: match.id)
+        XCTAssertEqual(service.note(for: match.id), "Played with Sam, windy court")
+        XCTAssertEqual(store.notes[match.id], "Played with Sam, windy court")
+
+        service.setNote("   ", for: match.id)
+        XCTAssertEqual(service.note(for: match.id), "")
+        XCTAssertNil(store.notes[match.id])
+    }
+
+    func testNoteSurvivesRemoteSnapshotAndRestore() throws {
+        let store = InMemoryMatchStore()
+        let engine = ScoringEngine()
+        let match = try engine.apply(.endEarly, to: engine.startMatch())
+        store.archive = [match]
+        let service = MatchService(store: store)
+        service.setNote("Left knee sore", for: match.id)
+
+        service.applyRemoteSnapshot(active: nil, archive: [match])
+        XCTAssertEqual(service.note(for: match.id), "Left knee sore")
+
+        let restored = MatchService(store: store)
+        XCTAssertEqual(restored.note(for: match.id), "Left knee sore")
+    }
+
+    func testDeletingAMatchDropsItsNoteForGood() throws {
+        let store = InMemoryMatchStore()
+        let engine = ScoringEngine()
+        let match = try engine.apply(.endEarly, to: engine.startMatch())
+        store.archive = [match]
+        let service = MatchService(store: store)
+        service.setNote("Best of the season", for: match.id)
+
+        service.deleteArchivedMatch(id: match.id)
+        XCTAssertTrue(store.notes.isEmpty)
+
+        // A detail view saving its draft on dismissal must not bring the note back.
+        service.setNote("Best of the season", for: match.id)
+        XCTAssertTrue(service.matchNotes.isEmpty)
+    }
+
+    func testNotesSurviveFileStoreRoundTrip() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let store = FileMatchStore(directory: dir)
+        XCTAssertTrue(try store.loadMatchNotes().isEmpty)
+
+        let notes = [UUID(): "First note", UUID(): "Second note"]
+        try store.saveMatchNotes(notes)
+
+        XCTAssertEqual(try FileMatchStore(directory: dir).loadMatchNotes(), notes)
+    }
+
     private func serviceWithActiveMatch(_ match: MatchState) -> MatchService {
         let store = InMemoryMatchStore()
         store.active = match
