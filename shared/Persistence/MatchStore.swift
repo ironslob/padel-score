@@ -7,6 +7,9 @@ public protocol MatchStore: AnyObject {
     func archiveMatch(_ match: MatchState) throws
     func deleteArchivedMatch(id: UUID) throws
     func replaceArchive(_ matches: [MatchState]) throws
+    /// Tombstones for matches the user deleted, so a remote snapshot cannot resurrect them.
+    func loadDeletedMatchIDs() throws -> Set<UUID>
+    func saveDeletedMatchIDs(_ ids: Set<UUID>) throws
 }
 
 /// JSON file-backed store. Active match is a single file; archive is one file of completed/ended matches.
@@ -43,6 +46,10 @@ public final class FileMatchStore: MatchStore {
 
     private var archiveURL: URL {
         directory.appendingPathComponent("match-archive.json")
+    }
+
+    private var deletedURL: URL {
+        directory.appendingPathComponent("deleted-matches.json")
     }
 
     public func loadActiveMatch() throws -> MatchState? {
@@ -86,12 +93,25 @@ public final class FileMatchStore: MatchStore {
         let data = try encoder.encode(matches)
         try data.write(to: archiveURL, options: [.atomic])
     }
+
+    public func loadDeletedMatchIDs() throws -> Set<UUID> {
+        guard fileManager.fileExists(atPath: deletedURL.path) else { return [] }
+        let data = try Data(contentsOf: deletedURL)
+        if data.isEmpty { return [] }
+        return Set(try decoder.decode([UUID].self, from: data))
+    }
+
+    public func saveDeletedMatchIDs(_ ids: Set<UUID>) throws {
+        let data = try encoder.encode(ids.sorted { $0.uuidString < $1.uuidString })
+        try data.write(to: deletedURL, options: [.atomic])
+    }
 }
 
 /// In-memory store for unit tests.
 public final class InMemoryMatchStore: MatchStore {
     public var active: MatchState?
     public var archive: [MatchState] = []
+    public var deletedIDs: Set<UUID> = []
 
     public init() {}
 
@@ -115,4 +135,8 @@ public final class InMemoryMatchStore: MatchStore {
     public func replaceArchive(_ matches: [MatchState]) throws {
         archive = matches
     }
+
+    public func loadDeletedMatchIDs() throws -> Set<UUID> { deletedIDs }
+
+    public func saveDeletedMatchIDs(_ ids: Set<UUID>) throws { deletedIDs = ids }
 }

@@ -14,6 +14,12 @@ Documented decisions that were not fully prescribed by `/spec`.
 
 **Why:** Matches the architecture rule that the Watch is authoritative during live scoring. No CloudKit in V1.
 
+## Deleting matches from history
+
+**Choice:** Deletion lives on the iPhone only (swipe-to-delete, Edit mode, or a Delete button in match detail), and the iPhone is authoritative for it. Deleted IDs are kept as tombstones in `deleted-matches.json`; `MatchService` filters every archive read and every remote snapshot through them, and the phone pushes the full tombstone set in each sync payload. The Watch accepts only the deletion key from an inbound payload — it prunes its own archive and never lets a phone payload touch the active match.
+
+**Why:** The Watch pushes its whole archive and `applyRemoteSnapshot` replaces the phone's copy wholesale, so a delete without tombstones would be silently resurrected on the next sync. Tombstones make deletion durable even if the Watch is offline or never updates; sending the whole set rather than a delta lets a disconnected Watch catch up on its next context update. History curation is a phone-sized task, so this narrow inversion of authority does not disturb the rule that the Watch owns live scoring.
+
 ## Undo model
 
 **Choice:** Undo removes the last `pointWon` event and replays the stream. After a point on the score screen, a 5-second clockwise outline animates on that side’s button; tapping the same button again cancels the point. Actions screen allows undo anytime while in progress.
