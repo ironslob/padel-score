@@ -164,16 +164,34 @@ class MatchService {
         persist();
     }
 
-    function getGoldenPointEnabled() as Boolean {
-        var value = Application.Properties.getValue("goldenPointEnabled");
-        if (value == null) {
-            return true;
+    function getDeuceFormat() as DeuceFormat {
+        var raw = Application.Properties.getValue("deuceFormat");
+        var format = null;
+        if (raw != null) {
+            format = deuceFormatFromString(raw.toString());
         }
-        return value as Boolean;
+        if (format != null) {
+            return format;
+        }
+        var legacy = Application.Properties.getValue("goldenPointEnabled");
+        return deuceFormatFromLegacyPreference(legacy as Boolean or Null);
     }
 
-    function setGoldenPointEnabled(enabled as Boolean) as Void {
-        Application.Properties.setValue("goldenPointEnabled", enabled);
+    function setDeuceFormat(format as DeuceFormat) as Void {
+        Application.Properties.setValue("deuceFormat", deuceFormatToString(format));
+    }
+
+    // Advances the setting through Regular → Silver → Golden → Regular.
+    function cycleDeuceFormat() as DeuceFormat {
+        var current = getDeuceFormat();
+        var next = DeuceFormat.DEUCE_ADVANTAGE;
+        if (current == DeuceFormat.DEUCE_ADVANTAGE) {
+            next = DeuceFormat.DEUCE_SILVER_POINT;
+        } else if (current == DeuceFormat.DEUCE_SILVER_POINT) {
+            next = DeuceFormat.DEUCE_GOLDEN_POINT;
+        }
+        setDeuceFormat(next);
+        return next;
     }
 
     // Swap-sides-each-game is the user-facing inverse of fixedServerPositions.

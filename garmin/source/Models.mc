@@ -38,12 +38,97 @@ enum MatchActionType {
     DISCARD
 }
 
+// How a game is resolved once both sides reach 40.
+enum DeuceFormat {
+    // Traditional scoring: advantage repeats until one side wins by two points.
+    DEUCE_ADVANTAGE,
+    // One advantage is played. If it is broken, the next point decides the game.
+    DEUCE_SILVER_POINT,
+    // No advantage at all — the first point at 40-40 decides the game.
+    DEUCE_GOLDEN_POINT
+}
+
+// Persisted as a string so stored values survive enum reordering.
+function deuceFormatToString(format as DeuceFormat) as String {
+    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
+        return "advantage";
+    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
+        return "silverPoint";
+    }
+    return "goldenPoint";
+}
+
+function deuceFormatFromString(raw as String or Null) as DeuceFormat or Null {
+    if (raw == null) {
+        return null;
+    }
+    if (raw.equals("advantage")) {
+        return DeuceFormat.DEUCE_ADVANTAGE;
+    } else if (raw.equals("silverPoint")) {
+        return DeuceFormat.DEUCE_SILVER_POINT;
+    } else if (raw.equals("goldenPoint")) {
+        return DeuceFormat.DEUCE_GOLDEN_POINT;
+    }
+    return null;
+}
+
+// Migration for a match archived before silver point existed. The old
+// `goldenPointEnabled` flag played one advantage before the decisive point,
+// which is silver point — so map it there to keep archived scorelines faithful
+// to how they were actually played.
+function deuceFormatFromLegacyArchivedFlag(goldenPointEnabled as Boolean) as DeuceFormat {
+    return goldenPointEnabled ? DeuceFormat.DEUCE_SILVER_POINT : DeuceFormat.DEUCE_ADVANTAGE;
+}
+
+// Migration for the stored user preference, which deliberately differs from the
+// archived-match rule above: someone who turned the old toggle off wanted full
+// advantage scoring, so honour that. Everyone else gets the new default, which
+// is what the old "Golden Point" label promised.
+function deuceFormatFromLegacyPreference(goldenPointEnabled as Boolean or Null) as DeuceFormat {
+    if (goldenPointEnabled != null && !goldenPointEnabled) {
+        return DeuceFormat.DEUCE_ADVANTAGE;
+    }
+    return DeuceFormat.DEUCE_GOLDEN_POINT;
+}
+
+// Settings label. Kept compact because the settings button renders at
+// FONT_MEDIUM and does not truncate.
+function deuceFormatLabel(format as DeuceFormat) as String {
+    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
+        return "Regular";
+    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
+        return "Silver";
+    }
+    return "Golden";
+}
+
+// Name for the decisive point, shown on the score screen.
+function deuceFormatDecidingPointLabel(format as DeuceFormat) as String {
+    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
+        return "Deuce";
+    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
+        return "Silver Point";
+    }
+    return "Golden Point";
+}
+
+// Two-character form for the score readout.
+function deuceFormatDecidingPointShortLabel(format as DeuceFormat) as String {
+    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
+        return "40";
+    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
+        return "SP";
+    }
+    return "GP";
+}
+
 class MatchSettings {
     var setsToWin as Number;
     var continuousPlay as Boolean;
     var gamesToWinSet as Number;
     var mustWinByTwoGames as Boolean;
-    var goldenPointEnabled as Boolean;
+    // How a game is decided once both sides reach 40.
+    var deuceFormat as DeuceFormat;
     var askServeAtSetStart as Boolean;
     var fixedServerPositions as Boolean;
     var usThemLabels as Boolean;
@@ -56,7 +141,7 @@ class MatchSettings {
         continuousPlay = false;
         gamesToWinSet = 6;
         mustWinByTwoGames = true;
-        goldenPointEnabled = true;
+        deuceFormat = DeuceFormat.DEUCE_GOLDEN_POINT;
         askServeAtSetStart = false;
         fixedServerPositions = true;
         usThemLabels = true;
@@ -68,7 +153,7 @@ class MatchSettings {
         s.continuousPlay = continuousPlay;
         s.gamesToWinSet = gamesToWinSet;
         s.mustWinByTwoGames = mustWinByTwoGames;
-        s.goldenPointEnabled = goldenPointEnabled;
+        s.deuceFormat = deuceFormat;
         s.askServeAtSetStart = askServeAtSetStart;
         s.fixedServerPositions = fixedServerPositions;
         s.usThemLabels = usThemLabels;
@@ -80,6 +165,8 @@ class GameScore {
     var leftPoints as Number;
     var rightPoints as Number;
     var advantageSide as Side or Null;
+    // True while a single decisive rally is in progress: immediately at 40-40 under
+    // golden point, or after an advantage is broken under silver point.
     var isGoldenPointActive as Boolean;
     var isTieBreak as Boolean;
     var isComplete as Boolean;
@@ -111,7 +198,7 @@ class GameScore {
         return leftPoints + rightPoints;
     }
 
-    function displayPair() as Array<String> {
+    function displayPair(deuceFormat as DeuceFormat) as Array<String> {
         if (isComplete) {
             return ["0", "0"] as Array<String>;
         }
@@ -119,7 +206,8 @@ class GameScore {
             return [leftPoints.toString(), rightPoints.toString()] as Array<String>;
         }
         if (isGoldenPointActive) {
-            return ["GP", "GP"] as Array<String>;
+            var label = deuceFormatDecidingPointShortLabel(deuceFormat);
+            return [label, label] as Array<String>;
         }
         if (advantageSide != null) {
             if (advantageSide == Side.LEFT) {
@@ -133,12 +221,12 @@ class GameScore {
         return [pointLabel(leftPoints), pointLabel(rightPoints)] as Array<String>;
     }
 
-    function statusLine() as String or Null {
+    function statusLine(deuceFormat as DeuceFormat) as String or Null {
         if (isTieBreak) {
             return "Tie-break";
         }
         if (isGoldenPointActive) {
-            return "Golden Point";
+            return deuceFormatDecidingPointLabel(deuceFormat);
         }
         if (advantageSide != null) {
             return "Advantage";
@@ -296,8 +384,18 @@ class MatchState {
         return [Side.LEFT, Side.RIGHT] as Array<Side>;
     }
 
+    // Game point labels for the current game, using this match's deuce format.
+    function gameDisplayPair() as Array<String> {
+        return currentGame.displayPair(settings.deuceFormat);
+    }
+
+    // Status line for the current game ("Deuce", "Golden Point", …), or null.
+    function gameStatusLine() as String or Null {
+        return currentGame.statusLine(settings.deuceFormat);
+    }
+
     function scoreScreenGameDisplay() as Array<String> {
-        return remapForScoreScreen(currentGame.displayPair());
+        return remapForScoreScreen(gameDisplayPair());
     }
 
     function scoreScreenSetDisplay() as Array<String> {
@@ -403,7 +501,7 @@ class MatchState {
         if (!hasInProgressGameScore()) {
             return null;
         }
-        var pair = currentGame.displayPair();
+        var pair = gameDisplayPair();
         return pair[0] + "-" + pair[1];
     }
 

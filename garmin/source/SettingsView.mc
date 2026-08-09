@@ -17,10 +17,13 @@ class SettingsView extends WatchUi.View {
         var width = dc.getWidth();
         UiHelpers.drawHeader(dc, "Settings");
 
-        var goldenPoint = service.getGoldenPointEnabled();
-        var goldenLabel = goldenPoint ? "Golden Point: On" : "Golden Point: Off";
-        var goldenColor = goldenPoint ? Graphics.COLOR_GREEN : Graphics.COLOR_DK_GRAY;
-        UiHelpers.drawPrimaryButton(dc, goldenLabel, 16, 40, width - 32, 44, goldenColor);
+        var deuceFormat = service.getDeuceFormat();
+        var deuceLabel = "Deuce: " + deuceFormatLabel(deuceFormat);
+        // Regular is the "plain" option, so it reads as unset like the toggles below.
+        var deuceColor = deuceFormat == DeuceFormat.DEUCE_ADVANTAGE
+            ? Graphics.COLOR_DK_GRAY
+            : Graphics.COLOR_GREEN;
+        UiHelpers.drawPrimaryButton(dc, deuceLabel, 16, 40, width - 32, 44, deuceColor);
 
         var rotateServe = service.getRotateServeEnabled();
         var rotateLabel = rotateServe ? "Swap Sides: On" : "Swap Sides: Off";
@@ -28,7 +31,7 @@ class SettingsView extends WatchUi.View {
         UiHelpers.drawPrimaryButton(dc, rotateLabel, 16, 96, width - 32, 44, rotateColor);
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
-        dc.drawText(width / 2, 156, Graphics.FONT_XTINY, "Tap to toggle", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 156, Graphics.FONT_XTINY, "Tap to change", Graphics.TEXT_JUSTIFY_CENTER);
         dc.drawText(width / 2, dc.getHeight() - 20, Graphics.FONT_XTINY, "Swipe right to close", Graphics.TEXT_JUSTIFY_CENTER);
     }
 }
@@ -45,7 +48,7 @@ class SettingsDelegate extends WatchUi.BehaviorDelegate {
         var coords = clickEvent.getCoordinates();
         var y = coords[1];
         if (y >= 40 && y <= 84) {
-            service.setGoldenPointEnabled(!service.getGoldenPointEnabled());
+            service.cycleDeuceFormat();
             WatchUi.requestUpdate();
             return true;
         }

@@ -53,7 +53,8 @@ class MatchPagerView extends WatchUi.View {
             dc.drawText(width / 2, 16, Graphics.FONT_XTINY, "Tie-break", Graphics.TEXT_JUSTIFY_CENTER);
         } else if (match.currentGame.isGoldenPointActive) {
             dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
-            dc.drawText(width / 2, 16, Graphics.FONT_XTINY, "Golden Point", Graphics.TEXT_JUSTIFY_CENTER);
+            var decidingLabel = deuceFormatDecidingPointLabel(match.settings.deuceFormat);
+            dc.drawText(width / 2, 16, Graphics.FONT_XTINY, decidingLabel, Graphics.TEXT_JUSTIFY_CENTER);
         } else {
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
             dc.drawText(width / 2, 16, Graphics.FONT_SMALL, games[0] + " – " + games[1], Graphics.TEXT_JUSTIFY_CENTER);

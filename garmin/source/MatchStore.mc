@@ -97,7 +97,10 @@ class MatchStore {
             "continuousPlay" => settings.continuousPlay,
             "gamesToWinSet" => settings.gamesToWinSet,
             "mustWinByTwoGames" => settings.mustWinByTwoGames,
-            "goldenPointEnabled" => settings.goldenPointEnabled,
+            "deuceFormat" => deuceFormatToString(settings.deuceFormat),
+            // Pre-silver-point key, still written so an older build reading this
+            // store keeps scoring these matches the same way.
+            "goldenPointEnabled" => settings.deuceFormat != DeuceFormat.DEUCE_ADVANTAGE,
             "askServeAtSetStart" => settings.askServeAtSetStart,
             "fixedServerPositions" => settings.fixedServerPositions,
             "usThemLabels" => settings.usThemLabels
@@ -144,7 +147,19 @@ class MatchStore {
         if (data.hasKey("continuousPlay")) { settings.continuousPlay = data.get("continuousPlay") as Boolean; }
         if (data.hasKey("gamesToWinSet")) { settings.gamesToWinSet = data.get("gamesToWinSet") as Number; }
         if (data.hasKey("mustWinByTwoGames")) { settings.mustWinByTwoGames = data.get("mustWinByTwoGames") as Boolean; }
-        if (data.hasKey("goldenPointEnabled")) { settings.goldenPointEnabled = data.get("goldenPointEnabled") as Boolean; }
+        var format = null;
+        if (data.hasKey("deuceFormat")) {
+            var rawFormat = data.get("deuceFormat");
+            if (rawFormat != null) {
+                format = deuceFormatFromString(rawFormat.toString());
+            }
+        }
+        if (format != null) {
+            settings.deuceFormat = format;
+        } else if (data.hasKey("goldenPointEnabled")) {
+            var legacyGoldenPoint = data.get("goldenPointEnabled") as Boolean;
+            settings.deuceFormat = deuceFormatFromLegacyArchivedFlag(legacyGoldenPoint);
+        }
         if (data.hasKey("askServeAtSetStart")) { settings.askServeAtSetStart = data.get("askServeAtSetStart") as Boolean; }
         if (data.hasKey("fixedServerPositions")) { settings.fixedServerPositions = data.get("fixedServerPositions") as Boolean; }
         if (data.hasKey("usThemLabels")) { settings.usThemLabels = data.get("usThemLabels") as Boolean; }

@@ -149,6 +149,7 @@ class ScoringEngine {
             awardTieBreakPoint(side, state);
             return;
         }
+        // A decisive point is live: this rally ends the game either way.
         if (state.currentGame.isGoldenPointActive) {
             completeGame(side, state);
             return;
@@ -157,14 +158,19 @@ class ScoringEngine {
         var myPoints = state.currentGame.pointsFor(side);
         var theirPoints = state.currentGame.pointsFor(oppositeSide(side));
 
+        // Deuce territory (both at 40+). Golden point never reaches here — it makes
+        // the point decisive the moment the game arrives at 40-40, below.
         if (myPoints >= 3 && theirPoints >= 3) {
             if (state.currentGame.advantageSide == null) {
                 state.currentGame.advantageSide = side;
             } else if (state.currentGame.advantageSide == side) {
                 completeGame(side, state);
             } else {
+                // Advantage broken → back to deuce. Silver point allows exactly one
+                // advantage, so the next point decides; regular scoring keeps cycling.
                 state.currentGame.advantageSide = null;
-                state.currentGame.isGoldenPointActive = state.settings.goldenPointEnabled;
+                state.currentGame.isGoldenPointActive =
+                    state.settings.deuceFormat == DeuceFormat.DEUCE_SILVER_POINT;
             }
             return;
         }
@@ -175,6 +181,14 @@ class ScoringEngine {
         }
 
         state.currentGame.setPoints(myPoints + 1, side);
+
+        // Golden point: no advantage phase at all, so reaching 40-40 makes the very
+        // next rally decisive.
+        if (state.settings.deuceFormat == DeuceFormat.DEUCE_GOLDEN_POINT
+            && state.currentGame.leftPoints >= 3
+            && state.currentGame.rightPoints >= 3) {
+            state.currentGame.isGoldenPointActive = true;
+        }
     }
 
     private function awardTieBreakPoint(side as Side, state as MatchState) as Void {
