@@ -178,6 +178,102 @@ final class MatchServiceTests: XCTestCase {
         XCTAssertTrue(service.archivedMatches.isEmpty)
     }
 
+    func testDeleteArchivedMatchRemovesItAndRecordsTombstone() {
+        let store = InMemoryMatchStore()
+        let service = MatchService(store: store)
+        service.startMatch()
+        service.selectServer(.left)
+        service.awardPoint(to: .left)
+        service.endMatchEarly()
+        service.acknowledgeCompletedMatch()
+        let id = try! XCTUnwrap(service.archivedMatches.first?.id)
+
+        service.deleteArchivedMatch(id: id)
+
+        XCTAssertTrue(service.archivedMatches.isEmpty)
+        XCTAssertTrue(store.archive.isEmpty)
+        XCTAssertEqual(store.deletedIDs, [id])
+    }
+
+    func testDeletedMatchDoesNotReturnViaRemoteSnapshot() throws {
+        let store = InMemoryMatchStore()
+        let engine = ScoringEngine()
+        var match = engine.startMatch()
+        match = try engine.apply(.selectServer(.left), to: match)
+        match = try engine.apply(.pointWon(.left), to: match)
+        match = try engine.apply(.endEarly, to: match)
+        store.archive = [match]
+
+        let service = MatchService(store: store)
+        service.deleteArchivedMatch(id: match.id)
+
+        // The Watch is unaware and pushes its full archive back.
+        service.applyRemoteSnapshot(active: nil, archive: [match])
+
+        XCTAssertTrue(service.archivedMatches.isEmpty)
+        XCTAssertTrue(store.archive.isEmpty)
+    }
+
+    func testDeletedMatchStaysDeletedAcrossRestore() throws {
+        let store = InMemoryMatchStore()
+        let engine = ScoringEngine()
+        var match = engine.startMatch()
+        match = try engine.apply(.endEarly, to: match)
+        store.archive = [match]
+
+        let service = MatchService(store: store)
+        service.deleteArchivedMatch(id: match.id)
+
+        let restored = MatchService(store: store)
+        XCTAssertTrue(restored.archivedMatches.isEmpty)
+        XCTAssertEqual(restored.deletedMatchIDs, [match.id])
+    }
+
+    func testDeleteIgnoresTheActiveMatch() {
+        let store = InMemoryMatchStore()
+        let service = MatchService(store: store)
+        service.startMatch()
+        service.selectServer(.left)
+        service.awardPoint(to: .left)
+        service.endMatchEarly()
+        let id = try! XCTUnwrap(service.activeMatch?.id)
+
+        service.deleteArchivedMatch(id: id)
+
+        XCTAssertEqual(service.archivedMatches.count, 1)
+        XCTAssertTrue(service.deletedMatchIDs.isEmpty)
+    }
+
+    func testRemoteDeletionsPruneArchiveButNotActiveMatch() throws {
+        let store = InMemoryMatchStore()
+        let engine = ScoringEngine()
+        var archived = engine.startMatch()
+        archived = try engine.apply(.endEarly, to: archived)
+        store.archive = [archived]
+
+        let service = MatchService(store: store)
+        service.startMatch()
+        let activeID = try XCTUnwrap(service.activeMatch?.id)
+
+        service.applyRemoteDeletions([archived.id, activeID])
+
+        XCTAssertTrue(service.archivedMatches.isEmpty)
+        XCTAssertTrue(store.archive.isEmpty)
+        XCTAssertEqual(service.activeMatch?.id, activeID)
+    }
+
+    func testDeletedIDsSurviveFileStoreRoundTrip() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let store = FileMatchStore(directory: dir)
+        XCTAssertTrue(try store.loadDeletedMatchIDs().isEmpty)
+
+        let ids: Set<UUID> = [UUID(), UUID()]
+        try store.saveDeletedMatchIDs(ids)
+
+        XCTAssertEqual(try FileMatchStore(directory: dir).loadDeletedMatchIDs(), ids)
+    }
+
     private func serviceWithActiveMatch(_ match: MatchState) -> MatchService {
         let store = InMemoryMatchStore()
         store.active = match

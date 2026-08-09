@@ -3,10 +3,13 @@ import WatchConnectivity
 
 /// Bidirectional sync of active match + archive between Watch and iPhone.
 /// Watch is authoritative during live scoring; iPhone applies remote snapshots.
+/// History deletion runs the other way: the iPhone owns it, and the Watch prunes
+/// its own archive to match.
 @MainActor
 public final class MatchSyncCoordinator: NSObject, ObservableObject {
     public static let activeKey = "activeMatchJSON"
     public static let archiveKey = "archiveJSON"
+    public static let deletedKey = "deletedMatchIDsJSON"
 
     private let service: MatchService
     private let session: WCSession?
@@ -35,12 +38,12 @@ public final class MatchSyncCoordinator: NSObject, ObservableObject {
             session.activate()
         }
 
-        service.onSyncNeeded { [weak self] active, archive in
-            self?.push(active: active, archive: archive)
+        service.onSyncNeeded { [weak self] active, archive, deleted in
+            self?.push(active: active, archive: archive, deleted: deleted)
         }
     }
 
-    public func push(active: MatchState?, archive: [MatchState]) {
+    public func push(active: MatchState?, archive: [MatchState], deleted: Set<UUID>) {
         guard let session, session.activationState == .activated else { return }
 
         var context: [String: Any] = [:]
@@ -51,6 +54,9 @@ public final class MatchSyncCoordinator: NSObject, ObservableObject {
                 context[Self.activeKey] = Data()
             }
             context[Self.archiveKey] = try encoder.encode(archive)
+            // Sent in full rather than as a delta, so a Watch that was unreachable at
+            // deletion time still catches up on its next context update.
+            context[Self.deletedKey] = try encoder.encode(Array(deleted))
             try session.updateApplicationContext(context)
 
             #if os(watchOS)
@@ -68,8 +74,19 @@ public final class MatchSyncCoordinator: NSObject, ObservableObject {
     }
 
     private func apply(context: [String: Any]) {
-        // Watch remains authoritative for live scoring; only apply remote updates on iPhone.
-        guard !isWatch else { return }
+        let deleted: Set<UUID>
+        if let data = context[Self.deletedKey] as? Data, !data.isEmpty {
+            deleted = Set((try? decoder.decode([UUID].self, from: data)) ?? [])
+        } else {
+            deleted = []
+        }
+
+        // Watch remains authoritative for live scoring, so it takes deletions from the
+        // phone and ignores everything else in the payload.
+        guard !isWatch else {
+            service.applyRemoteDeletions(deleted)
+            return
+        }
 
         let active: MatchState?
         if let data = context[Self.activeKey] as? Data, !data.isEmpty {
@@ -97,7 +114,11 @@ extension MatchSyncCoordinator: WCSessionDelegate {
     ) {
         Task { @MainActor in
             if activationState == .activated {
-                self.push(active: self.service.activeMatch, archive: self.service.archivedMatches)
+                self.push(
+                    active: self.service.activeMatch,
+                    archive: self.service.archivedMatches,
+                    deleted: self.service.deletedMatchIDs
+                )
             }
         }
     }

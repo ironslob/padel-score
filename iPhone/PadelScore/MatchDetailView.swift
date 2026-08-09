@@ -2,6 +2,11 @@ import SwiftUI
 
 struct MatchDetailView: View {
     let match: MatchState
+    /// Supplied for history entries only; the active match is owned by the Watch.
+    var onDelete: (() -> Void)?
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var isConfirmingDelete = false
 
     var body: some View {
         List {
@@ -49,6 +54,28 @@ struct MatchDetailView: View {
         }
         .navigationTitle("Match")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if onDelete != nil {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Delete", systemImage: "trash", role: .destructive) {
+                        isConfirmingDelete = true
+                    }
+                }
+            }
+        }
+        .confirmationDialog(
+            "Delete this match?",
+            isPresented: $isConfirmingDelete,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                onDelete?()
+                dismiss()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This can't be undone. The match is removed from your Apple Watch too.")
+        }
     }
 
     private var scoreText: String {

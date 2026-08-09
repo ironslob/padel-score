@@ -7,12 +7,13 @@ import os
 public final class MatchService: ObservableObject {
     @Published public private(set) var activeMatch: MatchState?
     @Published public private(set) var archivedMatches: [MatchState] = []
+    @Published public private(set) var deletedMatchIDs: Set<UUID> = []
     @Published public private(set) var isRestored = false
 
     private let engine: ScoringEngine
     private let store: MatchStore
     private let logger = Logger(subsystem: "com.padelscore", category: "MatchService")
-    private var syncHandler: ((MatchState?, [MatchState]) -> Void)?
+    private var syncHandler: ((MatchState?, [MatchState], Set<UUID>) -> Void)?
 
     public init(store: MatchStore, engine: ScoringEngine = ScoringEngine(), autoRestore: Bool = true) {
         self.store = store
@@ -23,14 +24,15 @@ public final class MatchService: ObservableObject {
     }
 
     /// Optional callback invoked after every persistence write (used by WatchConnectivity).
-    public func onSyncNeeded(_ handler: @escaping (MatchState?, [MatchState]) -> Void) {
+    public func onSyncNeeded(_ handler: @escaping (MatchState?, [MatchState], Set<UUID>) -> Void) {
         syncHandler = handler
     }
 
     public func restore() {
         do {
+            deletedMatchIDs = try store.loadDeletedMatchIDs()
             activeMatch = try store.loadActiveMatch()
-            archivedMatches = try store.loadArchivedMatches().filter { $0.status != .discarded }
+            archivedMatches = visibleArchive(try store.loadArchivedMatches())
             logger.info("Restored active=\(self.activeMatch != nil) archive=\(self.archivedMatches.count)")
             finishRestore()
         } catch {
@@ -44,13 +46,15 @@ public final class MatchService: ObservableObject {
     public func restore() async {
         do {
             let store = self.store
-            let (active, archive) = try await Task.detached(priority: .userInitiated) {
+            let (active, archive, deleted) = try await Task.detached(priority: .userInitiated) {
                 let active = try store.loadActiveMatch()
                 let archive = try store.loadArchivedMatches()
-                return (active, archive)
+                let deleted = try store.loadDeletedMatchIDs()
+                return (active, archive, deleted)
             }.value
+            deletedMatchIDs = deleted
             activeMatch = active
-            archivedMatches = archive.filter { $0.status != .discarded }
+            archivedMatches = visibleArchive(archive)
             logger.info("Restored active=\(self.activeMatch != nil) archive=\(self.archivedMatches.count)")
             finishRestore()
         } catch {
@@ -197,27 +201,60 @@ public final class MatchService: ObservableObject {
         // Ensure archived, then clear active.
         if !archivedMatches.contains(where: { $0.id == match.id }) {
             try? store.archiveMatch(match)
-            archivedMatches = (try? store.loadArchivedMatches()) ?? archivedMatches
+            archivedMatches = visibleArchive((try? store.loadArchivedMatches()) ?? archivedMatches)
         }
         activeMatch = nil
         try? store.saveActiveMatch(nil)
         notifySync()
     }
 
+    /// Removes a match from history for good. The tombstone survives so a later Watch
+    /// snapshot cannot resurrect it. The in-progress match is owned by the Watch and is
+    /// never deleted here.
+    public func deleteArchivedMatch(id: UUID) {
+        guard id != activeMatch?.id else {
+            logger.info("Refused to delete the active match \(id.uuidString)")
+            return
+        }
+        deletedMatchIDs.insert(id)
+        try? store.saveDeletedMatchIDs(deletedMatchIDs)
+        try? store.deleteArchivedMatch(id: id)
+        archivedMatches.removeAll { $0.id == id }
+        notifySync()
+        logger.info("Deleted archived match \(id.uuidString)")
+    }
+
     /// Used by the phone when receiving Watch sync payloads.
     public func applyRemoteSnapshot(active: MatchState?, archive: [MatchState]) {
         activeMatch = active
-        archivedMatches = archive.filter { $0.status != .discarded }
-            .sorted { $0.startedAt > $1.startedAt }
+        archivedMatches = visibleArchive(archive)
         try? store.saveActiveMatch(active)
         try? store.replaceArchive(archivedMatches)
+    }
+
+    /// Used by the Watch when the phone reports matches the user deleted from history.
+    /// Archive only — the active match is never touched by a remote payload.
+    public func applyRemoteDeletions(_ ids: Set<UUID>) {
+        let doomed = archivedMatches.filter { ids.contains($0.id) && $0.id != activeMatch?.id }
+        guard !doomed.isEmpty else { return }
+        for match in doomed {
+            try? store.deleteArchivedMatch(id: match.id)
+        }
+        archivedMatches.removeAll { match in doomed.contains { $0.id == match.id } }
+        logger.info("Applied \(doomed.count) remote deletion(s)")
+    }
+
+    private func visibleArchive(_ matches: [MatchState]) -> [MatchState] {
+        matches
+            .filter { $0.status != .discarded && !deletedMatchIDs.contains($0.id) }
+            .sorted { $0.startedAt > $1.startedAt }
     }
 
     private func finalizeActiveMatch() {
         guard let match = activeMatch else { return }
         if match.status != .discarded {
             try? store.archiveMatch(match)
-            archivedMatches = (try? store.loadArchivedMatches().filter { $0.status != .discarded }) ?? []
+            archivedMatches = visibleArchive((try? store.loadArchivedMatches()) ?? [])
         }
         // Keep terminal match as active until user acknowledges Done (Watch completion screen).
         try? store.saveActiveMatch(match)
@@ -234,6 +271,6 @@ public final class MatchService: ObservableObject {
     }
 
     private func notifySync() {
-        syncHandler?(activeMatch, archivedMatches)
+        syncHandler?(activeMatch, archivedMatches, deletedMatchIDs)
     }
 }

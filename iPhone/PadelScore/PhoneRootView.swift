@@ -4,6 +4,7 @@ struct PhoneRootView: View {
     @EnvironmentObject private var appModel: PhoneAppModel
     @EnvironmentObject private var service: MatchService
     @Environment(\.scenePhase) private var scenePhase
+    @State private var pendingDeletion: [MatchState] = []
 
     var body: some View {
         NavigationStack {
@@ -16,6 +17,13 @@ struct PhoneRootView: View {
                 }
             }
             .navigationTitle("Padel Score")
+            .toolbar {
+                if !historyMatches.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        EditButton()
+                    }
+                }
+            }
             .overlay {
                 if service.isRestored, service.activeMatch == nil, service.archivedMatches.isEmpty {
                     ContentUnavailableView(
@@ -27,6 +35,26 @@ struct PhoneRootView: View {
             }
             .refreshable {
                 service.restore()
+            }
+            .confirmationDialog(
+                deletionPrompt,
+                isPresented: Binding(
+                    get: { !pendingDeletion.isEmpty },
+                    set: { if !$0 { pendingDeletion = [] } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    for match in pendingDeletion {
+                        service.deleteArchivedMatch(id: match.id)
+                    }
+                    pendingDeletion = []
+                }
+                Button("Cancel", role: .cancel) {
+                    pendingDeletion = []
+                }
+            } message: {
+                Text("This can't be undone. The match is removed from your Apple Watch too.")
             }
         }
         .task {
@@ -53,20 +81,35 @@ struct PhoneRootView: View {
             }
 
             Section("History") {
-                if service.archivedMatches.isEmpty {
+                if historyMatches.isEmpty {
                     Text("No completed matches yet.")
                         .foregroundStyle(.secondary)
                 } else {
-                    ForEach(service.archivedMatches) { match in
+                    ForEach(historyMatches) { match in
                         NavigationLink {
-                            MatchDetailView(match: match)
+                            MatchDetailView(match: match) {
+                                service.deleteArchivedMatch(id: match.id)
+                            }
                         } label: {
                             MatchHistoryRow(match: match)
                         }
                     }
+                    .onDelete { offsets in
+                        pendingDeletion = offsets.map { historyMatches[$0] }
+                    }
                 }
             }
         }
+    }
+
+    /// The active match is archived as soon as it reaches a terminal state but stays
+    /// active until acknowledged on the Watch, so it would otherwise appear twice.
+    private var historyMatches: [MatchState] {
+        service.archivedMatches.filter { $0.id != service.activeMatch?.id }
+    }
+
+    private var deletionPrompt: String {
+        pendingDeletion.count > 1 ? "Delete \(pendingDeletion.count) matches?" : "Delete this match?"
     }
 }
 
