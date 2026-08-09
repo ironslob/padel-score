@@ -73,7 +73,11 @@ struct PhoneRootView: View {
             if let active = service.activeMatch, active.status == .inProgress || active.status.isTerminal {
                 Section("Active Match") {
                     NavigationLink {
-                        MatchDetailView(match: active)
+                        MatchDetailView(
+                            match: active,
+                            note: service.note(for: active.id),
+                            onNoteChange: { service.setNote($0, for: active.id) }
+                        )
                     } label: {
                         ActiveMatchRow(match: active)
                     }
@@ -87,11 +91,14 @@ struct PhoneRootView: View {
                 } else {
                     ForEach(historyMatches) { match in
                         NavigationLink {
-                            MatchDetailView(match: match) {
-                                service.deleteArchivedMatch(id: match.id)
-                            }
+                            MatchDetailView(
+                                match: match,
+                                note: service.note(for: match.id),
+                                onNoteChange: { service.setNote($0, for: match.id) },
+                                onDelete: { service.deleteArchivedMatch(id: match.id) }
+                            )
                         } label: {
-                            MatchHistoryRow(match: match)
+                            MatchHistoryRow(match: match, note: service.note(for: match.id))
                         }
                     }
                     .onDelete { offsets in
@@ -140,6 +147,7 @@ struct ActiveMatchRow: View {
 
 struct MatchHistoryRow: View {
     let match: MatchState
+    var note: String = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -156,6 +164,12 @@ struct MatchHistoryRow: View {
             Text(DurationFormatter.detailed(match.duration))
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            if !note.isEmpty {
+                Label(note, systemImage: "note.text")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
         }
         .padding(.vertical, 2)
     }

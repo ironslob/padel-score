@@ -2,11 +2,17 @@ import SwiftUI
 
 struct MatchDetailView: View {
     let match: MatchState
+    /// Phone-authored free text for this match; editing is hidden without `onNoteChange`.
+    var note: String = ""
+    var onNoteChange: ((String) -> Void)?
     /// Supplied for history entries only; the active match is owned by the Watch.
     var onDelete: (() -> Void)?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
     @State private var isConfirmingDelete = false
+    @State private var noteDraft = ""
+    @FocusState private var isNoteFocused: Bool
     @State private var isHistoryExpanded = false
 
     var body: some View {
@@ -21,6 +27,14 @@ struct MatchDetailView: View {
                 LabeledContent("Score", value: scoreText)
                 if let winner = match.winner {
                     LabeledContent("Winner", value: winner == .left ? "Us (left)" : "Them (right)")
+                }
+            }
+
+            if onNoteChange != nil {
+                Section("Notes") {
+                    TextField("Add a note", text: $noteDraft, axis: .vertical)
+                        .lineLimit(3...12)
+                        .focused($isNoteFocused)
                 }
             }
 
@@ -73,7 +87,21 @@ struct MatchDetailView: View {
                     }
                 }
             }
+            // A multi-line field takes Return as a newline, so it needs its own dismissal.
+            ToolbarItem(placement: .keyboard) {
+                if isNoteFocused {
+                    Button("Done") { isNoteFocused = false }
+                }
+            }
         }
+        .onAppear { noteDraft = note }
+        .onChange(of: isNoteFocused) { _, focused in
+            if !focused { saveNote() }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { saveNote() }
+        }
+        .onDisappear { saveNote() }
         .confirmationDialog(
             "Delete this match?",
             isPresented: $isConfirmingDelete,
@@ -87,6 +115,10 @@ struct MatchDetailView: View {
         } message: {
             Text("This can't be undone. The match is removed from your Apple Watch too.")
         }
+    }
+
+    private func saveNote() {
+        onNoteChange?(noteDraft)
     }
 
     private var scoreText: String {

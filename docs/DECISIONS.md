@@ -20,6 +20,12 @@ Documented decisions that were not fully prescribed by `/spec`.
 
 **Why:** The Watch pushes its whole archive and `applyRemoteSnapshot` replaces the phone's copy wholesale, so a delete without tombstones would be silently resurrected on the next sync. Tombstones make deletion durable even if the Watch is offline or never updates; sending the whole set rather than a delta lets a disconnected Watch catch up on its next context update. History curation is a phone-sized task, so this narrow inversion of authority does not disturb the rule that the Watch owns live scoring.
 
+## Match notes
+
+**Choice:** Free text notes are attached to a match on the iPhone (a Notes field in match detail, with a one-line preview in the history row). They live in their own phone-local `match-notes.json` keyed by match id, not as a field on `MatchState`, and are never sent to the Watch. The detail view saves its draft when the field loses focus, when the app leaves the foreground, and when the view goes away; deleting a match drops its note, and a tombstoned id refuses new notes so the dismissal save cannot resurrect one.
+
+**Why:** The Watch pushes its whole archive and `applyRemoteSnapshot` replaces the phone's copy wholesale, so a note stored inside `MatchState` would be wiped on the next sync. Keeping notes in a side file — the same shape as the deletion tombstones — makes them immune to that without inverting any authority, and the Watch has no screen for them anyway. Saving on focus loss rather than per keystroke avoids rewriting the file while typing without risking the draft.
+
 ## Undo model
 
 **Choice:** Undo removes the last `pointWon` event and replays the stream. After a point on the score screen, a 5-second clockwise outline animates on that side’s button; tapping the same button again cancels the point. Actions screen allows undo anytime while in progress.
