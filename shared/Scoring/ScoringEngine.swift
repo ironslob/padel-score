@@ -207,7 +207,19 @@ public struct ScoringEngine: Sendable {
         state.currentGame.isComplete = true
         state.currentGame.winner = winner
         state.currentSet.setGames(7, for: winner)
-        completeSet(winner: winner, in: &state)
+        // The side that opened the tie-break receives first in the next set, so
+        // serve keeps rotating as if the tie-break were a single game.
+        let nextSetServer = tieBreakOpeningServer(in: state)?.opposite
+        completeSet(winner: winner, in: &state, nextSetServer: nextSetServer)
+    }
+
+    /// The side that served the opening point of the tie-break in progress.
+    /// Serve flips after every odd-numbered point, so the opening server follows
+    /// from the current server and how many flips have happened.
+    private func tieBreakOpeningServer(in state: MatchState) -> Side? {
+        guard let server = state.currentServer else { return nil }
+        let flips = (state.currentGame.tieBreakTotalPoints + 1) / 2
+        return flips.isMultiple(of: 2) ? server : server.opposite
     }
 
     private func completeGame(winner: Side, in state: inout MatchState) {
@@ -219,15 +231,20 @@ public struct ScoringEngine: Sendable {
         let games = state.currentSet.games(for: winner) + 1
         state.currentSet.setGames(games, for: winner)
 
+        // Serve rotates after every completed game, including the one that ends a
+        // set and the one that sends the set to a tie-break.
+        let nextServer = state.currentServer?.opposite
+
         if state.currentSet.leftGames == 6 && state.currentSet.rightGames == 6 {
+            state.currentServer = nextServer
             state.currentGame = GameScore(isTieBreak: true)
             return
         }
 
         if isSetWon(by: winner, set: state.currentSet, settings: state.settings) {
-            completeSet(winner: winner, in: &state)
+            completeSet(winner: winner, in: &state, nextSetServer: nextServer)
         } else {
-            state.currentServer = state.currentServer?.opposite
+            state.currentServer = nextServer
             state.currentGame = .zero
         }
     }
@@ -242,7 +259,7 @@ public struct ScoringEngine: Sendable {
         return true
     }
 
-    private func completeSet(winner: Side, in state: inout MatchState) {
+    private func completeSet(winner: Side, in state: inout MatchState, nextSetServer: Side?) {
         state.currentSet.isComplete = true
         state.currentSet.winner = winner
         state.completedSets.append(state.currentSet)
@@ -255,10 +272,7 @@ public struct ScoringEngine: Sendable {
         if state.settings.continuousPlay {
             state.currentSet = .zero
             state.currentGame = .zero
-            if state.settings.askServeAtSetStart {
-                state.currentServer = nil
-                state.needsServerSelection = true
-            }
+            beginNextSetServe(nextSetServer, in: &state)
         } else if state.leftSetsWon >= state.settings.setsToWin {
             state.winner = .left
             state.status = .completed
@@ -272,10 +286,18 @@ public struct ScoringEngine: Sendable {
         } else {
             state.currentSet = .zero
             state.currentGame = .zero
-            if state.settings.askServeAtSetStart {
-                state.currentServer = nil
-                state.needsServerSelection = true
-            }
+            beginNextSetServe(nextSetServer, in: &state)
+        }
+    }
+
+    /// Carries serve rotation into the new set, unless the player opted to be
+    /// asked who serves at the start of each set.
+    private func beginNextSetServe(_ nextSetServer: Side?, in state: inout MatchState) {
+        if state.settings.askServeAtSetStart {
+            state.currentServer = nil
+            state.needsServerSelection = true
+        } else {
+            state.currentServer = nextSetServer
         }
     }
 

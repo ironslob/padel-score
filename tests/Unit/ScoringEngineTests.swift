@@ -180,7 +180,7 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.leftSetsWon, 1)
         XCTAssertEqual(s.currentSet.leftGames, 0)
         XCTAssertFalse(s.needsServerSelection)
-        XCTAssertEqual(s.currentServer, .right)
+        XCTAssertEqual(s.currentServer, .left)
     }
 
     func testSetStartRequiresServerSelectionWhenEnabled() throws {
@@ -204,12 +204,43 @@ final class ScoringEngineTests: XCTestCase {
             s = try winGame(for: .left, from: s)
             s = try winGame(for: .right, from: s)
         }
-        s = try winGame(for: .left, from: s) // 6-5
-        s = try winGame(for: .left, from: s) // 7-5 set
+        s = try winGame(for: .left, from: s) // 6-5, game 11 served by Us
+        s = try winGame(for: .left, from: s) // 7-5 set, game 12 served by Them
         XCTAssertFalse(s.needsServerSelection)
-        XCTAssertEqual(s.currentServer, .right)
+        // Serve rotates after the set-winning game like any other game.
+        XCTAssertEqual(s.currentServer, .left)
         s = try point(.left, s)
-        XCTAssertEqual(s.currentServer, .right)
+        XCTAssertEqual(s.currentServer, .left)
+    }
+
+    /// product.md §12: serve rotates after every game, so the set boundary is not
+    /// a reset — the side that did not serve the last game of a set opens the next.
+    func testServeRotatesIntoFirstGameOfNextSet() throws {
+        var s = start()
+        XCTAssertEqual(s.currentServer, .left)
+        for game in 1...6 {
+            s = try winGame(for: .left, from: s)
+            let expected: Side = game.isMultiple(of: 2) ? .left : .right
+            XCTAssertEqual(s.currentServer, expected, "after game \(game)")
+        }
+        // Set 1 is over 6-0; Them served game 6, so Us opens set 2.
+        XCTAssertEqual(s.completedSets.count, 1)
+        XCTAssertEqual(s.currentSet.leftGames, 0)
+        XCTAssertFalse(s.needsServerSelection)
+        XCTAssertEqual(s.currentServer, .left)
+    }
+
+    func testServeRotatesAcrossSetBoundaryInContinuousPlay() throws {
+        var settings = MatchSettings.default
+        settings.continuousPlay = true
+        var s = start(settings: settings)
+        for _ in 0..<6 {
+            s = try winGame(for: .left, from: s)
+        }
+        XCTAssertEqual(s.completedSets.count, 1)
+        XCTAssertEqual(s.status, .inProgress)
+        XCTAssertFalse(s.needsServerSelection)
+        XCTAssertEqual(s.currentServer, .left)
     }
 
     func testServerAutoTogglesAfterEachCompletedGame() throws {
@@ -336,13 +367,13 @@ final class ScoringEngineTests: XCTestCase {
         var s = engine.startMatch(settings: settings)
         s = try engine.apply(.selectServer(.left), to: s)
         s = try reachSixSix(from: s)
-        XCTAssertEqual(s.currentServer, .right)
-        s = try point(.left, s)
         XCTAssertEqual(s.currentServer, .left)
+        s = try point(.left, s)
+        XCTAssertEqual(s.currentServer, .right)
         s = try point(.right, s)
-        XCTAssertEqual(s.currentServer, .left)
-        s = try point(.left, s)
         XCTAssertEqual(s.currentServer, .right)
+        s = try point(.left, s)
+        XCTAssertEqual(s.currentServer, .left)
     }
 
     func testAskServeAtSetStartWorksWithFixedServerPositions() throws {
@@ -459,16 +490,67 @@ final class ScoringEngineTests: XCTestCase {
 
     func testTieBreakServeRotation() throws {
         var s = try reachSixSix(from: start())
-        XCTAssertEqual(s.currentServer, .right)
+        XCTAssertEqual(s.currentServer, .left)
 
         s = try point(.left, s) // point 1
-        XCTAssertEqual(s.currentServer, .left)
+        XCTAssertEqual(s.currentServer, .right)
 
         s = try point(.right, s) // point 2
-        XCTAssertEqual(s.currentServer, .left)
+        XCTAssertEqual(s.currentServer, .right)
 
         s = try point(.left, s) // point 3
+        XCTAssertEqual(s.currentServer, .left)
+    }
+
+    /// product.md §12: the tie-break is entered on the normal rotation, so the
+    /// side that did not serve game 12 serves the opening tie-break point.
+    func testServeRotatesIntoTieBreakOpeningPoint() throws {
+        var s = start()
+        for _ in 0..<5 {
+            s = try winGame(for: .left, from: s)
+            s = try winGame(for: .right, from: s)
+        }
+        s = try winGame(for: .left, from: s)  // 6-5, game 11 served by Us
         XCTAssertEqual(s.currentServer, .right)
+        s = try winGame(for: .right, from: s) // 6-6, game 12 served by Them
+        XCTAssertTrue(s.currentGame.isTieBreak)
+        XCTAssertEqual(s.currentServer, .left)
+    }
+
+    /// The side that opens a tie-break receives first in the next set, whatever
+    /// the tie-break's length.
+    func testServeAfterTieBreakPassesToTieBreakReceiver() throws {
+        var s = try reachSixSix(from: start())
+        XCTAssertEqual(s.currentServer, .left) // Us opens the tie-break
+
+        s = try winTieBreak(for: .left, points: 7, from: s) // 7-0, even flip count
+        XCTAssertEqual(s.completedSets.count, 1)
+        XCTAssertFalse(s.needsServerSelection)
+        XCTAssertEqual(s.currentServer, .right)
+    }
+
+    func testServeAfterOddLengthTieBreakPassesToTieBreakReceiver() throws {
+        var s = try reachSixSix(from: start())
+        XCTAssertEqual(s.currentServer, .left) // Us opens the tie-break
+
+        s = try winTieBreak(for: .right, points: 2, from: s)
+        s = try winTieBreak(for: .left, points: 7, from: s) // 7-2, odd flip count
+        XCTAssertEqual(s.completedSets.count, 1)
+        XCTAssertEqual(s.completedSets[0].leftGames, 7)
+        XCTAssertFalse(s.needsServerSelection)
+        XCTAssertEqual(s.currentServer, .right)
+    }
+
+    func testAskServeAtSetStartStillPromptsAfterTieBreak() throws {
+        var settings = MatchSettings.default
+        settings.askServeAtSetStart = true
+        var s = engine.startMatch(settings: settings)
+        s = try engine.apply(.selectServer(.left), to: s)
+        s = try reachSixSix(from: s)
+        s = try winTieBreak(for: .left, points: 7, from: s)
+        XCTAssertEqual(s.completedSets.count, 1)
+        XCTAssertTrue(s.needsServerSelection)
+        XCTAssertNil(s.currentServer)
     }
 
     func testTieBreakNoticeChangeSides() throws {
