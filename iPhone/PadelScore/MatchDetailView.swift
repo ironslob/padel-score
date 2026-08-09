@@ -28,7 +28,7 @@ struct MatchDetailView: View {
                         .monospacedDigit()
                 }
                 if match.displaysIncompleteSet {
-                    Text("\(incompleteSetLabel): \(match.currentSet.leftGames)–\(match.currentSet.rightGames) (Game \(match.currentGame.displayPair.left)–\(match.currentGame.displayPair.right))")
+                    Text("\(incompleteSetLabel): \(match.currentSet.leftGames)–\(match.currentSet.rightGames) (Game \(match.gameDisplayPair.left)–\(match.gameDisplayPair.right))")
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
                 }

@@ -168,7 +168,7 @@ final class WorkoutSessionErrorTests: XCTestCase {
 
 final class SettingsCopyTests: XCTestCase {
     func testSettingHelpersAreNonEmpty() {
-        XCTAssertFalse(SettingsCopy.goldenPoint.isEmpty)
+        XCTAssertFalse(SettingsCopy.deuceFormat.isEmpty)
         XCTAssertFalse(SettingsCopy.usThemLabels.isEmpty)
         XCTAssertFalse(SettingsCopy.fixedServerPositions.isEmpty)
         XCTAssertFalse(SettingsCopy.askServeAtSetStart.isEmpty)
@@ -257,14 +257,76 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
         XCTAssertFalse(store.usThemLabels)
     }
 
-    func testGoldenPointEnabledDefaultsTrueAndPersists() {
-        let suiteName = "ServeSelectionPreferenceStoreTests.goldenPoint.\(UUID().uuidString)"
+    func testDeuceFormatDefaultsGoldenPointAndPersists() {
+        let suiteName = "ServeSelectionPreferenceStoreTests.deuceFormat.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         let store = UserDefaultsServeSelectionPreferenceStore(defaults: defaults)
 
-        XCTAssertTrue(store.goldenPointEnabled)
-        store.setGoldenPointEnabled(false)
-        XCTAssertFalse(store.goldenPointEnabled)
+        XCTAssertEqual(store.deuceFormat, .goldenPoint)
+        store.setDeuceFormat(.silverPoint)
+        XCTAssertEqual(store.deuceFormat, .silverPoint)
+        store.setDeuceFormat(.advantage)
+        XCTAssertEqual(store.deuceFormat, .advantage)
+    }
+
+    func testDeuceFormatMigratesFromLegacyGoldenPointToggle() {
+        let suiteName = "ServeSelectionPreferenceStoreTests.legacyDeuce.\(UUID().uuidString)"
+
+        // Someone who switched the old toggle off wanted full advantage scoring.
+        let offDefaults = UserDefaults(suiteName: suiteName + ".off")!
+        offDefaults.set(false, forKey: "goldenPointEnabled")
+        XCTAssertEqual(
+            UserDefaultsServeSelectionPreferenceStore(defaults: offDefaults).deuceFormat,
+            .advantage
+        )
+
+        // Everyone else lands on the new default.
+        let onDefaults = UserDefaults(suiteName: suiteName + ".on")!
+        onDefaults.set(true, forKey: "goldenPointEnabled")
+        XCTAssertEqual(
+            UserDefaultsServeSelectionPreferenceStore(defaults: onDefaults).deuceFormat,
+            .goldenPoint
+        )
+
+        // An explicit choice always beats the legacy key.
+        let bothDefaults = UserDefaults(suiteName: suiteName + ".both")!
+        bothDefaults.set(false, forKey: "goldenPointEnabled")
+        let store = UserDefaultsServeSelectionPreferenceStore(defaults: bothDefaults)
+        store.setDeuceFormat(.silverPoint)
+        XCTAssertEqual(store.deuceFormat, .silverPoint)
+    }
+
+    func testArchivedMatchesKeepSilverPointBehaviour() throws {
+        // Matches written before this setting existed played one advantage before
+        // the decisive point, so they must decode as silver point, not golden.
+        let legacy = """
+        {"setsToWin":2,"gamesToWinSet":6,"mustWinByTwoGames":true,"goldenPointEnabled":true}
+        """
+        let settings = try JSONDecoder().decode(MatchSettings.self, from: Data(legacy.utf8))
+        XCTAssertEqual(settings.deuceFormat, .silverPoint)
+
+        let legacyOff = """
+        {"setsToWin":2,"gamesToWinSet":6,"mustWinByTwoGames":true,"goldenPointEnabled":false}
+        """
+        let offSettings = try JSONDecoder().decode(MatchSettings.self, from: Data(legacyOff.utf8))
+        XCTAssertEqual(offSettings.deuceFormat, .advantage)
+    }
+
+    func testDefaultSettingsUseGoldenPoint() {
+        XCTAssertEqual(MatchSettings.default.deuceFormat, .goldenPoint)
+        XCTAssertEqual(MatchSettings().deuceFormat, .goldenPoint)
+    }
+
+    func testDeuceFormatRoundTripsThroughCoding() throws {
+        // The legacy key is written alongside the new one, so a round trip must
+        // still land on the explicit format rather than the migration fallback.
+        for format in DeuceFormat.allCases {
+            var settings = MatchSettings.default
+            settings.deuceFormat = format
+            let data = try JSONEncoder().encode(settings)
+            let decoded = try JSONDecoder().decode(MatchSettings.self, from: data)
+            XCTAssertEqual(decoded.deuceFormat, format)
+        }
     }
 
     func testMatchSetFormatDefaultsBestOfThreeAndPersists() {

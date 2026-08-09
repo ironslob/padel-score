@@ -38,7 +38,7 @@ public final class MatchSessionCoordinator: ObservableObject {
     @Published public private(set) var alwaysAskServeAtSetStart = false
     @Published public private(set) var fixedServerPositions = true
     @Published public private(set) var usThemLabels = true
-    @Published public private(set) var goldenPointEnabled = true
+    @Published public private(set) var deuceFormat: DeuceFormat = .goldenPoint
     @Published public private(set) var matchSetFormat: MatchSetFormat = .bestOfThree
     @Published public private(set) var isWorkoutSessionActive = false
     @Published public private(set) var isWorkoutPaused = false
@@ -71,7 +71,7 @@ public final class MatchSessionCoordinator: ObservableObject {
         self.alwaysAskServeAtSetStart = serveStore.alwaysAskServeAtSetStart
         self.fixedServerPositions = serveStore.fixedServerPositions
         self.usThemLabels = serveStore.usThemLabels
-        self.goldenPointEnabled = serveStore.goldenPointEnabled
+        self.deuceFormat = serveStore.deuceFormat
         self.matchSetFormat = serveStore.matchSetFormat
         self.workoutManager.pauseStateHandler = { [weak self] isPaused in
             self?.isWorkoutPaused = isPaused
@@ -104,9 +104,9 @@ public final class MatchSessionCoordinator: ObservableObject {
         syncPreferencesToActiveMatch()
     }
 
-    public func setGoldenPointEnabled(_ value: Bool) {
-        goldenPointEnabled = value
-        serveStore.setGoldenPointEnabled(value)
+    public func setDeuceFormat(_ value: DeuceFormat) {
+        deuceFormat = value
+        serveStore.setDeuceFormat(value)
     }
 
     public func setMatchSetFormat(_ value: MatchSetFormat) {
@@ -126,7 +126,7 @@ public final class MatchSessionCoordinator: ObservableObject {
         guard service.activeMatch == nil else { return }
 
         var settings = MatchSettings.default
-        settings.goldenPointEnabled = goldenPointEnabled
+        settings.deuceFormat = deuceFormat
         matchSetFormat.apply(to: &settings)
         settings.askServeAtSetStart = alwaysAskServeAtSetStart
         settings.fixedServerPositions = fixedServerPositions

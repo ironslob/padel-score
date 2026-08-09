@@ -148,14 +148,16 @@ struct ScoreScreen: View {
 
     @ViewBuilder
     private var goldenPointLabel: some View {
+        let format = match.settings.deuceFormat
+        let accessibility = "\(format.decidingPointLabel), next point wins"
         if isLuminanceReduced {
-            Text("GP")
+            Text(format.decidingPointShortLabel)
                 .font(setScoreFont)
                 .foregroundStyle(.primary)
-                .accessibilityLabel("Golden Point, next point wins")
+                .accessibilityLabel(accessibility)
         } else {
             VStack(spacing: 2) {
-                Text("Golden Point")
+                Text(format.decidingPointLabel)
                     .font(.caption.weight(.bold))
                     .foregroundStyle(.yellow)
                 Text("Next point wins")
@@ -164,7 +166,7 @@ struct ScoreScreen: View {
             }
             .frame(maxWidth: .infinity)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("Golden Point, next point wins")
+            .accessibilityLabel(accessibility)
         }
     }
 

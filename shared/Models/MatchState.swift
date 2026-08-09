@@ -35,6 +35,8 @@ public struct GameScore: Codable, Sendable, Equatable {
     public var leftPoints: Int
     public var rightPoints: Int
     public var advantageSide: Side?
+    /// True while a single decisive rally is in progress: immediately at 40-40 under
+    /// golden point, or after an advantage is broken under silver point.
     public var isGoldenPointActive: Bool
     public var isTieBreak: Bool
     public var isComplete: Bool
@@ -89,7 +91,7 @@ public struct GameScore: Codable, Sendable, Equatable {
     }
 
     /// Labels for left and right suitable for the score screen.
-    public var displayPair: (left: String, right: String) {
+    public func displayPair(deuceFormat: DeuceFormat) -> (left: String, right: String) {
         if isComplete {
             return ("0", "0")
         }
@@ -97,7 +99,8 @@ public struct GameScore: Codable, Sendable, Equatable {
             return (String(leftPoints), String(rightPoints))
         }
         if isGoldenPointActive {
-            return ("GP", "GP")
+            let label = deuceFormat.decidingPointShortLabel
+            return (label, label)
         }
         if let advantageSide {
             switch advantageSide {
@@ -111,12 +114,12 @@ public struct GameScore: Codable, Sendable, Equatable {
         return (Self.label(for: leftPoints), Self.label(for: rightPoints))
     }
 
-    public var statusLine: String? {
+    public func statusLine(deuceFormat: DeuceFormat) -> String? {
         if isTieBreak {
             return "Tie-break"
         }
         if isGoldenPointActive {
-            return "Golden Point"
+            return deuceFormat.decidingPointLabel
         }
         if advantageSide != nil {
             return "Advantage"
@@ -262,9 +265,19 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         }
     }
 
+    /// Game point labels for the current game, using this match's deuce format.
+    public var gameDisplayPair: (left: String, right: String) {
+        currentGame.displayPair(deuceFormat: settings.deuceFormat)
+    }
+
+    /// Status line for the current game ("Deuce", "Golden Point", …), or nil.
+    public var gameStatusLine: String? {
+        currentGame.statusLine(deuceFormat: settings.deuceFormat)
+    }
+
     /// Game point labels oriented for the score screen.
     public var scoreScreenGameDisplay: (left: String, right: String) {
-        remapForScoreScreen(currentGame.displayPair)
+        remapForScoreScreen(gameDisplayPair)
     }
 
     /// Set games labels oriented for the score screen.
@@ -366,7 +379,7 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
 
     private var inProgressGameScoreLabel: String? {
         guard hasInProgressGameScore else { return nil }
-        let pair = currentGame.displayPair
+        let pair = gameDisplayPair
         return "\(pair.left)-\(pair.right)"
     }
 

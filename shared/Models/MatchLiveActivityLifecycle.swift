@@ -43,7 +43,7 @@ public struct MatchActivityAttributes: ActivityAttributes {
         public let startedAt: Date
 
         public init(from match: MatchState) {
-            let game = match.currentGame.displayPair
+            let game = match.gameDisplayPair
             let set = match.currentSet.displayPair
             gameLeft = game.left
             gameRight = game.right

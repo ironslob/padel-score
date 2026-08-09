@@ -270,7 +270,7 @@ Default settings:
 - Win by two games
 - Tie-break at 6–6 (first to 7 points, win by 2)
 - Tie-break serve rotates every 2 points after the opening point; change sides every 6 points
-- Golden point enabled
+- Golden point at deuce
 - Standard scoring
 
 Starting a match should remain fast and require no nested configuration.
@@ -372,37 +372,33 @@ The application performs all score progression automatically.
 
 ---
 
-# 14. Golden Point Rule
+# 14. Scoring at Deuce
 
-Version 1 intentionally implements the following house rule.
+The way a game is resolved at 40-40 is a user setting with three options.
 
-Golden point is **not** immediate.
-
-Instead:
+**Regular** — traditional advantage scoring. Advantage repeats until one side
+wins two points in a row.
 
 ```
-40-40
-
-↓
-
-Advantage
-
-↓
-
-Back to Deuce
-
-↓
-
-Golden Point Active
-
-↓
-
-Next Point Wins
+40-40 → Advantage → Back to Deuce → Advantage → … → Game
 ```
 
-This is considered the standard behaviour for this application.
+**Silver point** — one advantage is played. If it is broken, the next point
+decides the game.
 
-Golden point should become clearly visible on screen.
+```
+40-40 → Advantage → Back to Deuce → Silver Point → Next Point Wins
+```
+
+**Golden point** (default) — no advantage phase at all. The first point at
+40-40 decides the game. This is the format used by the FIP and Premier Padel.
+
+```
+40-40 → Golden Point → Next Point Wins
+```
+
+The decisive point should become clearly visible on screen, named for the
+format in play.
 
 Example:
 
@@ -411,6 +407,11 @@ Golden Point
 
 Next point wins
 ```
+
+Note: versions before this setting existed shipped a single "Golden point"
+toggle whose behaviour was in fact silver point. Matches archived under that
+toggle decode as silver point so their scorelines stay faithful to how they
+were played.
 
 ---
 
@@ -646,7 +647,7 @@ Deliver:
 - Game scoring
 - Set scoring
 - Match scoring
-- Golden point
+- Deuce format (regular / silver / golden point)
 - Undo
 - Finish match
 - End early

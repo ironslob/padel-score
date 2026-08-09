@@ -69,7 +69,7 @@ public struct MatchScoreSnapshot: Codable, Sendable, Equatable {
             )
             return
         }
-        let game = match.currentGame.displayPair
+        let game = match.gameDisplayPair
         let set = match.currentSet.displayPair
         self.init(
             gameLeft: game.left,
@@ -80,7 +80,7 @@ public struct MatchScoreSnapshot: Codable, Sendable, Equatable {
             startedAt: match.startedAt,
             isGoldenPointActive: match.currentGame.isGoldenPointActive,
             isTieBreak: match.currentGame.isTieBreak,
-            gameStatusLine: match.currentGame.statusLine
+            gameStatusLine: match.gameStatusLine
         )
     }
 

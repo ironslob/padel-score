@@ -86,14 +86,14 @@ final class MatchServiceTests: XCTestCase {
         XCTAssertEqual(service.activeMatch?.currentServer, .right)
     }
 
-    func testStartMatchPersistsGoldenPointSetting() {
+    func testStartMatchPersistsDeuceFormat() {
         let store = InMemoryMatchStore()
         let service = MatchService(store: store)
         var settings = MatchSettings.default
-        settings.goldenPointEnabled = false
+        settings.deuceFormat = .silverPoint
         service.startMatch(settings: settings)
-        XCTAssertEqual(service.activeMatch?.settings.goldenPointEnabled, false)
-        XCTAssertEqual(store.active?.settings.goldenPointEnabled, false)
+        XCTAssertEqual(service.activeMatch?.settings.deuceFormat, .silverPoint)
+        XCTAssertEqual(store.active?.settings.deuceFormat, .silverPoint)
     }
 
     func testExpireInactiveMatchWithPointsEndsEarly() throws {

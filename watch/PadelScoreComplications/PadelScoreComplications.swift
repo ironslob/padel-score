@@ -154,7 +154,9 @@ struct ScoreComplicationView: View {
     }
 
     private var statusIndicator: String? {
-        if entry.snapshot.isGoldenPointActive { return "GP" }
+        // The snapshot's game labels already carry the deuce format's short form
+        // ("GP" or "SP") while a decisive point is live.
+        if entry.snapshot.isGoldenPointActive { return entry.snapshot.gameLeft }
         if entry.snapshot.isTieBreak { return "TB" }
         return nil
     }

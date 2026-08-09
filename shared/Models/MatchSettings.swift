@@ -34,7 +34,45 @@ public enum MatchSetFormat: String, CaseIterable, Codable, Sendable, Identifiabl
     }
 }
 
-/// V1 defaults from product.md. `goldenPointEnabled` is a persisted preference on Watch.
+/// How a game is resolved once both sides reach 40.
+public enum DeuceFormat: String, CaseIterable, Codable, Sendable, Identifiable {
+    /// Traditional scoring: advantage repeats until one side wins by two points.
+    case advantage
+    /// One advantage is played. If it is broken, the next point decides the game.
+    case silverPoint
+    /// No advantage at all — the first point at 40-40 decides the game.
+    case goldenPoint
+
+    public var id: String { rawValue }
+
+    public var label: String {
+        switch self {
+        case .advantage: return "Regular"
+        case .silverPoint: return "Silver point"
+        case .goldenPoint: return "Golden point"
+        }
+    }
+
+    /// Short name for the decisive point, shown on the score screen.
+    public var decidingPointLabel: String {
+        switch self {
+        case .advantage: return "Deuce"
+        case .silverPoint: return "Silver Point"
+        case .goldenPoint: return "Golden Point"
+        }
+    }
+
+    /// Two-character form for the score readout and complications.
+    public var decidingPointShortLabel: String {
+        switch self {
+        case .advantage: return "40"
+        case .silverPoint: return "SP"
+        case .goldenPoint: return "GP"
+        }
+    }
+}
+
+/// V1 defaults from product.md. `deuceFormat` is a persisted preference on Watch.
 public struct MatchSettings: Codable, Sendable, Equatable {
     /// Quick-undo window on the score screen and game interstitial. Not persisted per match.
     public static let quickUndoTimeoutSeconds: TimeInterval = 3
@@ -47,7 +85,8 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     public var continuousPlay: Bool
     public var gamesToWinSet: Int
     public var mustWinByTwoGames: Bool
-    public var goldenPointEnabled: Bool
+    /// How a game is decided once both sides reach 40.
+    public var deuceFormat: DeuceFormat
     /// When true, the player must choose who is serving at the start of each new set.
     public var askServeAtSetStart: Bool
     /// When true, serve does not rotate after games; the side chosen at match start stays fixed.
@@ -62,7 +101,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         continuousPlay: Bool = false,
         gamesToWinSet: Int = 6,
         mustWinByTwoGames: Bool = true,
-        goldenPointEnabled: Bool = true,
+        deuceFormat: DeuceFormat = .goldenPoint,
         askServeAtSetStart: Bool = false,
         fixedServerPositions: Bool = true,
         usThemLabels: Bool = true
@@ -71,7 +110,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         self.continuousPlay = continuousPlay
         self.gamesToWinSet = gamesToWinSet
         self.mustWinByTwoGames = mustWinByTwoGames
-        self.goldenPointEnabled = goldenPointEnabled
+        self.deuceFormat = deuceFormat
         self.askServeAtSetStart = askServeAtSetStart
         self.fixedServerPositions = fixedServerPositions
         self.usThemLabels = usThemLabels
@@ -93,6 +132,9 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         case continuousPlay
         case gamesToWinSet
         case mustWinByTwoGames
+        case deuceFormat
+        /// Pre-silver-point key. Read for migration, still written so older builds
+        /// sharing the archive keep scoring these matches the same way.
         case goldenPointEnabled
         case askServeAtSetStart
         case fixedServerPositions
@@ -106,7 +148,16 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         continuousPlay = try container.decodeIfPresent(Bool.self, forKey: .continuousPlay) ?? false
         gamesToWinSet = try container.decode(Int.self, forKey: .gamesToWinSet)
         mustWinByTwoGames = try container.decode(Bool.self, forKey: .mustWinByTwoGames)
-        goldenPointEnabled = try container.decode(Bool.self, forKey: .goldenPointEnabled)
+        if let format = try container.decodeIfPresent(DeuceFormat.self, forKey: .deuceFormat) {
+            deuceFormat = format
+        } else {
+            // Matches written before silver point existed. The old `goldenPointEnabled`
+            // flag played one advantage before the decisive point, which is silver
+            // point — so map it there to keep archived scorelines faithful to how
+            // they were actually played.
+            let legacyGoldenPoint = try container.decodeIfPresent(Bool.self, forKey: .goldenPointEnabled) ?? true
+            deuceFormat = legacyGoldenPoint ? .silverPoint : .advantage
+        }
         askServeAtSetStart = try container.decodeIfPresent(Bool.self, forKey: .askServeAtSetStart) ?? false
         fixedServerPositions = try container.decodeIfPresent(Bool.self, forKey: .fixedServerPositions) ?? true
         usThemLabels = try container.decodeIfPresent(Bool.self, forKey: .usThemLabels) ?? true
@@ -120,7 +171,8 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         try container.encode(continuousPlay, forKey: .continuousPlay)
         try container.encode(gamesToWinSet, forKey: .gamesToWinSet)
         try container.encode(mustWinByTwoGames, forKey: .mustWinByTwoGames)
-        try container.encode(goldenPointEnabled, forKey: .goldenPointEnabled)
+        try container.encode(deuceFormat, forKey: .deuceFormat)
+        try container.encode(deuceFormat != .advantage, forKey: .goldenPointEnabled)
         try container.encode(askServeAtSetStart, forKey: .askServeAtSetStart)
         try container.encode(fixedServerPositions, forKey: .fixedServerPositions)
         try container.encode(usThemLabels, forKey: .usThemLabels)

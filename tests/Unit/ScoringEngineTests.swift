@@ -73,15 +73,15 @@ final class ScoringEngineTests: XCTestCase {
     func testLoveToFifteenToThirtyToFortyToGame() throws {
         var s = start()
         s = try point(.left, s)
-        XCTAssertEqual(s.currentGame.displayPair.left, "15")
+        XCTAssertEqual(s.gameDisplayPair.left, "15")
         s = try point(.left, s)
-        XCTAssertEqual(s.currentGame.displayPair.left, "30")
+        XCTAssertEqual(s.gameDisplayPair.left, "30")
         s = try point(.left, s)
-        XCTAssertEqual(s.currentGame.displayPair.left, "40")
+        XCTAssertEqual(s.gameDisplayPair.left, "40")
         s = try point(.left, s)
         XCTAssertEqual(s.currentSet.leftGames, 1)
-        XCTAssertEqual(s.currentGame.displayPair.left, "0")
-        XCTAssertEqual(s.currentGame.displayPair.right, "0")
+        XCTAssertEqual(s.gameDisplayPair.left, "0")
+        XCTAssertEqual(s.gameDisplayPair.right, "0")
     }
 
     func testOpponentBelowFortyThenFortyWinsGame() throws {
@@ -94,73 +94,130 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.currentSet.leftGames, 1)
     }
 
-    // MARK: - Deuce / Advantage / Golden Point
+    // MARK: - Deuce / Advantage / Silver Point / Golden Point
 
-    func testDeuceAdvantageAndGameWithoutGoldenPath() throws {
-        var s = start()
-        // Reach deuce 40-40
+    /// Rotating-serve settings pinned to a specific deuce format.
+    private func settings(_ format: DeuceFormat) -> MatchSettings {
+        var settings = rotatingSettings
+        settings.deuceFormat = format
+        return settings
+    }
+
+    /// Plays to 40-40 without ever putting a side above 40.
+    private func reachDeuce(_ state: MatchState) throws -> MatchState {
+        var s = state
         for _ in 0..<3 {
             s = try point(.left, s)
             s = try point(.right, s)
         }
-        XCTAssertEqual(s.currentGame.statusLine, "Deuce")
+        return s
+    }
+
+    // MARK: Regular (advantage)
+
+    func testAdvantageWinsGameWhenHeld() throws {
+        var s = try reachDeuce(start(settings: settings(.advantage)))
+        XCTAssertEqual(s.gameStatusLine, "Deuce")
         XCTAssertFalse(s.currentGame.isGoldenPointActive)
 
         s = try point(.left, s)
         XCTAssertEqual(s.currentGame.advantageSide, .left)
-        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.gameStatusLine, "Advantage")
 
-        // Advantage holder wins game normally
         s = try point(.left, s)
         XCTAssertEqual(s.currentSet.leftGames, 1)
+    }
+
+    func testAdvantageCyclesIndefinitely() throws {
+        var s = try reachDeuce(start(settings: settings(.advantage)))
+        // Three full advantage-then-broken cycles must never become decisive.
+        for _ in 0..<3 {
+            s = try point(.left, s)
+            XCTAssertEqual(s.currentGame.advantageSide, .left)
+            s = try point(.right, s)
+            XCTAssertNil(s.currentGame.advantageSide)
+            XCTAssertFalse(s.currentGame.isGoldenPointActive)
+            XCTAssertEqual(s.gameStatusLine, "Deuce")
+        }
+        XCTAssertEqual(s.currentSet.leftGames, 0)
+        XCTAssertEqual(s.currentSet.rightGames, 0)
+    }
+
+    // MARK: Golden point
+
+    func testGoldenPointIsDecisiveImmediatelyAtDeuce() throws {
+        var s = try reachDeuce(start(settings: settings(.goldenPoint)))
+        // No advantage phase at all: 40-40 is already the deciding rally.
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
+        XCTAssertNil(s.currentGame.advantageSide)
+        XCTAssertEqual(s.gameStatusLine, "Golden Point")
+        XCTAssertEqual(s.gameDisplayPair.left, "GP")
+        XCTAssertEqual(s.gameDisplayPair.right, "GP")
+
+        s = try point(.right, s)
+        XCTAssertEqual(s.currentSet.rightGames, 1)
+        XCTAssertEqual(s.currentSet.leftGames, 0)
         XCTAssertFalse(s.currentGame.isGoldenPointActive)
     }
 
-    func testGoldenPointActivatesAfterAdvantageBroken() throws {
-        var s = start()
-        for _ in 0..<3 {
-            s = try point(.left, s)
-            s = try point(.right, s)
-        }
-        s = try point(.left, s) // Ad left
-        s = try point(.right, s) // back to deuce → golden
+    func testGoldenPointNeverAwardsAdvantage() throws {
+        var s = try reachDeuce(start(settings: settings(.goldenPoint)))
+        s = try point(.left, s)
+        // The game is over — the point did not become an advantage.
+        XCTAssertEqual(s.currentSet.leftGames, 1)
+        XCTAssertNil(s.currentGame.advantageSide)
+    }
+
+    func testGoldenPointReachedFromUnevenScoreline() throws {
+        // 40-30 → 40-40 must arm the deciding point just the same.
+        var s = start(settings: settings(.goldenPoint))
+        s = try point(.left, s)
+        s = try point(.left, s)
+        s = try point(.left, s) // 40-0
+        s = try point(.right, s)
+        s = try point(.right, s) // 40-30
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+        s = try point(.right, s) // 40-40
         XCTAssertTrue(s.currentGame.isGoldenPointActive)
-        XCTAssertEqual(s.currentGame.statusLine, "Golden Point")
-        XCTAssertEqual(s.currentGame.displayPair.left, "GP")
-        XCTAssertEqual(s.currentGame.displayPair.right, "GP")
+    }
+
+    // MARK: Silver point
+
+    func testSilverPointPlaysOneAdvantageThenDecides() throws {
+        var s = try reachDeuce(start(settings: settings(.silverPoint)))
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.gameStatusLine, "Deuce")
+
+        s = try point(.left, s) // Ad left
+        XCTAssertEqual(s.currentGame.advantageSide, .left)
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+
+        s = try point(.right, s) // advantage broken → deciding point
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
+        XCTAssertNil(s.currentGame.advantageSide)
+        XCTAssertEqual(s.gameStatusLine, "Silver Point")
+        XCTAssertEqual(s.gameDisplayPair.left, "SP")
+        XCTAssertEqual(s.gameDisplayPair.right, "SP")
 
         s = try point(.right, s)
         XCTAssertEqual(s.currentSet.rightGames, 1)
         XCTAssertFalse(s.currentGame.isGoldenPointActive)
     }
 
-    func testGoldenPointNextPointWinsForEitherSide() throws {
-        var s = start()
-        for _ in 0..<3 {
-            s = try point(.left, s)
-            s = try point(.right, s)
-        }
-        s = try point(.right, s)
-        s = try point(.left, s) // golden
-        XCTAssertTrue(s.currentGame.isGoldenPointActive)
-        s = try point(.left, s)
+    func testSilverPointAdvantageHolderStillWinsOnSecondPoint() throws {
+        var s = try reachDeuce(start(settings: settings(.silverPoint)))
+        s = try point(.left, s) // Ad left
+        s = try point(.left, s) // converts, no deciding point needed
         XCTAssertEqual(s.currentSet.leftGames, 1)
     }
 
-    func testGoldenPointDisabledFallsBackToRepeatedAdvantage() throws {
-        var settings = MatchSettings.default
-        settings.goldenPointEnabled = false
-        var s = start(settings: settings)
-        for _ in 0..<3 {
-            s = try point(.left, s)
-            s = try point(.right, s)
-        }
+    func testSilverPointDecidingPointWinnableByEitherSide() throws {
+        var s = try reachDeuce(start(settings: settings(.silverPoint)))
+        s = try point(.right, s) // Ad right
+        s = try point(.left, s) // broken → deciding point
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
         s = try point(.left, s)
-        s = try point(.right, s)
-        XCTAssertFalse(s.currentGame.isGoldenPointActive)
-        XCTAssertNil(s.currentGame.advantageSide)
-        s = try point(.left, s)
-        XCTAssertEqual(s.currentGame.advantageSide, .left)
+        XCTAssertEqual(s.currentSet.leftGames, 1)
     }
 
     // MARK: - Set / Match
@@ -458,8 +515,8 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.currentSet.leftGames, 6)
         XCTAssertEqual(s.currentSet.rightGames, 6)
         XCTAssertEqual(s.completedSets.count, 0)
-        XCTAssertEqual(s.currentGame.displayPair.left, "0")
-        XCTAssertEqual(s.currentGame.displayPair.right, "0")
+        XCTAssertEqual(s.gameDisplayPair.left, "0")
+        XCTAssertEqual(s.gameDisplayPair.right, "0")
     }
 
     func testTieBreakFirstToSevenWinsSet() throws {
@@ -591,8 +648,8 @@ final class ScoringEngineTests: XCTestCase {
         s = try point(.left, s)
         s = try point(.right, s)
         s = try engine.apply(.undo, to: s)
-        XCTAssertEqual(s.currentGame.displayPair.left, "15")
-        XCTAssertEqual(s.currentGame.displayPair.right, "0")
+        XCTAssertEqual(s.gameDisplayPair.left, "15")
+        XCTAssertEqual(s.gameDisplayPair.right, "0")
         XCTAssertEqual(s.events.filter { $0.kind == .pointWon }.count, 1)
     }
 
@@ -602,21 +659,26 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.currentSet.leftGames, 1)
         s = try engine.apply(.undo, to: s)
         XCTAssertEqual(s.currentSet.leftGames, 0)
-        XCTAssertEqual(s.currentGame.displayPair.left, "40")
+        XCTAssertEqual(s.gameDisplayPair.left, "40")
     }
 
-    func testUndoGoldenPoint() throws {
-        var s = start()
-        for _ in 0..<3 {
-            s = try point(.left, s)
-            s = try point(.right, s)
-        }
+    func testUndoSilverPointReturnsToAdvantage() throws {
+        var s = try reachDeuce(start(settings: settings(.silverPoint)))
         s = try point(.left, s)
         s = try point(.right, s)
         XCTAssertTrue(s.currentGame.isGoldenPointActive)
         s = try engine.apply(.undo, to: s)
         XCTAssertFalse(s.currentGame.isGoldenPointActive)
         XCTAssertEqual(s.currentGame.advantageSide, .left)
+    }
+
+    func testUndoGoldenPointReturnsToFortyThirty() throws {
+        var s = try reachDeuce(start(settings: settings(.goldenPoint)))
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
+        s = try engine.apply(.undo, to: s)
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.gameDisplayPair.left, "40")
+        XCTAssertEqual(s.gameDisplayPair.right, "30")
     }
 
     func testUndoWithNoPointsThrows() {

@@ -158,6 +158,7 @@ public struct ScoringEngine: Sendable {
             return
         }
 
+        // A decisive point is live: this rally ends the game either way.
         if state.currentGame.isGoldenPointActive {
             completeGame(winner: side, in: &state)
             return
@@ -166,16 +167,18 @@ public struct ScoringEngine: Sendable {
         let myPoints = state.currentGame.points(for: side)
         let theirPoints = state.currentGame.points(for: side.opposite)
 
-        // Deuce territory (both at 40+)
+        // Deuce territory (both at 40+). Golden point never reaches here — it makes
+        // the point decisive the moment the game arrives at 40-40, below.
         if myPoints >= 3 && theirPoints >= 3 {
             if state.currentGame.advantageSide == nil {
                 state.currentGame.advantageSide = side
             } else if state.currentGame.advantageSide == side {
                 completeGame(winner: side, in: &state)
             } else {
-                // Advantage broken → back to deuce; golden point activates if enabled.
+                // Advantage broken → back to deuce. Silver point allows exactly one
+                // advantage, so the next point decides; regular scoring keeps cycling.
                 state.currentGame.advantageSide = nil
-                state.currentGame.isGoldenPointActive = state.settings.goldenPointEnabled
+                state.currentGame.isGoldenPointActive = state.settings.deuceFormat == .silverPoint
             }
             return
         }
@@ -187,6 +190,14 @@ public struct ScoringEngine: Sendable {
         }
 
         state.currentGame.setPoints(myPoints + 1, for: side)
+
+        // Golden point: no advantage phase at all, so reaching 40-40 makes the very
+        // next rally decisive.
+        if state.settings.deuceFormat == .goldenPoint,
+           state.currentGame.leftPoints >= 3,
+           state.currentGame.rightPoints >= 3 {
+            state.currentGame.isGoldenPointActive = true
+        }
     }
 
     private func awardTieBreakPoint(to side: Side, in state: inout MatchState) {

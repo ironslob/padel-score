@@ -37,8 +37,8 @@ public protocol ServeSelectionPreferenceStoring {
     func setFixedServerPositions(_ value: Bool)
     var usThemLabels: Bool { get }
     func setUsThemLabels(_ value: Bool)
-    var goldenPointEnabled: Bool { get }
-    func setGoldenPointEnabled(_ value: Bool)
+    var deuceFormat: DeuceFormat { get }
+    func setDeuceFormat(_ value: DeuceFormat)
     var matchSetFormat: MatchSetFormat { get }
     func setMatchSetFormat(_ value: MatchSetFormat)
 }
@@ -81,14 +81,16 @@ public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenc
     private let askServeKey = "alwaysAskServeAtSetStart"
     private let fixedServerKey = "fixedServerPositions"
     private let usThemLabelsKey = "usThemLabels"
-    private let goldenPointKey = "goldenPointEnabled"
+    private let legacyGoldenPointKey = "goldenPointEnabled"
+    private let deuceFormatKey = "deuceFormat"
     private let matchSetFormatKey = "matchSetFormat"
     private let defaults: UserDefaults
 
     public init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        // `deuceFormat` is deliberately not registered — its getter needs to see the
+        // key genuinely absent to migrate from the old `goldenPointEnabled` toggle.
         defaults.register(defaults: [
-            goldenPointKey: true,
             usThemLabelsKey: true,
             fixedServerKey: true,
             matchSetFormatKey: MatchSetFormat.bestOfThree.rawValue,
@@ -119,12 +121,22 @@ public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenc
         defaults.set(value, forKey: usThemLabelsKey)
     }
 
-    public var goldenPointEnabled: Bool {
-        defaults.bool(forKey: goldenPointKey)
+    public var deuceFormat: DeuceFormat {
+        if let raw = defaults.string(forKey: deuceFormatKey),
+           let format = DeuceFormat(rawValue: raw) {
+            return format
+        }
+        // Upgrading from the two-way toggle: someone who turned it off wanted
+        // full advantage scoring, so honour that. Everyone else gets the new
+        // default, which is what the old "Golden point" label promised.
+        if defaults.object(forKey: legacyGoldenPointKey) as? Bool == false {
+            return .advantage
+        }
+        return .goldenPoint
     }
 
-    public func setGoldenPointEnabled(_ value: Bool) {
-        defaults.set(value, forKey: goldenPointKey)
+    public func setDeuceFormat(_ value: DeuceFormat) {
+        defaults.set(value.rawValue, forKey: deuceFormatKey)
     }
 
     public var matchSetFormat: MatchSetFormat {
@@ -141,8 +153,10 @@ public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenc
 }
 
 public enum SettingsCopy {
-    public static let goldenPoint =
-        "After advantage is lost at deuce, the next point wins the game."
+    public static let deuceFormat =
+        "How a game is decided at 40-40. Regular plays advantage until someone wins by two. " +
+        "Silver point plays one advantage, then the next point wins. " +
+        "Golden point skips advantage entirely — the next point wins."
 
     public static let usThemLabels =
         "Score buttons show Us and Them instead of Serving and Receiving."
@@ -167,7 +181,7 @@ public enum FirstLaunchTipCopy {
         ),
         (
             "Settings",
-            "Match length, golden point, labels, and serve options are in Settings on the home screen—set them before you start a match."
+            "Match length, scoring at deuce, labels, and serve options are in Settings on the home screen—set them before you start a match."
         ),
     ]
 }

@@ -458,7 +458,7 @@ private struct WatchMatchHistoryDetailView: View {
 
                 labeled("Date", match.startedAt.formatted(date: .abbreviated, time: .shortened))
                 labeled("Duration", DurationFormatter.detailed(match.duration))
-                labeled("Scoring", match.settings.goldenPointEnabled ? "Golden point" : "Advantage")
+                labeled("Scoring", match.settings.deuceFormat.label)
                 labeled("Format", match.settings.matchSetFormat.label)
 
                 if !match.completedSets.isEmpty || match.displaysIncompleteSet {
@@ -578,16 +578,7 @@ struct MatchPreferenceToggles: View {
 
     var body: some View {
         MatchSetFormatPicker(match: match, showsHelperText: showsHelperText)
-        PreferenceToggleRow(
-            title: "Golden point",
-            helper: SettingsCopy.goldenPoint,
-            showsHelper: showsHelperText,
-            isOn: Binding(
-                get: { match?.settings.goldenPointEnabled ?? sessionCoordinator.goldenPointEnabled },
-                set: { sessionCoordinator.setGoldenPointEnabled($0) }
-            )
-        )
-        .disabled(match != nil)
+        DeuceFormatPicker(match: match, showsHelperText: showsHelperText)
         PreferenceToggleRow(
             title: "Us / Them labels",
             helper: SettingsCopy.usThemLabels,
@@ -640,6 +631,35 @@ struct MatchSetFormatPicker: View {
             }
             if showsHelperText {
                 Text(SettingsCopy.matchSetFormat)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .disabled(match != nil)
+    }
+}
+
+struct DeuceFormatPicker: View {
+    @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
+    var match: MatchState?
+    var showsHelperText = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Picker(
+                "Scoring at deuce",
+                selection: Binding(
+                    get: { match?.settings.deuceFormat ?? sessionCoordinator.deuceFormat },
+                    set: { sessionCoordinator.setDeuceFormat($0) }
+                )
+            ) {
+                ForEach(DeuceFormat.allCases) { format in
+                    Text(format.label).tag(format)
+                }
+            }
+            if showsHelperText {
+                Text(SettingsCopy.deuceFormat)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)

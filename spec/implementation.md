@@ -400,7 +400,7 @@ Avoid hard-coded values where future configuration is likely.
 
 Examples:
 
-Golden point enabled
+Deuce format (regular / silver / golden point)
 
 Best of three
 
@@ -446,9 +446,9 @@ Advantage
 
 Return to deuce
 
-Golden point activation
+Deciding-point activation per deuce format
 
-Golden point winner
+Deciding-point winner
 
 Set win
 

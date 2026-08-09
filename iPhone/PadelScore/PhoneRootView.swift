@@ -82,11 +82,11 @@ struct ActiveMatchRow: View {
                 Text("\(match.leftSetsWon)–\(match.rightSetsWon)")
                     .font(.title3.monospacedDigit().weight(.bold))
             }
-            Text("Set \(match.currentSet.leftGames)–\(match.currentSet.rightGames) · Game \(match.currentGame.displayPair.left)–\(match.currentGame.displayPair.right)")
+            Text("Set \(match.currentSet.leftGames)–\(match.currentSet.rightGames) · Game \(match.gameDisplayPair.left)–\(match.gameDisplayPair.right)")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             if match.currentGame.isGoldenPointActive {
-                Text("Golden Point")
+                Text(match.settings.deuceFormat.decidingPointLabel)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.orange)
             }
