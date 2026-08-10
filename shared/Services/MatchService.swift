@@ -130,6 +130,22 @@ public final class MatchService: ObservableObject {
         return match.events.contains { $0.kind == .pointWon }
     }
 
+    /// Switches how games are decided at 40-40 part-way through a match, for when the
+    /// wrong format was picked at the start. Applies from the current point on; games
+    /// already played keep the result they were scored with.
+    public func setDeuceFormat(_ format: DeuceFormat) {
+        guard var match = activeMatch, match.status == .inProgress else { return }
+        guard match.settings.deuceFormat != format else { return }
+        do {
+            match = try engine.apply(.setDeuceFormat(format), to: match)
+            activeMatch = match
+            persist()
+            logger.info("Deuce format changed to \(format.rawValue)")
+        } catch {
+            logger.error("Deuce format change failed: \(error.localizedDescription)")
+        }
+    }
+
     /// Updates in-match preference toggles without affecting scoring rules chosen at start.
     public func syncActiveMatchPreferences(
         usThemLabels: Bool,

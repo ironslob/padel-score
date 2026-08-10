@@ -220,6 +220,141 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.currentSet.leftGames, 1)
     }
 
+    // MARK: Changing the deuce format mid-match
+
+    private func changeFormat(_ format: DeuceFormat, _ state: MatchState) throws -> MatchState {
+        try engine.apply(.setDeuceFormat(format), to: state)
+    }
+
+    func testChangingToGoldenPointArmsTheGameInProgress() throws {
+        var s = try reachDeuce(start(settings: settings(.advantage)))
+        XCTAssertEqual(s.gameStatusLine, "Deuce")
+
+        s = try changeFormat(.goldenPoint, s)
+        XCTAssertEqual(s.settings.deuceFormat, .goldenPoint)
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.gameStatusLine, "Golden Point")
+
+        s = try point(.left, s)
+        XCTAssertEqual(s.currentSet.leftGames, 1)
+    }
+
+    func testChangingToGoldenPointSurrendersAnAdvantageAlreadyHeld() throws {
+        var s = try reachDeuce(start(settings: settings(.advantage)))
+        s = try point(.left, s)
+        XCTAssertEqual(s.currentGame.advantageSide, .left)
+
+        s = try changeFormat(.goldenPoint, s)
+        XCTAssertNil(s.currentGame.advantageSide)
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
+
+        // The next rally decides it, and it can go to the side that lost the advantage.
+        s = try point(.right, s)
+        XCTAssertEqual(s.currentSet.rightGames, 1)
+    }
+
+    func testChangingAwayFromGoldenPointDisarmsTheDecidingPoint() throws {
+        var s = try reachDeuce(start(settings: settings(.goldenPoint)))
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
+
+        s = try changeFormat(.advantage, s)
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.gameStatusLine, "Deuce")
+
+        // Back to a normal advantage phase rather than a game.
+        s = try point(.left, s)
+        XCTAssertEqual(s.currentGame.advantageSide, .left)
+        XCTAssertEqual(s.currentSet.leftGames, 0)
+    }
+
+    func testChangingToSilverPointLeavesItsOneAdvantageStillToPlay() throws {
+        var s = try reachDeuce(start(settings: settings(.goldenPoint)))
+        s = try changeFormat(.silverPoint, s)
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+
+        s = try point(.left, s)
+        XCTAssertEqual(s.currentGame.advantageSide, .left)
+        s = try point(.right, s)
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.gameStatusLine, "Silver Point")
+    }
+
+    func testGamesAlreadyPlayedKeepTheirResultAfterAFormatChange() throws {
+        // Two games decided on a golden point, then the format is corrected.
+        var s = start(settings: settings(.goldenPoint))
+        for _ in 0..<2 {
+            s = try reachDeuce(s)
+            s = try point(.left, s)
+        }
+        XCTAssertEqual(s.currentSet.leftGames, 2)
+
+        s = try changeFormat(.advantage, s)
+        XCTAssertEqual(s.currentSet.leftGames, 2)
+        XCTAssertEqual(s.completedSets.count, 0)
+    }
+
+    func testUndoAfterAFormatChangeDoesNotRescoreEarlierGames() throws {
+        var s = start(settings: settings(.goldenPoint))
+        s = try reachDeuce(s)
+        s = try point(.left, s) // golden point decides game 1
+        s = try changeFormat(.advantage, s)
+        s = try point(.right, s) // first point of game 2
+
+        s = try engine.apply(.undo, to: s)
+        // The undone point belongs to game 2; game 1 stays won on the golden point.
+        XCTAssertEqual(s.currentSet.leftGames, 1)
+        XCTAssertEqual(s.currentGame.leftPoints, 0)
+        XCTAssertEqual(s.currentGame.rightPoints, 0)
+    }
+
+    func testUndoRestoresTheDecidingPointArmedByAFormatChange() throws {
+        var s = try reachDeuce(start(settings: settings(.advantage)))
+        s = try changeFormat(.goldenPoint, s)
+        s = try point(.left, s)
+        XCTAssertEqual(s.currentSet.leftGames, 1)
+
+        s = try engine.apply(.undo, to: s)
+        XCTAssertEqual(s.currentSet.leftGames, 0)
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
+    }
+
+    func testFormatCanBeChangedRepeatedly() throws {
+        var s = try reachDeuce(start(settings: settings(.advantage)))
+        s = try changeFormat(.goldenPoint, s)
+        s = try changeFormat(.silverPoint, s)
+        s = try changeFormat(.advantage, s)
+        XCTAssertEqual(s.settings.deuceFormat, .advantage)
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.deuceFormatChanges.count, 4)
+    }
+
+    func testChangingToTheSameFormatIsANoOp() throws {
+        let s = try reachDeuce(start(settings: settings(.goldenPoint)))
+        let unchanged = try changeFormat(.goldenPoint, s)
+        XCTAssertEqual(unchanged, s)
+        XCTAssertTrue(unchanged.deuceFormatChanges.isEmpty)
+    }
+
+    func testFormatChangeMidTieBreakLeavesItAlone() throws {
+        var s = try reachSixSix(from: start(settings: settings(.advantage)))
+        s = try point(.left, s)
+        s = try point(.right, s)
+        XCTAssertTrue(s.currentGame.isTieBreak)
+
+        s = try changeFormat(.goldenPoint, s)
+        XCTAssertTrue(s.currentGame.isTieBreak)
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.currentGame.leftPoints, 1)
+        XCTAssertEqual(s.currentGame.rightPoints, 1)
+    }
+
+    func testFormatCannotBeChangedOnATerminalMatch() throws {
+        let s = try engine.apply(.endEarly, to: start(settings: settings(.advantage)))
+        XCTAssertThrowsError(try changeFormat(.goldenPoint, s)) { error in
+            XCTAssertEqual(error as? ScoringError, .matchNotInProgress)
+        }
+    }
+
     // MARK: - Set / Match
 
     func testSetRequiresWinByTwo() throws {

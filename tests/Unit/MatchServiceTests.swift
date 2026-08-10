@@ -96,6 +96,35 @@ final class MatchServiceTests: XCTestCase {
         XCTAssertEqual(store.active?.settings.deuceFormat, .silverPoint)
     }
 
+    func testDeuceFormatCanBeChangedMidMatchAndPersists() {
+        let store = InMemoryMatchStore()
+        let service = MatchService(store: store)
+        var settings = MatchSettings.default
+        settings.deuceFormat = .advantage
+        service.startMatch(settings: settings)
+        service.selectServer(.left)
+        for _ in 0..<3 {
+            service.awardPoint(to: .left)
+            service.awardPoint(to: .right)
+        }
+        XCTAssertEqual(service.activeMatch?.gameStatusLine, "Deuce")
+
+        service.setDeuceFormat(.goldenPoint)
+        XCTAssertEqual(service.activeMatch?.settings.deuceFormat, .goldenPoint)
+        XCTAssertEqual(service.activeMatch?.currentGame.isGoldenPointActive, true)
+        XCTAssertEqual(store.active?.settings.deuceFormat, .goldenPoint)
+
+        service.awardPoint(to: .left)
+        XCTAssertEqual(service.activeMatch?.currentSet.leftGames, 1)
+    }
+
+    func testDeuceFormatChangeIgnoredWithoutAnActiveMatch() {
+        let store = InMemoryMatchStore()
+        let service = MatchService(store: store)
+        service.setDeuceFormat(.advantage)
+        XCTAssertNil(service.activeMatch)
+    }
+
     func testExpireInactiveMatchWithPointsEndsEarly() throws {
         let engine = ScoringEngine()
         let oldDate = Date(timeIntervalSinceNow: -31 * 60)

@@ -179,12 +179,33 @@ public struct SetScore: Codable, Sendable, Equatable {
     }
 }
 
+/// A change of deuce format made while a match is under way, for when the wrong one
+/// was chosen at the start.
+///
+/// `MatchSettings.deuceFormat` always holds the format in force right now — so any
+/// build reading a synced match shows the correct label — while the change list keeps
+/// the history, letting replay score each point under the rule it was played by.
+public struct DeuceFormatChange: Codable, Sendable, Equatable {
+    public let format: DeuceFormat
+    /// Play from this instant onwards is scored with `format`.
+    public let at: Date
+
+    public init(format: DeuceFormat, at: Date) {
+        self.format = format
+        self.at = at
+    }
+}
+
 /// Full match record + derived score projection.
 public struct MatchState: Codable, Sendable, Equatable, Identifiable {
     public var id: UUID
     public var settings: MatchSettings
     public var status: MatchStatus
     public var events: [MatchEvent]
+    /// Empty while the match has only ever used the format it started with. The first
+    /// mid-match change opens the list with that starting format, so the entries always
+    /// describe the whole match and the last one matches `settings.deuceFormat`.
+    public var deuceFormatChanges: [DeuceFormatChange]
     public var startedAt: Date
     public var finishedAt: Date?
 
@@ -203,6 +224,7 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         settings: MatchSettings = .default,
         status: MatchStatus = .inProgress,
         events: [MatchEvent] = [],
+        deuceFormatChanges: [DeuceFormatChange] = [],
         startedAt: Date = Date(),
         finishedAt: Date? = nil,
         currentGame: GameScore = .zero,
@@ -218,6 +240,7 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         self.settings = settings
         self.status = status
         self.events = events
+        self.deuceFormatChanges = deuceFormatChanges
         self.startedAt = startedAt
         self.finishedAt = finishedAt
         self.currentGame = currentGame
@@ -388,6 +411,7 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         case settings
         case status
         case events
+        case deuceFormatChanges
         case startedAt
         case finishedAt
         case currentGame
@@ -406,6 +430,11 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         settings = try container.decode(MatchSettings.self, forKey: .settings)
         status = try container.decode(MatchStatus.self, forKey: .status)
         events = try container.decode([MatchEvent].self, forKey: .events)
+        // Absent for matches written before the format could be changed mid-match.
+        deuceFormatChanges = try container.decodeIfPresent(
+            [DeuceFormatChange].self,
+            forKey: .deuceFormatChanges
+        ) ?? []
         startedAt = try container.decode(Date.self, forKey: .startedAt)
         finishedAt = try container.decodeIfPresent(Date.self, forKey: .finishedAt)
         currentGame = try container.decodeIfPresent(GameScore.self, forKey: .currentGame) ?? .zero

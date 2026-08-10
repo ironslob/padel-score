@@ -329,6 +329,34 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
         }
     }
 
+    func testDeuceFormatChangesRoundTripThroughCoding() throws {
+        let engine = ScoringEngine()
+        var match = engine.startMatch()
+        match = try engine.apply(.selectServer(.left), to: match)
+        match = try engine.apply(.setDeuceFormat(.advantage), to: match)
+
+        let data = try JSONEncoder().encode(match)
+        let decoded = try JSONDecoder().decode(MatchState.self, from: data)
+        XCTAssertEqual(decoded.deuceFormatChanges, match.deuceFormatChanges)
+        XCTAssertEqual(decoded.settings.deuceFormat, .advantage)
+    }
+
+    func testMatchWrittenBeforeMidMatchChangesDecodes() throws {
+        // Older archives have no change list at all; they simply played throughout
+        // under the format in their settings.
+        let engine = ScoringEngine()
+        let match = try engine.apply(.selectServer(.left), to: engine.startMatch())
+        var json = try JSONSerialization.jsonObject(
+            with: try JSONEncoder().encode(match)
+        ) as! [String: Any]
+        json.removeValue(forKey: "deuceFormatChanges")
+
+        let data = try JSONSerialization.data(withJSONObject: json)
+        let decoded = try JSONDecoder().decode(MatchState.self, from: data)
+        XCTAssertTrue(decoded.deuceFormatChanges.isEmpty)
+        XCTAssertEqual(decoded.settings.deuceFormat, match.settings.deuceFormat)
+    }
+
     func testMatchSetFormatDefaultsBestOfThreeAndPersists() {
         let suiteName = "ServeSelectionPreferenceStoreTests.matchSetFormat.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

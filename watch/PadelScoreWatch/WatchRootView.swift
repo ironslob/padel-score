@@ -665,7 +665,6 @@ struct DeuceFormatPicker: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .disabled(match != nil)
     }
 }
 

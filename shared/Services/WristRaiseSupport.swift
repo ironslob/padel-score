@@ -156,7 +156,8 @@ public enum SettingsCopy {
     public static let deuceFormat =
         "How a game is decided at 40-40. Regular plays advantage until someone wins by two. " +
         "Silver point plays one advantage, then the next point wins. " +
-        "Golden point skips advantage entirely — the next point wins."
+        "Golden point skips advantage entirely — the next point wins. " +
+        "Can be changed during a match; games already played keep their result."
 
     public static let usThemLabels =
         "Score buttons show Us and Them instead of Serving and Receiving."

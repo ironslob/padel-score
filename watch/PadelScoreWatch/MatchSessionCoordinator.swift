@@ -107,6 +107,9 @@ public final class MatchSessionCoordinator: ObservableObject {
     public func setDeuceFormat(_ value: DeuceFormat) {
         deuceFormat = value
         serveStore.setDeuceFormat(value)
+        // Also switches the match under way, so a format picked wrongly at the start
+        // can be corrected without abandoning the match.
+        service.setDeuceFormat(value)
     }
 
     public func setMatchSetFormat(_ value: MatchSetFormat) {
