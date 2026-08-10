@@ -56,6 +56,23 @@ public struct ScoringEngine: Sendable {
             }
             return result
 
+        case .setDeuceFormat(let format):
+            guard state.status == .inProgress else { throw ScoringError.matchNotInProgress }
+            guard state.settings.deuceFormat != format else { return state }
+            var next = state
+            if next.deuceFormatChanges.isEmpty {
+                // Open the history with what the match has been played under so far.
+                next.deuceFormatChanges.append(
+                    DeuceFormatChange(format: next.settings.deuceFormat, at: next.startedAt)
+                )
+            }
+            // Never let a slow clock place the change before a point that has already
+            // been scored under the old format.
+            let effective = max(date, next.events.last?.timestamp ?? date)
+            next.deuceFormatChanges.append(DeuceFormatChange(format: format, at: effective))
+            next.settings.deuceFormat = format
+            return replay(events: next.events, onto: blankMatch(from: next))
+
         case .undo:
             guard state.status == .inProgress else { throw ScoringError.matchNotInProgress }
             guard let index = state.events.lastIndex(where: { $0.kind == .pointWon }) else {
@@ -109,7 +126,17 @@ public struct ScoringEngine: Sendable {
         state.finishedAt = nil
         state.status = .inProgress
 
+        // Deuce format in force, which mid-match changes move along as replay reaches
+        // the point they were made at. With no changes recorded it never moves.
+        var pendingFormatChanges = base.deuceFormatChanges.sorted { $0.at < $1.at }
+        var deuceFormat = pendingFormatChanges.first?.format ?? base.settings.deuceFormat
+
         for event in events {
+            while let change = pendingFormatChanges.first, change.at < event.timestamp {
+                deuceFormat = change.format
+                applyDeuceFormat(deuceFormat, to: &state)
+                pendingFormatChanges.removeFirst()
+            }
             state.events.append(event)
             switch event.kind {
             case .matchStarted:
@@ -124,7 +151,7 @@ public struct ScoringEngine: Sendable {
 
             case .pointWon:
                 guard let side = event.side, state.status == .inProgress else { continue }
-                awardPoint(to: side, in: &state)
+                awardPoint(to: side, in: &state, deuceFormat: deuceFormat)
 
             case .matchFinished:
                 state.finishedAt = event.timestamp
@@ -145,12 +172,41 @@ public struct ScoringEngine: Sendable {
             }
         }
 
+        // A change made after the last point still has to arm (or disarm) the game in
+        // progress, otherwise the next point would be scored under the old rule.
+        for change in pendingFormatChanges {
+            applyDeuceFormat(change.format, to: &state)
+        }
+
         return state
+    }
+
+    /// Brings the game in progress into line with a deuce format chosen mid-match.
+    /// Completed games are left alone: they keep the result they were played for.
+    private func applyDeuceFormat(_ format: DeuceFormat, to state: inout MatchState) {
+        guard state.status == .inProgress,
+              !state.currentGame.isComplete,
+              !state.currentGame.isTieBreak,
+              state.currentGame.leftPoints >= 3,
+              state.currentGame.rightPoints >= 3
+        else { return }
+
+        switch format {
+        case .goldenPoint:
+            // Golden point has no advantage phase, so an advantage already held is
+            // given up and the next rally decides the game.
+            state.currentGame.advantageSide = nil
+            state.currentGame.isGoldenPointActive = true
+        case .silverPoint, .advantage:
+            // A pending decisive rally stops being decisive; under silver point the
+            // single advantage it allows is still to be played.
+            state.currentGame.isGoldenPointActive = false
+        }
     }
 
     // MARK: - Point / game / set / match progression
 
-    private func awardPoint(to side: Side, in state: inout MatchState) {
+    private func awardPoint(to side: Side, in state: inout MatchState, deuceFormat: DeuceFormat) {
         guard !state.currentGame.isComplete, state.status == .inProgress else { return }
 
         if state.currentGame.isTieBreak {
@@ -178,7 +234,7 @@ public struct ScoringEngine: Sendable {
                 // Advantage broken → back to deuce. Silver point allows exactly one
                 // advantage, so the next point decides; regular scoring keeps cycling.
                 state.currentGame.advantageSide = nil
-                state.currentGame.isGoldenPointActive = state.settings.deuceFormat == .silverPoint
+                state.currentGame.isGoldenPointActive = deuceFormat == .silverPoint
             }
             return
         }
@@ -193,7 +249,7 @@ public struct ScoringEngine: Sendable {
 
         // Golden point: no advantage phase at all, so reaching 40-40 makes the very
         // next rally decisive.
-        if state.settings.deuceFormat == .goldenPoint,
+        if deuceFormat == .goldenPoint,
            state.currentGame.leftPoints >= 3,
            state.currentGame.rightPoints >= 3 {
             state.currentGame.isGoldenPointActive = true
@@ -329,6 +385,7 @@ public struct ScoringEngine: Sendable {
             settings: state.settings,
             status: .inProgress,
             events: [],
+            deuceFormatChanges: state.deuceFormatChanges,
             startedAt: state.startedAt
         )
     }
