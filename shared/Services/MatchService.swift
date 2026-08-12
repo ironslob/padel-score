@@ -112,6 +112,21 @@ public final class MatchService: ObservableObject {
         }
     }
 
+    /// Asks who serves the set about to start, instead of carrying the rotation on.
+    /// Offered at the changeover, where players often swap ends and reorder the serve.
+    public func requestServerSelection() {
+        guard var match = activeMatch, match.status == .inProgress else { return }
+        do {
+            match = try engine.apply(.requestServerSelection, to: match)
+            activeMatch = match
+            persist()
+            expireInactiveMatchIfNeeded()
+            logger.info("Server selection requested")
+        } catch {
+            logger.error("Server selection request failed: \(error.localizedDescription)")
+        }
+    }
+
     public func undoLastPoint() {
         guard var match = activeMatch, match.status == .inProgress else { return }
         do {

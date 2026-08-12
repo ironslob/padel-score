@@ -22,8 +22,9 @@ struct WatchRootView: View {
                             completedSet: gameInterstitialCompletedSet,
                             isTieBreak: gameInterstitialIsTieBreak,
                             startedAt: startedAt,
-                            timeout: MatchSettings.quickUndoTimeoutSeconds,
-                            onNext: clearGameInterstitial
+                            timeout: gameInterstitialCompletedSet ? 0 : MatchSettings.quickUndoTimeoutSeconds,
+                            onNext: clearGameInterstitial,
+                            onChooseServer: chooseServerForNextSet
                         )
                     } else if match.needsServerSelection {
                         SelectServerView()
@@ -81,11 +82,7 @@ struct WatchRootView: View {
 
         if let completedSet = didCompleteSet(from: oldMatch, to: newMatch) {
             let isTieBreak = newMatch.currentGame.isTieBreak && !oldMatch.currentGame.isTieBreak
-            beginGameInterstitialWindow(
-                completedSet: completedSet,
-                isTieBreak: isTieBreak,
-                timeout: MatchSettings.quickUndoTimeoutSeconds
-            )
+            beginGameInterstitialWindow(completedSet: completedSet, isTieBreak: isTieBreak)
             return
         }
 
@@ -108,17 +105,30 @@ struct WatchRootView: View {
         return setAdvanced
     }
 
-    private func beginGameInterstitialWindow(completedSet: Bool, isTieBreak: Bool, timeout: TimeInterval) {
+    private func beginGameInterstitialWindow(completedSet: Bool, isTieBreak: Bool) {
         gameInterstitialTask?.cancel()
+        gameInterstitialTask = nil
         gameInterstitialCompletedSet = completedSet
         gameInterstitialIsTieBreak = isTieBreak
         gameInterstitialStartedAt = Date()
         showGameInterstitial = true
+
+        // A finished set waits to be tapped through: ends get swapped and the serve
+        // order rearranged long before anyone looks at their wrist again.
+        guard !completedSet else { return }
+
+        let timeout = MatchSettings.quickUndoTimeoutSeconds
         gameInterstitialTask = Task { @MainActor in
             try? await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
             if Task.isCancelled { return }
             clearGameInterstitial()
         }
+    }
+
+    /// Starts the next set by asking who serves, rather than carrying the rotation on.
+    private func chooseServerForNextSet() {
+        service.requestServerSelection()
+        clearGameInterstitial()
     }
 
     private func clearGameInterstitial() {
@@ -151,6 +161,7 @@ private struct GameInterstitialView: View {
     let startedAt: Date
     let timeout: TimeInterval
     let onNext: () -> Void
+    let onChooseServer: () -> Void
 
     private var sets: (left: String, right: String) { match.matchSetsDisplay }
     private var games: (left: String, right: String) {
@@ -166,49 +177,96 @@ private struct GameInterstitialView: View {
         return "Game!"
     }
 
+    private var nextLabel: String {
+        completedSet ? "Next set" : "Next"
+    }
+
+    /// The changeover between sets is where ends get swapped and the serve order
+    /// rearranged, so that is the only place a fresh serve choice is offered.
+    private var offersServeChoice: Bool {
+        completedSet && match.canChooseNewServer
+    }
+
     var body: some View {
         TimelineView(
             .animation(
                 minimumInterval: 1.0 / 30.0,
-                paused: isLuminanceReduced
+                // Nothing counts down without a timeout, so stop redrawing entirely
+                // rather than animate a ring that never appears.
+                paused: isLuminanceReduced || timeout <= 0
             )
         ) { context in
             let progress = nextProgress(at: context.date)
 
-            VStack(spacing: 10) {
-                Text(headline)
-                    .font(.headline.weight(.bold))
-                    .frame(maxWidth: .infinity)
+            ScrollView {
+                // The serve choice is a third control on a screen sized for two, so the
+                // set summary gives up its breathing room to keep it above the fold on
+                // the smallest watch.
+                VStack(spacing: offersServeChoice ? 6 : 10) {
+                    Text(headline)
+                        .font(.headline.weight(.bold))
+                        .frame(maxWidth: .infinity)
 
-                VStack(spacing: 4) {
-                    if isTieBreak {
-                        Text("First to 7, win by 2")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                    if offersServeChoice {
+                        // Both scores on one line: the third button needs the height.
+                        HStack(spacing: 6) {
+                            Text("Games \(games.left) – \(games.right)")
+                                .font(.subheadline.weight(.semibold).monospacedDigit())
+                            Text("Sets \(sets.left) – \(sets.right)")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .frame(maxWidth: .infinity)
                     } else {
-                        Text("Sets \(sets.left) – \(sets.right)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        VStack(spacing: 4) {
+                            if isTieBreak {
+                                Text("First to 7, win by 2")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Text("Sets \(sets.left) – \(sets.right)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Text("Games \(games.left) – \(games.right)")
+                                .font(.title3.weight(.semibold).monospacedDigit())
+                        }
+                        .frame(maxWidth: .infinity)
                     }
-                    Text("Games \(games.left) – \(games.right)")
-                        .font(.title3.weight(.semibold).monospacedDigit())
-                }
-                .frame(maxWidth: .infinity)
 
-                HStack(spacing: 8) {
-                    Button("Undo") {
-                        service.undoLastPoint()
+                    HStack(spacing: 8) {
+                        Button("Undo") {
+                            service.undoLastPoint()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.orange)
+                        .disabled(!service.canUndo)
+                        .frame(maxWidth: .infinity)
+
+                        nextButton(progress: isLuminanceReduced ? 0 : progress)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.orange)
-                    .disabled(!service.canUndo)
-                    .frame(maxWidth: .infinity)
 
-                    nextButton(progress: isLuminanceReduced ? 0 : progress)
+                    if offersServeChoice {
+                        chooseServerButton
+                    }
                 }
+                .padding(.horizontal)
+                .padding(.vertical, offersServeChoice ? 6 : 16)
             }
-            .padding()
         }
+    }
+
+    private var chooseServerButton: some View {
+        Button(action: onChooseServer) {
+            Text("New serve")
+                .font(.caption.weight(.semibold))
+                .frame(maxWidth: .infinity, minHeight: 30)
+        }
+        .buttonStyle(.bordered)
+        .accessibilityLabel("New serve")
+        .accessibilityHint("Start the next set and choose who is serving")
     }
 
     private func nextButton(progress: Double) -> some View {
@@ -233,16 +291,22 @@ private struct GameInterstitialView: View {
                         )
                 }
 
-                Text("Next")
+                Text(nextLabel)
                     .font(.body.weight(.semibold))
                     .foregroundStyle(.primary)
                     .padding(.vertical, 8)
+                    .minimumScaleFactor(0.8)
+                    .lineLimit(1)
             }
-            .frame(maxWidth: .infinity, minHeight: 44)
+            .frame(maxWidth: .infinity, minHeight: offersServeChoice ? 40 : 44)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Next")
-        .accessibilityHint("Continue to the next game")
+        .accessibilityLabel(nextLabel)
+        .accessibilityHint(
+            completedSet
+                ? "Continue to the next set, keeping the serve rotation"
+                : "Continue to the next game"
+        )
     }
 
     private func nextProgress(at date: Date) -> Double {

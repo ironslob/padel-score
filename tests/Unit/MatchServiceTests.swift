@@ -86,6 +86,29 @@ final class MatchServiceTests: XCTestCase {
         XCTAssertEqual(service.activeMatch?.currentServer, .right)
     }
 
+    func testNewServeAtTheChangeoverPromptsAndPersists() {
+        let store = InMemoryMatchStore()
+        let service = MatchService(store: store)
+        var settings = MatchSettings.default
+        settings.setsToWin = 2
+        service.startMatch(settings: settings)
+        service.selectServer(.left)
+        for _ in 0..<24 {
+            service.awardPoint(to: .left) // 6-0, set to Us
+        }
+        XCTAssertEqual(service.activeMatch?.completedSets.count, 1)
+
+        service.requestServerSelection()
+        XCTAssertEqual(service.activeMatch?.needsServerSelection, true)
+        XCTAssertEqual(store.active?.needsServerSelection, true)
+
+        service.selectServer(.right)
+        XCTAssertEqual(service.activeMatch?.currentServer, .right)
+        service.awardPoint(to: .left)
+        XCTAssertEqual(service.activeMatch?.currentServer, .right)
+        XCTAssertEqual(store.active?.currentGame.leftPoints, 1)
+    }
+
     func testStartMatchPersistsDeuceFormat() {
         let store = InMemoryMatchStore()
         let service = MatchService(store: store)

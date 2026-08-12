@@ -17,6 +17,17 @@ struct ActionsScreen: View {
             }
             .disabled(!service.canUndo)
 
+            // Only between sets, and only while nothing has been played into the new
+            // one — the same window the set summary offers it in, for when that
+            // dismissed itself before anyone reached the watch.
+            if match.canChooseNewServer {
+                Button {
+                    service.requestServerSelection()
+                } label: {
+                    Label("New Serve", systemImage: "arrow.triangle.2.circlepath")
+                }
+            }
+
             Button(role: .destructive) {
                 confirmEndMatch = true
             } label: {

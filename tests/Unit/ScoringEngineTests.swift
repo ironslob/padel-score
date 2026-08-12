@@ -435,6 +435,89 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.currentServer, .left)
     }
 
+    // MARK: - Choosing a new server at the changeover
+
+    /// Runs a 6-0 set out. Serve has flipped six times, so it comes back to whoever
+    /// opened the match for the first game of the next set.
+    private func winFirstSet(from state: MatchState) throws -> MatchState {
+        var s = state
+        for _ in 0..<6 {
+            s = try winGame(for: .left, from: s)
+        }
+        return s
+    }
+
+    func testNewServeAtTheChangeoverAsksWhoIsServing() throws {
+        var s = try winFirstSet(from: start())
+        XCTAssertEqual(s.completedSets.count, 1)
+        XCTAssertTrue(s.canChooseNewServer)
+
+        s = try engine.apply(.requestServerSelection, to: s)
+        XCTAssertTrue(s.needsServerSelection)
+        XCTAssertNil(s.currentServer)
+        XCTAssertThrowsError(try point(.left, s)) { error in
+            XCTAssertEqual(error as? ScoringError, .invalidAction)
+        }
+    }
+
+    func testServerChosenAtTheChangeoverSurvivesReplay() throws {
+        var s = try winFirstSet(from: start())
+        XCTAssertEqual(s.currentServer, .left) // rotation would carry Us on
+
+        s = try engine.apply(.requestServerSelection, to: s)
+        s = try engine.apply(.selectServer(.right), to: s)
+        XCTAssertFalse(s.needsServerSelection)
+        XCTAssertEqual(s.currentServer, .right)
+
+        // Every later action replays the whole stream, so the choice has to survive it.
+        s = try point(.left, s)
+        XCTAssertEqual(s.currentServer, .right)
+        s = try engine.apply(.undo, to: s)
+        XCTAssertEqual(s.currentServer, .right)
+        XCTAssertEqual(s.completedSets.count, 1)
+    }
+
+    func testNewServeIsRefusedOnceTheSetIsUnderWay() throws {
+        var s = try winFirstSet(from: start())
+        s = try point(.left, s)
+        XCTAssertFalse(s.canChooseNewServer)
+        XCTAssertThrowsError(try engine.apply(.requestServerSelection, to: s)) { error in
+            XCTAssertEqual(error as? ScoringError, .invalidAction)
+        }
+    }
+
+    func testNewServeChangesNothingWhileAlreadyAsking() throws {
+        var settings = MatchSettings.default
+        settings.askServeAtSetStart = true
+        let s = try winFirstSet(from: start(settings: settings))
+        XCTAssertTrue(s.needsServerSelection)
+        XCTAssertFalse(s.canChooseNewServer)
+        XCTAssertEqual(try engine.apply(.requestServerSelection, to: s), s)
+    }
+
+    /// Undo moves the set boundary back, which strands a server chosen for a set that
+    /// is no longer over. The mid-set rotation has to win.
+    func testUndoingTheSetWinningPointDropsTheServerChosenForTheNextSet() throws {
+        var s = start()
+        for _ in 0..<5 {
+            s = try winGame(for: .left, from: s)
+        }
+        s = try point(.left, s)
+        s = try point(.left, s)
+        s = try point(.left, s) // 5-0, 40-0 on serve
+        let serverBeforeSetPoint = s.currentServer
+        s = try point(.left, s) // 6-0 set
+
+        s = try engine.apply(.requestServerSelection, to: s)
+        s = try engine.apply(.selectServer(.right), to: s)
+        s = try engine.apply(.undo, to: s)
+
+        XCTAssertEqual(s.completedSets.count, 0)
+        XCTAssertEqual(s.currentSet.leftGames, 5)
+        XCTAssertFalse(s.needsServerSelection)
+        XCTAssertEqual(s.currentServer, serverBeforeSetPoint)
+    }
+
     func testServerAutoTogglesAfterEachCompletedGame() throws {
         var s = startUnselected()
         s = try engine.apply(.selectServer(.left), to: s)
