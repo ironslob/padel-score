@@ -32,6 +32,12 @@ Documented decisions that were not fully prescribed by `/spec`.
 
 **Why:** Keeps undo fast on the tiny Watch score surface without a separate Undo control, while Actions still covers recovering older mistakes. Replay keeps behaviour identical to event sourcing.
 
+## Choosing a new server at the changeover
+
+**Choice:** The set summary waits to be tapped through — unlike the game one, it has no countdown — and offers "New serve" alongside "Next set". The Actions screen repeats "New serve" for as long as the new set is untouched. It puts the match back to "Who's serving?" instead of carrying the rotation on. `requestServerSelection` records no event of its own — it only re-arms `needsServerSelection`, and replay accepts a `serverSelected` event at a set boundary even when the match was not waiting for one.
+
+**Why:** Players swap ends between sets and often rearrange who serves, which the existing `askServeAtSetStart` preference only covers by asking every single time. The three-second quick-undo window is far too short to survive a changeover, so auto-advancing would have hidden the choice before anyone reached their wrist. Storing the request as an event would need a new `MatchEventKind`, which an older build sharing the archive could not decode; the choice that follows is the fact worth keeping, and the set boundary it belongs to is already derivable from the stream. Anywhere other than a set start the stored choice is ignored on replay, so undoing the set-winning point drops a server picked for a set that is no longer over rather than applying it mid-game.
+
 ## Golden point house rule
 
 **Choice:** First deuce → advantage → if advantage is broken, golden point activates; next point wins. Winning from advantage before that second deuce still wins the game normally.

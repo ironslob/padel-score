@@ -262,6 +262,18 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         events.contains { $0.kind == .pointWon }
     }
 
+    /// True while the set in progress has not been played into: no games won and no
+    /// points on the board. Serve can still be handed to either side here.
+    public var isAtSetStart: Bool {
+        currentSet.leftGames == 0 && currentSet.rightGames == 0 && currentGame == .zero
+    }
+
+    /// Whether the player may pick a new server right now, rather than carrying the
+    /// rotation on. Offered at the changeover between sets.
+    public var canChooseNewServer: Bool {
+        status == .inProgress && !needsServerSelection && isAtSetStart
+    }
+
     public var lastScoringActivityAt: Date {
         events.last(where: { $0.kind == .pointWon })?.timestamp ?? startedAt
     }

@@ -166,7 +166,8 @@ public enum SettingsCopy {
         "After each game, Us and Them swap so the serving team stays on the left. Serve still alternates when this is off."
 
     public static let askServeAtSetStart =
-        "Choose who serves when each new set begins."
+        "Always choose who serves when each new set begins. With this off, the set " +
+        "summary still offers New serve when you want to change it."
 
     public static let matchSetFormat =
         "How many sets decide the match. Continuous keeps scoring until you finish."

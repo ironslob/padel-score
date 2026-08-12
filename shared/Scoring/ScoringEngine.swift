@@ -42,6 +42,17 @@ public struct ScoringEngine: Sendable {
             next.events.append(.serverSelected(side, at: date))
             return replay(events: next.events, onto: blankMatch(from: next))
 
+        case .requestServerSelection:
+            guard state.status == .inProgress else { throw ScoringError.matchNotInProgress }
+            guard state.isAtSetStart else { throw ScoringError.invalidAction }
+            guard !state.needsServerSelection else { return state }
+            // No event is recorded: the choice that follows is the fact worth keeping,
+            // and replay re-derives the prompt from where the set boundary falls.
+            var next = state
+            next.currentServer = nil
+            next.needsServerSelection = true
+            return next
+
         case .pointWon(let side):
             guard state.status == .inProgress else { throw ScoringError.matchNotInProgress }
             guard !state.needsServerSelection else { throw ScoringError.invalidAction }
@@ -145,7 +156,11 @@ public struct ScoringEngine: Sendable {
                 state.needsServerSelection = true
 
             case .serverSelected:
-                guard let side = event.side, state.status == .inProgress, state.needsServerSelection else { continue }
+                guard let side = event.side, state.status == .inProgress else { continue }
+                // A choice made at a set boundary counts even though the match was not
+                // waiting for one, because the changeover offers it. Anywhere else the
+                // event is stale — an undo has moved the set boundary out from under it.
+                guard state.needsServerSelection || state.isAtSetStart else { continue }
                 state.currentServer = side
                 state.needsServerSelection = false
 
