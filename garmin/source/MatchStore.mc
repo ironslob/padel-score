@@ -1,3 +1,6 @@
+import Toybox.Application;
+import Toybox.Lang;
+
 // Local persistence — ported from shared/Persistence/MatchStore.swift
 
 class MatchStore {
@@ -86,8 +89,10 @@ class MatchStore {
             "settings" => serializeSettings(match.settings),
             "status" => match.status as Number,
             "events" => serializeEvents(match.events),
+            "deuceFormatChanges" => serializeDeuceFormatChanges(match.deuceFormatChanges),
             "startedAt" => match.startedAt,
-            "finishedAt" => match.finishedAt
+            "finishedAt" => match.finishedAt,
+            "needsServerSelection" => match.needsServerSelection
         } as Dictionary;
     }
 
@@ -137,8 +142,17 @@ class MatchStore {
             state.finishedAt = data.get("finishedAt") as Number;
         }
         var events = deserializeEvents(data.get("events") as Array);
+        if (data.hasKey("deuceFormatChanges")) {
+            state.deuceFormatChanges = deserializeDeuceFormatChanges(data.get("deuceFormatChanges") as Array);
+        }
         var engine = new ScoringEngine();
-        return engine.replay(events, state);
+        var replayed = engine.replay(events, state);
+        if (data.hasKey("needsServerSelection") && (data.get("needsServerSelection") as Boolean)
+            && replayed.status == MatchStatus.IN_PROGRESS && replayed.isAtSetStart()) {
+            replayed.currentServer = null;
+            replayed.needsServerSelection = true;
+        }
+        return replayed;
     }
 
     private function deserializeSettings(data as Dictionary) as MatchSettings {
@@ -181,5 +195,28 @@ class MatchStore {
             ));
         }
         return events;
+    }
+
+    private function serializeDeuceFormatChanges(changes as Array<DeuceFormatChange>) as Array {
+        var items = [] as Array;
+        for (var i = 0; i < changes.size(); i += 1) {
+            items.add({
+                "format" => deuceFormatToString(changes[i].format),
+                "at" => changes[i].at
+            } as Dictionary);
+        }
+        return items;
+    }
+
+    private function deserializeDeuceFormatChanges(items as Array) as Array<DeuceFormatChange> {
+        var changes = [] as Array<DeuceFormatChange>;
+        for (var i = 0; i < items.size(); i += 1) {
+            var item = items[i] as Dictionary;
+            var format = deuceFormatFromString(item.get("format") as String);
+            if (format != null) {
+                changes.add(new DeuceFormatChange(format, item.get("at") as Number));
+            }
+        }
+        return changes;
     }
 }

@@ -1,11 +1,13 @@
 #if os(iOS)
 import ActivityKit
 import Foundation
+import os
 
 @MainActor
 public final class MatchLiveActivityManager: ObservableObject {
     private var activeMatchID: UUID?
     private var activity: Activity<MatchActivityAttributes>?
+    private let logger = Logger(subsystem: "com.padelscore", category: "LiveActivity")
 
     public init() {}
 
@@ -46,6 +48,7 @@ public final class MatchLiveActivityManager: ObservableObject {
         } catch {
             activity = nil
             activeMatchID = nil
+            logger.error("Live Activity start failed: \(error.localizedDescription)")
         }
     }
 

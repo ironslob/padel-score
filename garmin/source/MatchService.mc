@@ -1,3 +1,8 @@
+import Toybox.Application;
+import Toybox.Lang;
+import Toybox.System;
+import Toybox.Time;
+
 // Match lifecycle coordinator — ported from shared/Services/MatchService.swift
 
 class MatchService {
@@ -54,6 +59,19 @@ class MatchService {
             return;
         }
         var updated = engine.applySelectServer(activeMatch, side, Time.now().value());
+        if (updated == null) {
+            return;
+        }
+        activeMatch = updated;
+        persist();
+        expireInactiveMatchIfNeeded();
+    }
+
+    function requestServerSelection() as Void {
+        if (activeMatch == null || activeMatch.status != MatchStatus.IN_PROGRESS) {
+            return;
+        }
+        var updated = engine.applyRequestServerSelection(activeMatch);
         if (updated == null) {
             return;
         }
@@ -179,6 +197,13 @@ class MatchService {
 
     function setDeuceFormat(format as DeuceFormat) as Void {
         Application.Properties.setValue("deuceFormat", deuceFormatToString(format));
+        if (activeMatch != null && activeMatch.status == MatchStatus.IN_PROGRESS) {
+            var updated = engine.applySetDeuceFormat(activeMatch, format, Time.now().value());
+            if (updated != null) {
+                activeMatch = updated;
+                persist();
+            }
+        }
     }
 
     // Advances the setting through Regular → Silver → Golden → Regular.
@@ -209,6 +234,84 @@ class MatchService {
             activeMatch.settings.fixedServerPositions = !enabled;
             persist();
         }
+    }
+
+    function getUsThemLabels() as Boolean {
+        var value = Application.Properties.getValue("usThemLabels");
+        if (value == null) {
+            return true;
+        }
+        return value as Boolean;
+    }
+
+    function setUsThemLabels(enabled as Boolean) as Void {
+        Application.Properties.setValue("usThemLabels", enabled);
+        if (activeMatch != null && activeMatch.status == MatchStatus.IN_PROGRESS) {
+            activeMatch.settings.usThemLabels = enabled;
+            persist();
+        }
+    }
+
+    function cycleUsThemLabels() as Boolean {
+        var next = !getUsThemLabels();
+        setUsThemLabels(next);
+        return next;
+    }
+
+    function getAskServeAtSetStart() as Boolean {
+        var value = Application.Properties.getValue("askServeAtSetStart");
+        if (value == null) {
+            return false;
+        }
+        return value as Boolean;
+    }
+
+    function setAskServeAtSetStart(enabled as Boolean) as Void {
+        Application.Properties.setValue("askServeAtSetStart", enabled);
+        if (activeMatch != null && activeMatch.status == MatchStatus.IN_PROGRESS) {
+            activeMatch.settings.askServeAtSetStart = enabled;
+            persist();
+        }
+    }
+
+    function cycleAskServeAtSetStart() as Boolean {
+        var next = !getAskServeAtSetStart();
+        setAskServeAtSetStart(next);
+        return next;
+    }
+
+    function getMatchSetFormat() as MatchSetFormat {
+        var raw = Application.Properties.getValue("matchSetFormat");
+        if (raw != null) {
+            var value = raw as Number;
+            if (value == MatchSetFormat.SET_FORMAT_BEST_OF_ONE
+                || value == MatchSetFormat.SET_FORMAT_BEST_OF_THREE
+                || value == MatchSetFormat.SET_FORMAT_BEST_OF_FIVE
+                || value == MatchSetFormat.SET_FORMAT_CONTINUOUS) {
+                return value as MatchSetFormat;
+            }
+        }
+        return MatchSetFormat.SET_FORMAT_BEST_OF_THREE;
+    }
+
+    function setMatchSetFormat(format as MatchSetFormat) as Void {
+        Application.Properties.setValue("matchSetFormat", format as Number);
+    }
+
+    function cycleMatchSetFormat() as MatchSetFormat {
+        var next = nextMatchSetFormat(getMatchSetFormat());
+        setMatchSetFormat(next);
+        return next;
+    }
+
+    function settingsForNewMatch() as MatchSettings {
+        var settings = new MatchSettings();
+        settings.deuceFormat = getDeuceFormat();
+        settings.fixedServerPositions = !getRotateServeEnabled();
+        settings.usThemLabels = getUsThemLabels();
+        settings.askServeAtSetStart = getAskServeAtSetStart();
+        applyMatchSetFormat(settings, getMatchSetFormat());
+        return settings;
     }
 
     private function finalizeActiveMatch() as Void {

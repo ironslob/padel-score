@@ -171,6 +171,9 @@ public enum SettingsCopy {
 
     public static let matchSetFormat =
         "How many sets decide the match. Continuous keeps scoring until you finish."
+
+    public static let workoutTrackingMode =
+        "Score only keeps scoring without a Health workout — use it when another app is already tracking. Track as workout lets Padel Score own the session so it can return when you raise your wrist."
 }
 
 public enum FirstLaunchTipCopy {

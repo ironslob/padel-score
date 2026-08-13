@@ -5,6 +5,7 @@ struct ActionsScreen: View {
     let match: MatchState
 
     @State private var confirmEndMatch = false
+    @State private var confirmEndEarly = false
     @State private var confirmDiscard = false
     @State private var showDuringPlayHelp = false
 
@@ -34,6 +35,12 @@ struct ActionsScreen: View {
                 Label("End Match", systemImage: "flag.checkered")
             }
 
+            Button(role: .destructive) {
+                confirmEndEarly = true
+            } label: {
+                Label("End Match Early", systemImage: "stop.circle")
+            }
+
             MatchPreferenceToggles(match: match)
 
             Button {
@@ -50,6 +57,10 @@ struct ActionsScreen: View {
         }
         .confirmationDialog("End this match?", isPresented: $confirmEndMatch) {
             Button("End Match", role: .destructive) { service.finishMatch() }
+            Button("Cancel", role: .cancel) {}
+        }
+        .confirmationDialog("End match early? The current score is kept.", isPresented: $confirmEndEarly) {
+            Button("End Early", role: .destructive) { service.endMatchEarly() }
             Button("Cancel", role: .cancel) {}
         }
         .confirmationDialog("Discard match? History will be deleted.", isPresented: $confirmDiscard) {

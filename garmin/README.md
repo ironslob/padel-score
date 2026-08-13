@@ -61,11 +61,12 @@ base64 -i developer_key.der | pbcopy
 ## Features (V1)
 
 - Start match, select server
-- Large left/right score buttons with quick-undo (tap same side twice within 3s)
-- Swipe pager: Score → Overview → Actions
-- Golden point, deuce/advantage, tie-break (parity with Apple Watch scoring engine)
-- Finish / end early / discard
-- Match history and golden-point setting
+- Large left/right score buttons with quick-undo (tap same side twice within 3s; yellow bar on the button)
+- Swipe pager: Overview → Score → Actions
+- Golden / silver / regular deuce, tie-break, serve rotation at set boundaries (parity with Apple Watch)
+- New serve at changeover; deuce format can be changed mid-match
+- Finish / end early / discard (with confirmation)
+- Match history, match length, ask-serve, and Us/Them settings
 - Local persistence via `Application.Storage`
 
 ## Scoring parity

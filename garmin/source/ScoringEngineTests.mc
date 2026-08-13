@@ -305,7 +305,7 @@ function testFinalScoreSummaryFinishMidSetIncludesPartial(logger as Logger) as B
     state = engine.applyPointWon(state, Side.RIGHT, t);
     t += 1;
     state = engine.applyFinish(state, t);
-    Test.assertEqual(MatchStatus.COMPLETED, state.status);
+    Test.assertEqual(MatchStatus.ENDED_EARLY, state.status);
     Test.assertEqual("3-2 (40-15)", state.finalScoreSummary());
     Test.assert(state.displaysIncompleteSet());
     return true;
@@ -343,7 +343,7 @@ function testFinalScoreSummaryFinishMidSetAfterCompletedSet(logger as Logger) as
     state = engine.applyPointWon(state, Side.RIGHT, t);
     t += 1;
     state = engine.applyFinish(state, t);
-    Test.assertEqual(MatchStatus.COMPLETED, state.status);
+    Test.assertEqual(MatchStatus.ENDED_EARLY, state.status);
     Test.assertEqual("6-0, 3-2 (30-15)", state.finalScoreSummary());
     Test.assert(state.displaysIncompleteSet());
     return true;
@@ -386,5 +386,111 @@ function testFixedServerPositionsRotatesServeButKeepsLayout(logger as Logger) as
     Test.assertEqual(Side.RIGHT, state.scoreScreenSides()[1]);
     Test.assertEqual("Us", state.servingRoleLabels()[0]);
     Test.assertEqual("Them", state.servingRoleLabels()[1]);
+    return true;
+}
+
+function winGames(engine as ScoringEngine, state as MatchState, side as Side, games as Number, t as Number) as MatchState {
+    for (var g = 0; g < games; g += 1) {
+        for (var p = 0; p < 4; p += 1) {
+            var next = engine.applyPointWon(state, side, t);
+            if (next == null) {
+                return state;
+            }
+            state = next;
+            t += 1;
+        }
+    }
+    return state;
+}
+
+(:test)
+function testServeRotatesIntoFirstGameOfNextSet(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var settings = new MatchSettings();
+    settings.fixedServerPositions = false;
+    var state = engine.startMatch(settings, "test-set-serve", 0);
+    state = engine.applySelectServer(state, Side.LEFT, 1);
+    state = winGames(engine, state, Side.LEFT, 6, 2);
+    Test.assertEqual(1, state.completedSets.size());
+    Test.assertEqual(0, state.currentSet.leftGames);
+    Test.assert(!state.needsServerSelection);
+    Test.assertEqual(Side.LEFT, state.currentServer);
+    return true;
+}
+
+(:test)
+function testTieBreakOpensOnRotatedServe(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var settings = new MatchSettings();
+    settings.fixedServerPositions = false;
+    var state = engine.startMatch(settings, "test-tb-serve", 0);
+    state = engine.applySelectServer(state, Side.LEFT, 1);
+    var t = 2;
+    for (var i = 0; i < 6; i += 1) {
+        for (var p = 0; p < 4; p += 1) {
+            state = engine.applyPointWon(state, Side.LEFT, t);
+            t += 1;
+        }
+        for (var p = 0; p < 4; p += 1) {
+            state = engine.applyPointWon(state, Side.RIGHT, t);
+            t += 1;
+        }
+    }
+    Test.assert(state.currentGame.isTieBreak);
+    Test.assertEqual(Side.LEFT, state.currentServer);
+    return true;
+}
+
+(:test)
+function testNewServeNotOfferedBeforeFirstSet(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var settings = new MatchSettings();
+    var state = engine.startMatch(settings, "test-no-serve", 0);
+    state = engine.applySelectServer(state, Side.LEFT, 1);
+    Test.assertEqual(0, state.completedSets.size());
+    Test.assert(state.isAtSetStart());
+    Test.assert(!state.canChooseNewServer());
+    return true;
+}
+
+(:test)
+function testNewServeAtChangeover(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var settings = new MatchSettings();
+    var state = engine.startMatch(settings, "test-new-serve", 0);
+    state = engine.applySelectServer(state, Side.LEFT, 1);
+    state = winGames(engine, state, Side.LEFT, 6, 2);
+    Test.assert(state.canChooseNewServer());
+    state = engine.applyRequestServerSelection(state);
+    Test.assert(state.needsServerSelection);
+    Test.assertEqual(null, state.currentServer);
+    return true;
+}
+
+(:test)
+function testDeuceFormatChangeKeepsNewServePrompt(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var settings = new MatchSettings();
+    var state = engine.startMatch(settings, "test-deuce-serve", 0);
+    state = engine.applySelectServer(state, Side.LEFT, 1);
+    state = winGames(engine, state, Side.LEFT, 6, 2);
+    state = engine.applyRequestServerSelection(state);
+    state = engine.applySetDeuceFormat(state, DeuceFormat.DEUCE_ADVANTAGE, 100);
+    Test.assert(state.needsServerSelection);
+    Test.assertEqual(null, state.currentServer);
+    Test.assertEqual(DeuceFormat.DEUCE_ADVANTAGE, state.settings.deuceFormat);
+    return true;
+}
+
+(:test)
+function testFinishWithoutWinnerEndsEarly(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var settings = new MatchSettings();
+    var state = engine.startMatch(settings, "test-finish-early", 0);
+    state = engine.applySelectServer(state, Side.LEFT, 1);
+    state = engine.applyPointWon(state, Side.LEFT, 2);
+    state = engine.applyFinish(state, 3);
+    Test.assertEqual(MatchStatus.ENDED_EARLY, state.status);
+    Test.assertEqual(null, state.winner);
     return true;
 }

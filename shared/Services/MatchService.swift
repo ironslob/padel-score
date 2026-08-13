@@ -33,8 +33,8 @@ public final class MatchService: ObservableObject {
         do {
             deletedMatchIDs = try store.loadDeletedMatchIDs()
             matchNotes = try store.loadMatchNotes()
-            activeMatch = try store.loadActiveMatch()
-            archivedMatches = visibleArchive(try store.loadArchivedMatches())
+            activeMatch = try store.loadActiveMatch().map { engine.rehydrate($0) }
+            archivedMatches = visibleArchive((try store.loadArchivedMatches()).map { engine.rehydrate($0) })
             logger.info("Restored active=\(self.activeMatch != nil) archive=\(self.archivedMatches.count)")
             finishRestore()
         } catch {
@@ -57,8 +57,8 @@ public final class MatchService: ObservableObject {
             }.value
             deletedMatchIDs = deleted
             matchNotes = notes
-            activeMatch = active
-            archivedMatches = visibleArchive(archive)
+            activeMatch = active.map { engine.rehydrate($0) }
+            archivedMatches = visibleArchive(archive.map { engine.rehydrate($0) })
             logger.info("Restored active=\(self.activeMatch != nil) archive=\(self.archivedMatches.count)")
             finishRestore()
         } catch {
@@ -299,13 +299,16 @@ public final class MatchService: ObservableObject {
     /// Used by the Watch when the phone reports matches the user deleted from history.
     /// Archive only — the active match is never touched by a remote payload.
     public func applyRemoteDeletions(_ ids: Set<UUID>) {
-        let doomed = archivedMatches.filter { ids.contains($0.id) && $0.id != activeMatch?.id }
-        guard !doomed.isEmpty else { return }
+        let incoming = Set(ids.filter { $0 != activeMatch?.id })
+        guard !incoming.isEmpty else { return }
+        deletedMatchIDs.formUnion(incoming)
+        try? store.saveDeletedMatchIDs(deletedMatchIDs)
+        let doomed = archivedMatches.filter { incoming.contains($0.id) }
         for match in doomed {
             try? store.deleteArchivedMatch(id: match.id)
         }
-        archivedMatches.removeAll { match in doomed.contains { $0.id == match.id } }
-        logger.info("Applied \(doomed.count) remote deletion(s)")
+        archivedMatches.removeAll { incoming.contains($0.id) }
+        logger.info("Applied \(incoming.count) remote deletion(s)")
     }
 
     private func visibleArchive(_ matches: [MatchState]) -> [MatchState] {

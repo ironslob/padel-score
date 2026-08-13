@@ -73,6 +73,10 @@ public final class MatchSessionCoordinator: ObservableObject {
         self.usThemLabels = serveStore.usThemLabels
         self.deuceFormat = serveStore.deuceFormat
         self.matchSetFormat = serveStore.matchSetFormat
+        if let raw = modeStore.preferredWorkoutTrackingModeRawValue,
+           let mode = WorkoutTrackingMode(rawValue: raw) {
+            self.workoutTrackingMode = mode
+        }
         self.workoutManager.pauseStateHandler = { [weak self] isPaused in
             self?.isWorkoutPaused = isPaused
         }
@@ -137,17 +141,19 @@ public final class MatchSessionCoordinator: ObservableObject {
         service.startMatch(settings: settings)
         publishSnapshot(for: service.activeMatch)
 
-        await startWorkoutSession()
+        if workoutTrackingMode == .trackAsWorkout {
+            await startWorkoutSession()
+        }
     }
 
     public func presentFirstLaunchTipIfNeeded() {
         guard tipStore.shouldShowTip else { return }
         showFirstLaunchTip = true
-        tipStore.markTipSeen()
     }
 
     public func dismissFirstLaunchTip() {
         showFirstLaunchTip = false
+        tipStore.markTipSeen()
     }
 
     public func handleScenePhaseChange(_ phase: ScenePhase) {

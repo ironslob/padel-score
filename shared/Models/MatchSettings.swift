@@ -89,9 +89,8 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     public var deuceFormat: DeuceFormat
     /// When true, the player must choose who is serving at the start of each new set.
     public var askServeAtSetStart: Bool
-    /// When true, serve does not rotate after games; the side chosen at match start stays fixed.
-    /// Default true (UI "Swap sides each game" off). Controls score-button layout only;
-    /// serve always rotates per padel rules regardless of this flag.
+    /// When true, Us/Them stay fixed on the score buttons (UI "Swap sides each game" off).
+    /// Controls layout only; serve always rotates per padel rules regardless of this flag.
     public var fixedServerPositions: Bool
     /// When true, score buttons show "Us" / "Them" instead of "Serving" / "Receiving".
     public var usThemLabels: Bool

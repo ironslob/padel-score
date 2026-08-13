@@ -219,12 +219,16 @@ struct ScoreScreen: View {
             .frame(maxWidth: .infinity, minHeight: isLuminanceReduced ? 64 : 72)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(role) \(score)")
+        .accessibilityLabel(serveAccessibilityLabel(role: role, score: score, isServing: showsServeIndicator))
         .accessibilityHint(
             undoSide == logicalSide
                 ? "Double tap again to cancel the last point"
                 : "Awards a point"
         )
+    }
+
+    private func serveAccessibilityLabel(role: String, score: String, isServing: Bool) -> String {
+        isServing ? "\(role) \(score), serving" : "\(role) \(score)"
     }
 
     private func handleTap(_ logicalSide: Side) {

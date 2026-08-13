@@ -10,11 +10,13 @@ struct MatchCompleteView: View {
                 Text(title)
                     .font(.headline)
                     .multilineTextAlignment(.center)
+                    .accessibilityAddTraits(.isHeader)
 
                 if let winner = match.winner {
                     Text(winner == .left ? "Won" : "Lost")
                         .font(.title3.weight(.bold))
                         .foregroundStyle(winner == .left ? .green : .orange)
+                        .accessibilityLabel(winner == .left ? "Won" : "Lost")
                 } else if match.status == .endedEarly {
                     Text("Ended Early")
                         .font(.title3.weight(.semibold))
@@ -24,6 +26,7 @@ struct MatchCompleteView: View {
                 Text(match.finalScoreSummary.isEmpty ? matchSummaryFallback : match.finalScoreSummary)
                     .font(.body.monospacedDigit())
                     .multilineTextAlignment(.center)
+                    .accessibilityLabel("Final score \(match.finalScoreSummary.isEmpty ? matchSummaryFallback : match.finalScoreSummary)")
 
                 Button {
                     service.acknowledgeCompletedMatch()
@@ -32,6 +35,8 @@ struct MatchCompleteView: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                .accessibilityLabel("Done")
+                .accessibilityHint("Return to the start screen")
             }
             .padding()
         }

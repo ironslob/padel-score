@@ -312,6 +312,8 @@ final class MatchServiceTests: XCTestCase {
         XCTAssertTrue(service.archivedMatches.isEmpty)
         XCTAssertTrue(store.archive.isEmpty)
         XCTAssertEqual(service.activeMatch?.id, activeID)
+        XCTAssertEqual(service.deletedMatchIDs, [archived.id])
+        XCTAssertEqual(store.deletedIDs, [archived.id])
     }
 
     func testDeletedIDsSurviveFileStoreRoundTrip() throws {

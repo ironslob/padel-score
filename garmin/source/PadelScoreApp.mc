@@ -33,7 +33,7 @@ function buildRootNavigation(service as MatchService) as [Views] or [Views, Inpu
     }
     if (match.status == MatchStatus.IN_PROGRESS) {
         if (match.needsServerSelection) {
-            return [new SelectServerView(service), new SelectServerDelegate(service)] as [Views] or [Views, InputDelegates];
+            return [new SelectServerView(service), new SelectServerDelegate(service, true)] as [Views] or [Views, InputDelegates];
         }
         var pager = new MatchPagerView(service, 1);
         return [pager, new MatchPagerDelegate(service, pager)] as [Views] or [Views, InputDelegates];

@@ -67,7 +67,9 @@ struct WatchRootView: View {
         } message: {
             Text("Apple Watch supports one active workout at a time. Keep this match as Score only, or cancel and end the other workout first.")
         }
-        .sheet(isPresented: $sessionCoordinator.showFirstLaunchTip) {
+        .sheet(isPresented: $sessionCoordinator.showFirstLaunchTip, onDismiss: {
+            sessionCoordinator.dismissFirstLaunchTip()
+        }) {
             FirstLaunchTipView {
                 sessionCoordinator.dismissFirstLaunchTip()
             }
@@ -330,12 +332,16 @@ struct SelectServerView: View {
             .buttonStyle(.borderedProminent)
             .tint(.green)
             .frame(maxWidth: .infinity)
+            .accessibilityLabel("We are serving")
+            .accessibilityHint("Us starts the match on serve")
 
             Button("They are") {
                 service.selectServer(.right)
             }
             .buttonStyle(.bordered)
             .frame(maxWidth: .infinity)
+            .accessibilityLabel("They are serving")
+            .accessibilityHint("Them starts the match on serve")
         }
         .padding()
     }
@@ -371,6 +377,8 @@ struct StartMatchView: View {
                 .tint(.green)
                 .disabled(isStarting)
                 .accessibilityLabel("Start Match")
+
+                WorkoutTrackingModePicker()
 
                 HStack(spacing: 8) {
                     Button("Settings") {
@@ -641,6 +649,9 @@ struct MatchPreferenceToggles: View {
     var showsHelperText = false
 
     var body: some View {
+        if match == nil {
+            WorkoutTrackingModePicker(showsHelperText: showsHelperText)
+        }
         MatchSetFormatPicker(match: match, showsHelperText: showsHelperText)
         DeuceFormatPicker(match: match, showsHelperText: showsHelperText)
         PreferenceToggleRow(
@@ -672,6 +683,33 @@ struct MatchPreferenceToggles: View {
                 set: { sessionCoordinator.setAlwaysAskServeAtSetStart($0) }
             )
         )
+    }
+}
+
+struct WorkoutTrackingModePicker: View {
+    @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
+    var showsHelperText = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Picker(
+                "Workout",
+                selection: Binding(
+                    get: { sessionCoordinator.workoutTrackingMode },
+                    set: { sessionCoordinator.setWorkoutTrackingMode($0) }
+                )
+            ) {
+                ForEach(MatchSessionCoordinator.WorkoutTrackingMode.allCases) { mode in
+                    Text(mode.label).tag(mode)
+                }
+            }
+            if showsHelperText {
+                Text(SettingsCopy.workoutTrackingMode)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 }
 

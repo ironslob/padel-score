@@ -35,7 +35,9 @@ enum MatchActionType {
     UNDO,
     FINISH,
     END_EARLY,
-    DISCARD
+    DISCARD,
+    REQUEST_SERVER_SELECTION,
+    SET_DEUCE_FORMAT
 }
 
 // How a game is resolved once both sides reach 40.
@@ -122,6 +124,73 @@ function deuceFormatDecidingPointShortLabel(format as DeuceFormat) as String {
     return "GP";
 }
 
+enum MatchSetFormat {
+    SET_FORMAT_BEST_OF_ONE,
+    SET_FORMAT_BEST_OF_THREE,
+    SET_FORMAT_BEST_OF_FIVE,
+    SET_FORMAT_CONTINUOUS
+}
+
+function matchSetFormatFromSettings(settings as MatchSettings) as MatchSetFormat {
+    if (settings.continuousPlay) {
+        return MatchSetFormat.SET_FORMAT_CONTINUOUS;
+    }
+    if (settings.setsToWin == 1) {
+        return MatchSetFormat.SET_FORMAT_BEST_OF_ONE;
+    }
+    if (settings.setsToWin == 3) {
+        return MatchSetFormat.SET_FORMAT_BEST_OF_FIVE;
+    }
+    return MatchSetFormat.SET_FORMAT_BEST_OF_THREE;
+}
+
+function applyMatchSetFormat(settings as MatchSettings, format as MatchSetFormat) as Void {
+    if (format == MatchSetFormat.SET_FORMAT_BEST_OF_ONE) {
+        settings.setsToWin = 1;
+        settings.continuousPlay = false;
+    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_FIVE) {
+        settings.setsToWin = 3;
+        settings.continuousPlay = false;
+    } else if (format == MatchSetFormat.SET_FORMAT_CONTINUOUS) {
+        settings.continuousPlay = true;
+    } else {
+        settings.setsToWin = 2;
+        settings.continuousPlay = false;
+    }
+}
+
+function matchSetFormatLabel(format as MatchSetFormat) as String {
+    if (format == MatchSetFormat.SET_FORMAT_BEST_OF_ONE) {
+        return "1 set";
+    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_FIVE) {
+        return "Best of 5";
+    } else if (format == MatchSetFormat.SET_FORMAT_CONTINUOUS) {
+        return "Continuous";
+    }
+    return "Best of 3";
+}
+
+function nextMatchSetFormat(format as MatchSetFormat) as MatchSetFormat {
+    if (format == MatchSetFormat.SET_FORMAT_BEST_OF_ONE) {
+        return MatchSetFormat.SET_FORMAT_BEST_OF_THREE;
+    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_THREE) {
+        return MatchSetFormat.SET_FORMAT_BEST_OF_FIVE;
+    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_FIVE) {
+        return MatchSetFormat.SET_FORMAT_CONTINUOUS;
+    }
+    return MatchSetFormat.SET_FORMAT_BEST_OF_ONE;
+}
+
+class DeuceFormatChange {
+    var format as DeuceFormat;
+    var at as Number;
+
+    function initialize(format as DeuceFormat, at as Number) {
+        self.format = format;
+        self.at = at;
+    }
+}
+
 class MatchSettings {
     var setsToWin as Number;
     var continuousPlay as Boolean;
@@ -134,7 +203,7 @@ class MatchSettings {
     var usThemLabels as Boolean;
 
     static const QUICK_UNDO_TIMEOUT_MS = 3000;
-    static const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000;
+    static const INACTIVITY_TIMEOUT_S = 30 * 60;
 
     function initialize() {
         setsToWin = 2;
@@ -313,6 +382,7 @@ class MatchState {
     var settings as MatchSettings;
     var status as MatchStatus;
     var events as Array<MatchEvent>;
+    var deuceFormatChanges as Array<DeuceFormatChange>;
     var startedAt as Number;
     var finishedAt as Number or Null;
 
@@ -330,6 +400,7 @@ class MatchState {
         self.settings = settings;
         self.status = MatchStatus.IN_PROGRESS;
         self.events = [] as Array<MatchEvent>;
+        self.deuceFormatChanges = [] as Array<DeuceFormatChange>;
         self.startedAt = startedAt;
         self.finishedAt = null;
         self.currentGame = new GameScore();
@@ -351,6 +422,18 @@ class MatchState {
         return false;
     }
 
+    function isAtSetStart() as Boolean {
+        return currentSet.leftGames == 0 && currentSet.rightGames == 0
+            && currentGame.leftPoints == 0 && currentGame.rightPoints == 0
+            && currentGame.advantageSide == null && !currentGame.isGoldenPointActive
+            && !currentGame.isTieBreak && !currentGame.isComplete;
+    }
+
+    function canChooseNewServer() as Boolean {
+        return status == MatchStatus.IN_PROGRESS && !needsServerSelection && isAtSetStart()
+            && completedSets.size() > 0;
+    }
+
     function lastScoringActivityAt() as Number {
         for (var i = events.size() - 1; i >= 0; i -= 1) {
             if (events[i].kind == MatchEventKind.POINT_WON) {
@@ -364,7 +447,7 @@ class MatchState {
         if (status != MatchStatus.IN_PROGRESS) {
             return false;
         }
-        return (now - lastScoringActivityAt()) >= MatchSettings.INACTIVITY_TIMEOUT_MS;
+        return (now - lastScoringActivityAt()) >= MatchSettings.INACTIVITY_TIMEOUT_S;
     }
 
     function matchSetsDisplay() as Array<String> {

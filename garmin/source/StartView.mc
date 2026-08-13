@@ -23,6 +23,7 @@ class StartView extends WatchUi.View {
         dc.drawText(width / 2, height / 4 + 28, Graphics.FONT_XTINY, "Tap to start match", Graphics.TEXT_JUSTIFY_CENTER);
 
         UiHelpers.drawPrimaryButton(dc, "Start Match", width / 2 - 80, height / 2, 160, 50, UiHelpers.COLOR_ACCENT);
+        UiHelpers.drawPrimaryButton(dc, "Settings", width / 2 - 80, height / 2 + 58, 160, 40, Graphics.COLOR_DK_GRAY);
 
         if (service.archivedMatches.size() > 0) {
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
@@ -47,12 +48,14 @@ class StartDelegate extends WatchUi.BehaviorDelegate {
         var y = coords[1];
 
         if (x >= width / 2 - 80 && x <= width / 2 + 80 && y >= height / 2 && y <= height / 2 + 50) {
-            var settings = new MatchSettings();
-            settings.deuceFormat = service.getDeuceFormat();
-            settings.fixedServerPositions = !service.getRotateServeEnabled();
+            var settings = service.settingsForNewMatch();
             service.startMatch(settings);
             WatchUi.popView(WatchUi.SLIDE_LEFT);
-            WatchUi.pushView(new SelectServerView(service), new SelectServerDelegate(service), WatchUi.SLIDE_LEFT);
+            WatchUi.pushView(new SelectServerView(service), new SelectServerDelegate(service, true), WatchUi.SLIDE_LEFT);
+            return true;
+        }
+        if (x >= width / 2 - 80 && x <= width / 2 + 80 && y >= height / 2 + 58 && y <= height / 2 + 98) {
+            pushSettingsView(service);
             return true;
         }
         return false;
@@ -68,7 +71,7 @@ class StartDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onMenu() as Boolean {
-        WatchUi.pushView(new SettingsView(service), new SettingsDelegate(service), WatchUi.SLIDE_UP);
+        pushSettingsView(service);
         return true;
     }
 }

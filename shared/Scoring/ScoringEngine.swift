@@ -82,7 +82,9 @@ public struct ScoringEngine: Sendable {
             let effective = max(date, next.events.last?.timestamp ?? date)
             next.deuceFormatChanges.append(DeuceFormatChange(format: format, at: effective))
             next.settings.deuceFormat = format
-            return replay(events: next.events, onto: blankMatch(from: next))
+            let replayed = replay(events: next.events, onto: blankMatch(from: next))
+            // New Serve is not an event; replay would restore the rotated server.
+            return restoreServerSelectionPrompt(from: state, onto: replayed)
 
         case .undo:
             guard state.status == .inProgress else { throw ScoringError.matchNotInProgress }
@@ -98,8 +100,10 @@ public struct ScoringEngine: Sendable {
             var next = state
             if let winner = naturalWinner(of: state) {
                 next.winner = winner
+                next.status = .completed
+            } else {
+                next.status = .endedEarly
             }
-            next.status = .completed
             next.finishedAt = date
             next.events.append(.matchFinished(at: date))
             return next
@@ -120,6 +124,13 @@ public struct ScoringEngine: Sendable {
             next.events.append(.matchDiscarded(at: date))
             return next
         }
+    }
+
+    /// Rebuilds derived fields from the event stream after a load.
+    /// Keeps an in-progress New Serve prompt, which is not itself an event.
+    public func rehydrate(_ state: MatchState) -> MatchState {
+        let replayed = replay(events: state.events, onto: blankMatch(from: state))
+        return restoreServerSelectionPrompt(from: state, onto: replayed)
     }
 
     /// Rebuilds derived score state from the authoritative event stream.
@@ -370,6 +381,20 @@ public struct ScoringEngine: Sendable {
             state.currentGame = .zero
             beginNextSetServe(nextSetServer, in: &state)
         }
+    }
+
+    /// `requestServerSelection` records no event, so replay restores the rotated
+    /// server. Re-apply the prompt when the set is still untouched.
+    private func restoreServerSelectionPrompt(from previous: MatchState, onto replayed: MatchState) -> MatchState {
+        guard previous.status == .inProgress,
+              previous.needsServerSelection,
+              replayed.status == .inProgress,
+              replayed.isAtSetStart
+        else { return replayed }
+        var next = replayed
+        next.currentServer = nil
+        next.needsServerSelection = true
+        return next
     }
 
     /// Carries serve rotation into the new set, unless the player opted to be

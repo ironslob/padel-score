@@ -368,4 +368,42 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
         store.setMatchSetFormat(.bestOfFive)
         XCTAssertEqual(store.matchSetFormat, .bestOfFive)
     }
+
+    func testSnapshotUsesScoreScreenLayoutWhenSidesSwap() throws {
+        let engine = ScoringEngine()
+        var settings = MatchSettings.default
+        settings.fixedServerPositions = false
+        var match = engine.startMatch(settings: settings)
+        match = try engine.apply(.selectServer(.left), to: match)
+        for _ in 0..<4 {
+            match = try engine.apply(.pointWon(.left), to: match)
+        }
+        match = try engine.apply(.pointWon(.left), to: match)
+        match = try engine.apply(.pointWon(.right), to: match)
+        match = try engine.apply(.pointWon(.right), to: match)
+        XCTAssertEqual(match.currentServer, .right)
+        XCTAssertEqual(match.scoreScreenGameDisplay.left, "30")
+        XCTAssertEqual(match.scoreScreenGameDisplay.right, "15")
+
+        let snapshot = MatchScoreSnapshot(from: match)
+        XCTAssertEqual(snapshot.gameLeft, "30")
+        XCTAssertEqual(snapshot.gameRight, "15")
+    }
+
+    func testLegacyMatchWithoutNeedsServerSelectionKeepsKnownServer() throws {
+        let engine = ScoringEngine()
+        var match = engine.startMatch()
+        match = try engine.apply(.selectServer(.left), to: match)
+        match = try engine.apply(.pointWon(.left), to: match)
+        var json = try JSONSerialization.jsonObject(
+            with: try JSONEncoder().encode(match)
+        ) as! [String: Any]
+        json.removeValue(forKey: "needsServerSelection")
+
+        let data = try JSONSerialization.data(withJSONObject: json)
+        let decoded = try JSONDecoder().decode(MatchState.self, from: data)
+        XCTAssertEqual(decoded.currentServer, .left)
+        XCTAssertFalse(decoded.needsServerSelection)
+        XCTAssertEqual(decoded.currentGame.leftPoints, 1)
+    }
 }

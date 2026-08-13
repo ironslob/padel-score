@@ -69,8 +69,8 @@ public struct MatchScoreSnapshot: Codable, Sendable, Equatable {
             )
             return
         }
-        let game = match.gameDisplayPair
-        let set = match.currentSet.displayPair
+        let game = match.scoreScreenGameDisplay
+        let set = match.scoreScreenSetDisplay
         self.init(
             gameLeft: game.left,
             gameRight: game.right,

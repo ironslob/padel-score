@@ -42,6 +42,8 @@ The application should feel faster than asking another player for the score and 
 
 The Apple Watch is the primary product.
 
+A Garmin Connect IQ port ships in parallel. Scoring behaviour must stay identical.
+
 The iPhone exists to support the Watch experience by providing history, review and future synchronisation.
 
 ---
@@ -144,7 +146,6 @@ Version 1 intentionally excludes:
 - statistics
 - AI analysis
 - live sharing
-- wearable complications
 - Siri integration
 - coaching
 
@@ -159,6 +160,7 @@ The objective is an excellent scoring application.
 Primary:
 
 - Apple Watch
+- Garmin touchscreen watches (Connect IQ)
 
 Secondary:
 
@@ -279,15 +281,15 @@ Starting a match should remain fast and require no nested configuration.
 
 # 10. Active Match
 
-During a match the watch should present three horizontally swipeable screens.
+During a match the watch should present three horizontally swipeable screens, landing on the score screen.
 
 ## Screen 1
 
-Current scoring.
+Current match summary (sets, elapsed).
 
 ## Screen 2
 
-Current match summary.
+Current scoring.
 
 ## Screen 3
 
@@ -301,21 +303,7 @@ No nested menus.
 
 The score screen is the most important screen in the application.
 
-It should display:
-
-```
-Current Game
-
-15 – 30
-
-Set
-
-4 – 3
-
-Match
-
-0 – 0
-```
+It should display the current game score and games in the current set. Match set wins live on the summary screen.
 
 Below this should be two large buttons.
 
@@ -419,16 +407,16 @@ were played.
 
 After recording a point the application enters a temporary undo state.
 
-Undo should remain available for approximately five seconds.
+Undo should remain available for approximately three seconds.
 
 Example:
 
 ```
-Undo (5)
-
-Undo (4)
-
 Undo (3)
+
+Undo (2)
+
+Undo (1)
 ```
 
 If Undo is selected:
@@ -476,12 +464,16 @@ Actions include:
 ```
 Undo Last Point
 
+New Serve
+
 Finish Match
 
 End Match Early
 
 Discard Match
 ```
+
+New Serve is available between sets while the new set is untouched. Settings (labels, swap sides, deuce format, match length) live on the same screen.
 
 Any destructive action requires confirmation.
 
@@ -583,6 +575,8 @@ Version 1 allows users to:
 - browse previous matches
 - inspect completed matches
 - view in-progress match
+- add notes
+- delete matches from history
 
 The iPhone does **not** score matches during Version 1.
 

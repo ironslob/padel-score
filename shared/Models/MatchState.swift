@@ -271,7 +271,7 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
     /// Whether the player may pick a new server right now, rather than carrying the
     /// rotation on. Offered at the changeover between sets.
     public var canChooseNewServer: Bool {
-        status == .inProgress && !needsServerSelection && isAtSetStart
+        status == .inProgress && !needsServerSelection && isAtSetStart && !completedSets.isEmpty
     }
 
     public var lastScoringActivityAt: Date {
@@ -456,6 +456,12 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         rightSetsWon = try container.decodeIfPresent(Int.self, forKey: .rightSetsWon) ?? 0
         winner = try container.decodeIfPresent(Side.self, forKey: .winner)
         currentServer = try container.decodeIfPresent(Side.self, forKey: .currentServer)
-        needsServerSelection = try container.decodeIfPresent(Bool.self, forKey: .needsServerSelection) ?? true
+        if let waiting = try container.decodeIfPresent(Bool.self, forKey: .needsServerSelection) {
+            needsServerSelection = waiting
+        } else {
+            // Matches written before this field existed. If a server is already
+            // known, do not block scoring behind a fresh "Who's serving?" prompt.
+            needsServerSelection = currentServer == nil && status == .inProgress
+        }
     }
 }

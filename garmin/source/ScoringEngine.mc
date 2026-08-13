@@ -18,6 +18,42 @@ class ScoringEngine {
         return replay(next.events, blankMatch(state));
     }
 
+    function applyRequestServerSelection(state as MatchState) as MatchState or Null {
+        if (state.status != MatchStatus.IN_PROGRESS || !state.isAtSetStart()) {
+            return null;
+        }
+        if (state.needsServerSelection) {
+            return state;
+        }
+        var next = copyStateShell(state);
+        next.events = copyEvents(state.events);
+        next.deuceFormatChanges = copyDeuceFormatChanges(state.deuceFormatChanges);
+        next.currentServer = null;
+        next.needsServerSelection = true;
+        return next;
+    }
+
+    function applySetDeuceFormat(state as MatchState, format as DeuceFormat, at as Number) as MatchState or Null {
+        if (state.status != MatchStatus.IN_PROGRESS) {
+            return null;
+        }
+        if (state.settings.deuceFormat == format) {
+            return state;
+        }
+        var next = copyStateShell(state);
+        next.events = copyEvents(state.events);
+        next.deuceFormatChanges = copyDeuceFormatChanges(state.deuceFormatChanges);
+        if (next.deuceFormatChanges.size() == 0) {
+            next.deuceFormatChanges.add(new DeuceFormatChange(next.settings.deuceFormat, next.startedAt));
+        }
+        var lastEventAt = next.events.size() > 0 ? next.events[next.events.size() - 1].timestamp : at;
+        var effective = at > lastEventAt ? at : lastEventAt;
+        next.deuceFormatChanges.add(new DeuceFormatChange(format, effective));
+        next.settings.deuceFormat = format;
+        var replayed = replay(next.events, blankMatch(next));
+        return restoreServerSelectionPrompt(state, replayed);
+    }
+
     function applyPointWon(state as MatchState, side as Side, at as Number) as MatchState or Null {
         if (state.status != MatchStatus.IN_PROGRESS || state.needsServerSelection) {
             return null;
@@ -63,8 +99,10 @@ class ScoringEngine {
         var winner = naturalWinner(state);
         if (winner != null) {
             next.winner = winner;
+            next.status = MatchStatus.COMPLETED;
+        } else {
+            next.status = MatchStatus.ENDED_EARLY;
         }
-        next.status = MatchStatus.COMPLETED;
         next.finishedAt = at;
         next.events.add(new MatchEvent(MatchEventKind.MATCH_FINISHED, null, at));
         return next;
@@ -98,8 +136,17 @@ class ScoringEngine {
         var state = blankMatch(base);
         state.events = [] as Array<MatchEvent>;
 
+        var pending = copyDeuceFormatChanges(base.deuceFormatChanges);
+        pending = sortDeuceFormatChanges(pending);
+        var deuceFormat = pending.size() > 0 ? pending[0].format : base.settings.deuceFormat;
+
         for (var i = 0; i < events.size(); i += 1) {
             var event = events[i];
+            while (pending.size() > 0 && pending[0].at < event.timestamp) {
+                deuceFormat = pending[0].format;
+                applyDeuceFormat(deuceFormat, state);
+                pending = removeFirstChange(pending);
+            }
             state.events.add(event);
             switch (event.kind) {
                 case MatchEventKind.MATCH_STARTED:
@@ -108,14 +155,15 @@ class ScoringEngine {
                     state.needsServerSelection = true;
                     break;
                 case MatchEventKind.SERVER_SELECTED:
-                    if (event.side != null && state.status == MatchStatus.IN_PROGRESS && state.needsServerSelection) {
+                    if (event.side != null && state.status == MatchStatus.IN_PROGRESS
+                        && (state.needsServerSelection || state.isAtSetStart())) {
                         state.currentServer = event.side;
                         state.needsServerSelection = false;
                     }
                     break;
                 case MatchEventKind.POINT_WON:
                     if (event.side != null && state.status == MatchStatus.IN_PROGRESS) {
-                        awardPoint(event.side, state);
+                        awardPoint(event.side, state, deuceFormat);
                     }
                     break;
                 case MatchEventKind.MATCH_FINISHED:
@@ -138,10 +186,42 @@ class ScoringEngine {
                     break;
             }
         }
+        for (var j = 0; j < pending.size(); j += 1) {
+            applyDeuceFormat(pending[j].format, state);
+        }
         return state;
     }
 
-    private function awardPoint(side as Side, state as MatchState) as Void {
+    function rehydrate(state as MatchState) as MatchState {
+        var replayed = replay(state.events, blankMatch(state));
+        return restoreServerSelectionPrompt(state, replayed);
+    }
+
+    private function restoreServerSelectionPrompt(previous as MatchState, replayed as MatchState) as MatchState {
+        if (previous.status != MatchStatus.IN_PROGRESS || !previous.needsServerSelection
+            || replayed.status != MatchStatus.IN_PROGRESS || !replayed.isAtSetStart()) {
+            return replayed;
+        }
+        replayed.currentServer = null;
+        replayed.needsServerSelection = true;
+        return replayed;
+    }
+
+    private function applyDeuceFormat(format as DeuceFormat, state as MatchState) as Void {
+        if (state.status != MatchStatus.IN_PROGRESS || state.currentGame.isComplete
+            || state.currentGame.isTieBreak
+            || state.currentGame.leftPoints < 3 || state.currentGame.rightPoints < 3) {
+            return;
+        }
+        if (format == DeuceFormat.DEUCE_GOLDEN_POINT) {
+            state.currentGame.advantageSide = null;
+            state.currentGame.isGoldenPointActive = true;
+        } else {
+            state.currentGame.isGoldenPointActive = false;
+        }
+    }
+
+    private function awardPoint(side as Side, state as MatchState, deuceFormat as DeuceFormat) as Void {
         if (state.currentGame.isComplete || state.status != MatchStatus.IN_PROGRESS) {
             return;
         }
@@ -170,7 +250,7 @@ class ScoringEngine {
                 // advantage, so the next point decides; regular scoring keeps cycling.
                 state.currentGame.advantageSide = null;
                 state.currentGame.isGoldenPointActive =
-                    state.settings.deuceFormat == DeuceFormat.DEUCE_SILVER_POINT;
+                    deuceFormat == DeuceFormat.DEUCE_SILVER_POINT;
             }
             return;
         }
@@ -184,7 +264,7 @@ class ScoringEngine {
 
         // Golden point: no advantage phase at all, so reaching 40-40 makes the very
         // next rally decisive.
-        if (state.settings.deuceFormat == DeuceFormat.DEUCE_GOLDEN_POINT
+        if (deuceFormat == DeuceFormat.DEUCE_GOLDEN_POINT
             && state.currentGame.leftPoints >= 3
             && state.currentGame.rightPoints >= 3) {
             state.currentGame.isGoldenPointActive = true;
@@ -211,7 +291,20 @@ class ScoringEngine {
         state.currentGame.isComplete = true;
         state.currentGame.winner = winner;
         state.currentSet.setGames(7, winner);
-        completeSet(winner, state);
+        var nextSetServer as Side or Null = null;
+        var opener = tieBreakOpeningServer(state);
+        if (opener != null) {
+            nextSetServer = oppositeSide(opener);
+        }
+        completeSet(winner, state, nextSetServer);
+    }
+
+    private function tieBreakOpeningServer(state as MatchState) as Side or Null {
+        if (state.currentServer == null) {
+            return null;
+        }
+        var flips = (state.currentGame.tieBreakTotalPoints() + 1) / 2;
+        return (flips % 2 == 0) ? state.currentServer : oppositeSide(state.currentServer);
     }
 
     private function completeGame(winner as Side, state as MatchState) as Void {
@@ -223,7 +316,13 @@ class ScoringEngine {
         var games = state.currentSet.gamesFor(winner) + 1;
         state.currentSet.setGames(games, winner);
 
+        var nextServer as Side or Null = null;
+        if (state.currentServer != null) {
+            nextServer = oppositeSide(state.currentServer);
+        }
+
         if (state.currentSet.leftGames == 6 && state.currentSet.rightGames == 6) {
+            state.currentServer = nextServer;
             var tieBreak = new GameScore();
             tieBreak.isTieBreak = true;
             state.currentGame = tieBreak;
@@ -231,11 +330,9 @@ class ScoringEngine {
         }
 
         if (isSetWon(winner, state.currentSet, state.settings)) {
-            completeSet(winner, state);
+            completeSet(winner, state, nextServer);
         } else {
-            if (state.currentServer != null) {
-                state.currentServer = oppositeSide(state.currentServer);
-            }
+            state.currentServer = nextServer;
             state.currentGame = new GameScore();
         }
     }
@@ -252,7 +349,7 @@ class ScoringEngine {
         return true;
     }
 
-    private function completeSet(winner as Side, state as MatchState) as Void {
+    private function completeSet(winner as Side, state as MatchState, nextSetServer as Side or Null) as Void {
         state.currentSet.isComplete = true;
         state.currentSet.winner = winner;
         state.completedSets.add(copySetScore(state.currentSet));
@@ -266,10 +363,7 @@ class ScoringEngine {
         if (state.settings.continuousPlay) {
             state.currentSet = new SetScore();
             state.currentGame = new GameScore();
-            if (state.settings.askServeAtSetStart) {
-                state.currentServer = null;
-                state.needsServerSelection = true;
-            }
+            beginNextSetServe(nextSetServer, state);
         } else if (state.leftSetsWon >= state.settings.setsToWin) {
             state.winner = Side.LEFT;
             state.status = MatchStatus.COMPLETED;
@@ -283,10 +377,16 @@ class ScoringEngine {
         } else {
             state.currentSet = new SetScore();
             state.currentGame = new GameScore();
-            if (state.settings.askServeAtSetStart) {
-                state.currentServer = null;
-                state.needsServerSelection = true;
-            }
+            beginNextSetServe(nextSetServer, state);
+        }
+    }
+
+    private function beginNextSetServe(nextSetServer as Side or Null, state as MatchState) as Void {
+        if (state.settings.askServeAtSetStart) {
+            state.currentServer = null;
+            state.needsServerSelection = true;
+        } else {
+            state.currentServer = nextSetServer;
         }
     }
 
@@ -310,7 +410,9 @@ class ScoringEngine {
     }
 
     private function blankMatch(from as MatchState) as MatchState {
-        return new MatchState(from.id, from.settings.copy(), from.startedAt);
+        var blank = new MatchState(from.id, from.settings.copy(), from.startedAt);
+        blank.deuceFormatChanges = copyDeuceFormatChanges(from.deuceFormatChanges);
+        return blank;
     }
 
     private function copyStateShell(state as MatchState) as MatchState {
@@ -325,6 +427,37 @@ class ScoringEngine {
         copy.winner = state.winner;
         copy.currentServer = state.currentServer;
         copy.needsServerSelection = state.needsServerSelection;
+        copy.deuceFormatChanges = copyDeuceFormatChanges(state.deuceFormatChanges);
+        return copy;
+    }
+
+    private function copyDeuceFormatChanges(changes as Array<DeuceFormatChange>) as Array<DeuceFormatChange> {
+        var copy = [] as Array<DeuceFormatChange>;
+        for (var i = 0; i < changes.size(); i += 1) {
+            copy.add(new DeuceFormatChange(changes[i].format, changes[i].at));
+        }
+        return copy;
+    }
+
+    private function sortDeuceFormatChanges(changes as Array<DeuceFormatChange>) as Array<DeuceFormatChange> {
+        var copy = copyDeuceFormatChanges(changes);
+        for (var i = 1; i < copy.size(); i += 1) {
+            var j = i;
+            while (j > 0 && copy[j - 1].at > copy[j].at) {
+                var temp = copy[j - 1];
+                copy[j - 1] = copy[j];
+                copy[j] = temp;
+                j -= 1;
+            }
+        }
+        return copy;
+    }
+
+    private function removeFirstChange(changes as Array<DeuceFormatChange>) as Array<DeuceFormatChange> {
+        var copy = [] as Array<DeuceFormatChange>;
+        for (var i = 1; i < changes.size(); i += 1) {
+            copy.add(changes[i]);
+        }
         return copy;
     }
 

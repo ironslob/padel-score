@@ -88,7 +88,7 @@ The phone app shows history and any active match synced from the Watch. It does 
 2. Destination: an Apple Watch simulator.
 3. Run (`⌘R`).
 
-Typical flow: **Start Match** → swipe between Score / Overview / Actions → record points with **Serving** / **Receiving**. Tap the same button again within 5s to cancel.
+Typical flow: **Start Match** → swipe between Overview / Score / Actions → record points with **Us** / **Them**. Tap the same button again within 3s to cancel.
 
 To pair a Watch simulator with an iPhone simulator: in Xcode, Window → Devices and Simulators, or start both and use File → Open Simulator; create a Watch/Phone pair under the Watch simulator Hardware menu if needed.
 
@@ -141,8 +141,9 @@ PadelScore.xcodeproj
 
 - Start / score / finish / end early / discard match on Watch
 - Game, set, and match scoring with the house golden-point rule
-- 5-second undo on the score screen; undo also on Actions
+- 3-second undo on the score screen; undo also on Actions
 - Local persistence and restore after restart
-- iPhone match history and detail (read-only)
+- iPhone match history, notes, and deletion
+- Deuce format: regular / silver point / golden point
 
 See [docs/DECISIONS.md](docs/DECISIONS.md) for engineering choices and [spec/](spec/) for authoritative requirements.

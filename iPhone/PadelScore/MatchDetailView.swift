@@ -56,21 +56,21 @@ struct MatchDetailView: View {
 
             Section {
                 DisclosureGroup(isExpanded: $isHistoryExpanded) {
-                    ForEach(Array(match.events.enumerated()), id: \.element.id) { index, event in
+                    ForEach(Array(historyRows.enumerated()), id: \.element.id) { index, row in
                         HStack {
-                            Text(eventLabel(event))
+                            Text(row.label)
                             Spacer()
-                            Text(event.timestamp.formatted(date: .omitted, time: .standard))
+                            Text(row.timestamp.formatted(date: .omitted, time: .standard))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
-                        .accessibilityLabel("Event \(index + 1): \(eventLabel(event))")
+                        .accessibilityLabel("Event \(index + 1): \(row.label)")
                     }
                 } label: {
                     HStack {
                         Text("Scoring History")
                         Spacer()
-                        Text("\(match.events.count)")
+                        Text("\(historyRows.count)")
                             .foregroundStyle(.secondary)
                             .monospacedDigit()
                     }
@@ -95,6 +95,9 @@ struct MatchDetailView: View {
             }
         }
         .onAppear { noteDraft = note }
+        .onChange(of: note) { _, newNote in
+            if !isNoteFocused { noteDraft = newNote }
+        }
         .onChange(of: isNoteFocused) { _, focused in
             if !focused { saveNote() }
         }
@@ -128,6 +131,28 @@ struct MatchDetailView: View {
 
     private var incompleteSetLabel: String {
         match.status == .inProgress ? "Current" : "Set \(match.completedSets.count + 1)"
+    }
+
+    private struct HistoryRow: Identifiable {
+        let id: String
+        let timestamp: Date
+        let label: String
+    }
+
+    private var historyRows: [HistoryRow] {
+        var rows = match.events.map { event in
+            HistoryRow(id: event.id.uuidString, timestamp: event.timestamp, label: eventLabel(event))
+        }
+        for (index, change) in match.deuceFormatChanges.enumerated() where index > 0 {
+            rows.append(
+                HistoryRow(
+                    id: "deuce-\(index)-\(change.at.timeIntervalSince1970)",
+                    timestamp: change.at,
+                    label: "Scoring at deuce: \(change.format.label)"
+                )
+            )
+        }
+        return rows.sorted { $0.timestamp < $1.timestamp }
     }
 
     private func eventLabel(_ event: MatchEvent) -> String {

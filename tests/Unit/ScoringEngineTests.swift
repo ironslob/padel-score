@@ -447,6 +447,13 @@ final class ScoringEngineTests: XCTestCase {
         return s
     }
 
+    func testNewServeIsNotOfferedBeforeTheFirstSetEnds() throws {
+        let s = start()
+        XCTAssertTrue(s.completedSets.isEmpty)
+        XCTAssertTrue(s.isAtSetStart)
+        XCTAssertFalse(s.canChooseNewServer)
+    }
+
     func testNewServeAtTheChangeoverAsksWhoIsServing() throws {
         var s = try winFirstSet(from: start())
         XCTAssertEqual(s.completedSets.count, 1)
@@ -493,6 +500,28 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertTrue(s.needsServerSelection)
         XCTAssertFalse(s.canChooseNewServer)
         XCTAssertEqual(try engine.apply(.requestServerSelection, to: s), s)
+    }
+
+    func testChangingDeuceFormatKeepsNewServePrompt() throws {
+        var s = try winFirstSet(from: start())
+        s = try engine.apply(.requestServerSelection, to: s)
+        XCTAssertTrue(s.needsServerSelection)
+        XCTAssertNil(s.currentServer)
+
+        s = try engine.apply(.setDeuceFormat(.advantage), to: s)
+        XCTAssertTrue(s.needsServerSelection)
+        XCTAssertNil(s.currentServer)
+        XCTAssertEqual(s.settings.deuceFormat, .advantage)
+        XCTAssertTrue(s.isAtSetStart)
+    }
+
+    func testRehydratePreservesNewServePrompt() throws {
+        var s = try winFirstSet(from: start())
+        s = try engine.apply(.requestServerSelection, to: s)
+        let rehydrated = engine.rehydrate(s)
+        XCTAssertTrue(rehydrated.needsServerSelection)
+        XCTAssertNil(rehydrated.currentServer)
+        XCTAssertEqual(rehydrated.completedSets.count, 1)
     }
 
     /// Undo moves the set boundary back, which strands a server chosen for a set that
@@ -925,12 +954,18 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.status, .discarded)
     }
 
-    func testFinishWithoutWinnerCompletes() throws {
+    func testFinishWithoutWinnerEndsEarlyAndMatchesReplay() throws {
         var s = start()
         s = try point(.left, s)
         s = try engine.apply(.finish, to: s)
-        XCTAssertEqual(s.status, .completed)
+        XCTAssertEqual(s.status, .endedEarly)
         XCTAssertNil(s.winner)
+        let replayed = engine.replay(
+            events: s.events,
+            onto: MatchState(id: s.id, settings: s.settings, startedAt: s.startedAt)
+        )
+        XCTAssertEqual(replayed.status, .endedEarly)
+        XCTAssertNil(replayed.winner)
     }
 
     func testReplayIsDeterministic() throws {
@@ -1030,7 +1065,7 @@ final class ScoringEngineTests: XCTestCase {
         s = try point(.right, s)
         s = try engine.apply(.finish, to: s)
 
-        XCTAssertEqual(s.status, .completed)
+        XCTAssertEqual(s.status, .endedEarly)
         XCTAssertEqual(s.finalScoreSummary, "3-2 (40-15)")
         XCTAssertTrue(s.displaysIncompleteSet)
         XCTAssertEqual(s.setScoreLines, ["3-2"])
@@ -1052,7 +1087,7 @@ final class ScoringEngineTests: XCTestCase {
         s = try point(.right, s)
         s = try engine.apply(.finish, to: s)
 
-        XCTAssertEqual(s.status, .completed)
+        XCTAssertEqual(s.status, .endedEarly)
         XCTAssertEqual(s.finalScoreSummary, "6-0, 3-2 (30-15)")
         XCTAssertTrue(s.displaysIncompleteSet)
         XCTAssertEqual(s.setScoreLines, ["6-0", "3-2"])
@@ -1062,7 +1097,7 @@ final class ScoringEngineTests: XCTestCase {
         var s = start()
         s = try engine.apply(.finish, to: s)
 
-        XCTAssertEqual(s.status, .completed)
+        XCTAssertEqual(s.status, .endedEarly)
         XCTAssertEqual(s.finalScoreSummary, "")
         XCTAssertFalse(s.displaysIncompleteSet)
     }

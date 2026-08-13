@@ -31,10 +31,12 @@ class SelectServerView extends WatchUi.View {
 
 class SelectServerDelegate extends WatchUi.BehaviorDelegate {
     private var service as MatchService;
+    private var pushPagerAfter as Boolean;
 
-    function initialize(service as MatchService) {
+    function initialize(service as MatchService, pushPagerAfter as Boolean) {
         BehaviorDelegate.initialize();
         self.service = service;
+        self.pushPagerAfter = pushPagerAfter;
     }
 
     function onTap(clickEvent as ClickEvent) as Boolean {
@@ -44,8 +46,12 @@ class SelectServerDelegate extends WatchUi.BehaviorDelegate {
         var side = x < width / 2 ? Side.LEFT : Side.RIGHT;
         service.selectServer(side);
         WatchUi.popView(WatchUi.SLIDE_LEFT);
-        var pager = new MatchPagerView(service, 1);
-        WatchUi.pushView(pager, new MatchPagerDelegate(service, pager), WatchUi.SLIDE_LEFT);
+        if (pushPagerAfter) {
+            var pager = new MatchPagerView(service, 1);
+            WatchUi.pushView(pager, new MatchPagerDelegate(service, pager), WatchUi.SLIDE_LEFT);
+        } else {
+            WatchUi.requestUpdate();
+        }
         return true;
     }
 }

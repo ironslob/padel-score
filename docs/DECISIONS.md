@@ -28,7 +28,7 @@ Documented decisions that were not fully prescribed by `/spec`.
 
 ## Undo model
 
-**Choice:** Undo removes the last `pointWon` event and replays the stream. After a point on the score screen, a 5-second clockwise outline animates on that side’s button; tapping the same button again cancels the point. Actions screen allows undo anytime while in progress.
+**Choice:** Undo removes the last `pointWon` event and replays the stream. After a point on the score screen, a 3-second clockwise outline animates on that side’s button; tapping the same button again cancels the point. Actions screen allows undo anytime while in progress.
 
 **Why:** Keeps undo fast on the tiny Watch score surface without a separate Undo control, while Actions still covers recovering older mistakes. Replay keeps behaviour identical to event sourcing.
 
@@ -40,13 +40,13 @@ Documented decisions that were not fully prescribed by `/spec`.
 
 ## Golden point house rule
 
-**Choice:** First deuce → advantage → if advantage is broken, golden point activates; next point wins. Winning from advantage before that second deuce still wins the game normally.
+**Choice:** Three deuce formats. **Golden point** (default, FIP): 40-40 is immediately decisive — no advantage. **Silver point:** one advantage is played; if it is broken, the next point wins. **Regular:** advantage repeats until one side wins by two. Versions before this setting existed shipped a "Golden point" toggle that actually played silver point; archived matches decode as silver so their scorelines stay faithful.
 
 **Why:** Exactly as specified in `spec/product.md` §14.
 
 ## Finish Match vs End Early
 
-**Choice:** Finish with a natural match winner marks `completed`. Finish without a winner behaves like end-early for score retention. Explicit End Early always marks `endedEarly`. Discard is not archived.
+**Choice:** Finish with a natural match winner marks `completed`. Finish without a winner marks `endedEarly`, matching event replay. Explicit End Early always marks `endedEarly`. Discard is not archived.
 
 **Why:** Product distinguishes completed, ended early, and discarded terminal states.
 
@@ -61,3 +61,9 @@ Documented decisions that were not fully prescribed by `/spec`.
 **Choice:** Score buttons default to "Us" / "Them". Serve always alternates after each game and during tie-breaks. The serve ball appears on the serving team's button. "Swap sides each game" defaults **off**, so Us/Them stay fixed and the ball moves with the server. When enabled, the point buttons swap after each game so the serving team stays on the left (ball stays left). Users can switch labels to "Serving" / "Receiving" (following the serving team on each button). Games won in the current set appear above the buttons; set wins are omitted from the score page (available on Overview).
 
 **Why:** Fixed button positions are the simpler default for wrist scoring; swapping sides is opt-in when players want Us/Them to follow announcement order (server first). Serve rotation is a scoring rule, not a layout preference.
+
+## Garmin scoring parity
+
+**Choice:** Garmin’s Monkey C engine mirrors Apple for serve rotation at set and tie-break boundaries, New Serve at changeover, mid-match deuce format changes, match-length / ask-serve / Us-Them settings, destructive-action confirmation, and the game/set interstitial.
+
+**Still Garmin-only gaps:** HealthKit / workout recording, phone companion sync, complications, and Live Activities — blocked by Connect IQ APIs. See `garmin/README.md`.

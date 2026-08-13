@@ -3,7 +3,6 @@ import SwiftUI
 struct PhoneRootView: View {
     @EnvironmentObject private var appModel: PhoneAppModel
     @EnvironmentObject private var service: MatchService
-    @Environment(\.scenePhase) private var scenePhase
     @State private var pendingDeletion: [MatchState] = []
 
     var body: some View {
@@ -59,11 +58,6 @@ struct PhoneRootView: View {
         }
         .task {
             await appModel.bootstrap()
-        }
-        .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .active {
-                service.expireInactiveMatchIfNeeded()
-            }
         }
     }
 

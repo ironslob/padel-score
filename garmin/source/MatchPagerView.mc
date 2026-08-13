@@ -1,6 +1,7 @@
 import Toybox.Attention;
 import Toybox.Graphics;
 import Toybox.Lang;
+import Toybox.System;
 import Toybox.Timer;
 import Toybox.WatchUi;
 
@@ -8,11 +9,15 @@ import Toybox.WatchUi;
 class MatchPagerView extends WatchUi.View {
     var service as MatchService;
     var page as Number;
+    var undoProgressLeft as Float;
+    var undoProgressRight as Float;
 
     function initialize(service as MatchService, page as Number) {
         View.initialize();
         self.service = service;
         self.page = page;
+        undoProgressLeft = 0.0;
+        undoProgressRight = 0.0;
     }
 
     function setPage(newPage as Number) as Void {
@@ -75,13 +80,18 @@ class MatchPagerView extends WatchUi.View {
         var leftServing = match.currentServer != null && match.currentServer == sides[0];
         var rightServing = match.currentServer != null && match.currentServer == sides[1];
 
-        drawScoreButton(dc, game[0], roles[0], 6, buttonY, buttonW, buttonH, leftColor, leftServing);
-        drawScoreButton(dc, game[1], roles[1], width / 2 + 4, buttonY, buttonW, buttonH, rightColor, rightServing);
+        drawScoreButton(dc, game[0], roles[0], 6, buttonY, buttonW, buttonH, leftColor, leftServing, undoProgressLeft);
+        drawScoreButton(dc, game[1], roles[1], width / 2 + 4, buttonY, buttonW, buttonH, rightColor, rightServing, undoProgressRight);
     }
 
-    private function drawScoreButton(dc as Dc, score as String, role as String, x as Number, y as Number, w as Number, h as Number, color as Number, isServing as Boolean) as Void {
+    private function drawScoreButton(dc as Dc, score as String, role as String, x as Number, y as Number, w as Number, h as Number, color as Number, isServing as Boolean, undoProgress as Float) as Void {
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
         dc.fillRoundedRectangle(x, y, w, h, 14);
+        if (undoProgress > 0) {
+            dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
+            dc.drawRoundedRectangle(x, y, w, h, 14);
+            dc.fillRectangle(x, y, (w * undoProgress).toNumber(), 4);
+        }
         if (isServing) {
             dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
             dc.fillCircle(x + w / 2, y + 14, 4);
@@ -116,20 +126,52 @@ class MatchPagerView extends WatchUi.View {
 
     private function drawActionsPage(dc as Dc, match as MatchState) as Void {
         var width = dc.getWidth();
-        var height = dc.getHeight();
         UiHelpers.drawHeader(dc, "Actions");
 
-        var y = 36;
-        var buttonH = 36;
+        var keys = actionKeys(match);
+        var y = 32;
+        var buttonH = 32;
         var buttonW = width - 32;
+        for (var i = 0; i < keys.size(); i += 1) {
+            var key = keys[i];
+            var label = actionLabel(key);
+            var color = actionColor(key);
+            if (key.equals("undo") && !service.canUndo()) {
+                color = Graphics.COLOR_DK_GRAY;
+            }
+            UiHelpers.drawPrimaryButton(dc, label, 16, y, buttonW, buttonH, color);
+            y += buttonH + 6;
+        }
+    }
 
-        UiHelpers.drawPrimaryButton(dc, "Undo", 16, y, buttonW, buttonH, service.canUndo() ? Graphics.COLOR_DK_BLUE : Graphics.COLOR_DK_GRAY);
-        y += buttonH + 8;
-        UiHelpers.drawPrimaryButton(dc, "Finish", 16, y, buttonW, buttonH, Graphics.COLOR_GREEN);
-        y += buttonH + 8;
-        UiHelpers.drawPrimaryButton(dc, "End Early", 16, y, buttonW, buttonH, Graphics.COLOR_ORANGE);
-        y += buttonH + 8;
-        UiHelpers.drawPrimaryButton(dc, "Discard", 16, y, buttonW, buttonH, Graphics.COLOR_RED);
+    function actionKeys(match as MatchState) as Array<String> {
+        var keys = ["undo"] as Array<String>;
+        if (match.canChooseNewServer()) {
+            keys.add("newServe");
+        }
+        keys.add("finish");
+        keys.add("endEarly");
+        keys.add("discard");
+        keys.add("settings");
+        return keys;
+    }
+
+    private function actionLabel(key as String) as String {
+        if (key.equals("undo")) { return "Undo"; }
+        if (key.equals("newServe")) { return "New Serve"; }
+        if (key.equals("finish")) { return "Finish"; }
+        if (key.equals("endEarly")) { return "End Early"; }
+        if (key.equals("discard")) { return "Discard"; }
+        return "Settings";
+    }
+
+    private function actionColor(key as String) as Number {
+        if (key.equals("undo")) { return Graphics.COLOR_DK_BLUE; }
+        if (key.equals("newServe")) { return Graphics.COLOR_PINK; }
+        if (key.equals("finish")) { return Graphics.COLOR_GREEN; }
+        if (key.equals("endEarly")) { return Graphics.COLOR_ORANGE; }
+        if (key.equals("discard")) { return Graphics.COLOR_RED; }
+        return Graphics.COLOR_DK_GRAY;
     }
 }
 
@@ -138,6 +180,7 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
     var view as MatchPagerView;
     private var undoSide as Side or Null;
     private var undoStartedAt as Number or Null;
+    private var undoStartedMs as Number or Null;
     private var undoTimer as Timer.Timer or Null;
 
     function initialize(service as MatchService, pagerView as MatchPagerView) {
@@ -146,6 +189,7 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
         view = pagerView;
         undoSide = null;
         undoStartedAt = null;
+        undoStartedMs = null;
         undoTimer = null;
     }
 
@@ -183,14 +227,16 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
         if (undoSide == side && undoStartedAt != null && (now - undoStartedAt) < MatchSettings.QUICK_UNDO_TIMEOUT_MS) {
             clearUndoWindow();
             service.undoLastPoint();
-            checkMatchComplete();
+            checkMatchComplete(null, service.activeMatch);
             WatchUi.requestUpdate();
             return true;
         }
 
         service.awardPoint(side);
-        checkMatchComplete();
-        if (service.activeMatch != null && service.activeMatch.status == MatchStatus.IN_PROGRESS) {
+        var updated = service.activeMatch;
+        checkMatchComplete(match, updated);
+        if (service.activeMatch != null && service.activeMatch.status == MatchStatus.IN_PROGRESS
+            && !didPointEndGame(match, service.activeMatch)) {
             startUndoWindow(side, now);
         }
         WatchUi.requestUpdate();
@@ -198,29 +244,47 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
     }
 
     private function handleActionsTap(x as Number, y as Number, width as Number) as Boolean {
-        if (x < 16 || x > width - 16) {
+        var match = service.activeMatch;
+        if (match == null || x < 16 || x > width - 16) {
             return false;
         }
-        var row = (y - 36) / 44;
-        if (row == 0 && service.canUndo()) {
+        var keys = view.actionKeys(match);
+        var row = ((y - 32) / 38).toNumber();
+        if (row < 0 || row >= keys.size()) {
+            return false;
+        }
+        var key = keys[row];
+        if (key.equals("undo") && service.canUndo()) {
             service.undoLastPoint();
-            checkMatchComplete();
+            checkMatchComplete(null, service.activeMatch);
             WatchUi.requestUpdate();
             return true;
-        } else if (row == 1) {
-            service.finishMatch();
-            navigateToComplete();
+        } else if (key.equals("newServe")) {
+            service.requestServerSelection();
+            WatchUi.pushView(new SelectServerView(service), new SelectServerDelegate(service, false), WatchUi.SLIDE_LEFT);
             return true;
-        } else if (row == 2) {
-            service.endMatchEarly();
-            navigateToComplete();
+        } else if (key.equals("finish")) {
+            confirmAction("Finish this match?", 1);
             return true;
-        } else if (row == 3) {
-            service.discardMatch();
-            navigateToStart();
+        } else if (key.equals("endEarly")) {
+            confirmAction("End match early?", 2);
+            return true;
+        } else if (key.equals("discard")) {
+            confirmAction("Discard match?", 3);
+            return true;
+        } else if (key.equals("settings")) {
+            pushSettingsView(service);
             return true;
         }
         return false;
+    }
+
+    private function confirmAction(message as String, action as Number) as Void {
+        WatchUi.pushView(
+            new WatchUi.Confirmation(message),
+            new MatchActionConfirmDelegate(service, action),
+            WatchUi.SLIDE_IMMEDIATE
+        );
     }
 
     function onSwipe(swipeEvent as SwipeEvent) as Boolean {
@@ -262,13 +326,49 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
     private function startUndoWindow(side as Side, at as Number) as Void {
         undoSide = side;
         undoStartedAt = at;
+        undoStartedMs = System.getTimer();
         if (undoTimer == null) {
             undoTimer = new Timer.Timer();
         }
         undoTimer.stop();
-        undoTimer.start(method(:onUndoTimeout), MatchSettings.QUICK_UNDO_TIMEOUT_MS, false);
+        undoTimer.start(method(:onUndoTick), 100, true);
+        updateUndoProgress();
         if (Attention has :vibrate) {
             Attention.vibrate([new Attention.VibeProfile(50, 200)]);
+        }
+    }
+
+    function onUndoTick() as Void {
+        if (undoStartedMs == null) {
+            return;
+        }
+        var elapsed = System.getTimer() - undoStartedMs;
+        if (elapsed >= MatchSettings.QUICK_UNDO_TIMEOUT_MS) {
+            clearUndoWindow();
+            WatchUi.requestUpdate();
+            return;
+        }
+        updateUndoProgress();
+        WatchUi.requestUpdate();
+    }
+
+    private function updateUndoProgress() as Void {
+        if (undoStartedMs == null || undoSide == null || service.activeMatch == null) {
+            view.undoProgressLeft = 0.0;
+            view.undoProgressRight = 0.0;
+            return;
+        }
+        var progress = (System.getTimer() - undoStartedMs).toFloat() / MatchSettings.QUICK_UNDO_TIMEOUT_MS.toFloat();
+        if (progress > 1) {
+            progress = 1;
+        }
+        var visual = service.activeMatch.visualSideForLogical(undoSide);
+        if (visual == Side.LEFT) {
+            view.undoProgressLeft = progress;
+            view.undoProgressRight = 0.0;
+        } else {
+            view.undoProgressLeft = 0.0;
+            view.undoProgressRight = progress;
         }
     }
 
@@ -280,18 +380,42 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
     private function clearUndoWindow() as Void {
         undoSide = null;
         undoStartedAt = null;
+        undoStartedMs = null;
+        view.undoProgressLeft = 0.0;
+        view.undoProgressRight = 0.0;
         if (undoTimer != null) {
             undoTimer.stop();
         }
     }
 
-    private function checkMatchComplete() as Void {
-        var match = service.activeMatch;
-        if (match != null && (match.status == MatchStatus.COMPLETED || match.status == MatchStatus.ENDED_EARLY)) {
+    private function didPointEndGame(previous as MatchState, updated as MatchState) as Boolean {
+        if (previous.status != MatchStatus.IN_PROGRESS || updated.status != MatchStatus.IN_PROGRESS) {
+            return false;
+        }
+        var oldGames = previous.currentSet.leftGames + previous.currentSet.rightGames;
+        var newGames = updated.currentSet.leftGames + updated.currentSet.rightGames;
+        return updated.completedSets.size() > previous.completedSets.size() || newGames > oldGames;
+    }
+
+    private function checkMatchComplete(previous as MatchState or Null, updated as MatchState or Null) as Void {
+        var match = updated != null ? updated : service.activeMatch;
+        if (match == null) {
+            return;
+        }
+        if (match.status == MatchStatus.COMPLETED || match.status == MatchStatus.ENDED_EARLY) {
             navigateToComplete();
-        } else if (match != null && match.needsServerSelection) {
+            return;
+        }
+        if (previous != null && didPointEndGame(previous, match)) {
+            var completedSet = match.completedSets.size() > previous.completedSets.size();
+            var isTieBreak = match.currentGame.isTieBreak && !previous.currentGame.isTieBreak;
+            var interstitial = new GameInterstitialView(service, completedSet, isTieBreak);
+            WatchUi.pushView(interstitial, new GameInterstitialDelegate(service, interstitial), WatchUi.SLIDE_UP);
+            return;
+        }
+        if (match.needsServerSelection) {
             WatchUi.popView(WatchUi.SLIDE_LEFT);
-            WatchUi.pushView(new SelectServerView(service), new SelectServerDelegate(service), WatchUi.SLIDE_LEFT);
+            WatchUi.pushView(new SelectServerView(service), new SelectServerDelegate(service, true), WatchUi.SLIDE_LEFT);
         }
     }
 
@@ -303,5 +427,35 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
     private function navigateToStart() as Void {
         WatchUi.popView(WatchUi.SLIDE_RIGHT);
         WatchUi.pushView(new StartView(service), new StartDelegate(service), WatchUi.SLIDE_RIGHT);
+    }
+}
+
+class MatchActionConfirmDelegate extends WatchUi.ConfirmationDelegate {
+    private var service as MatchService;
+    private var action as Number;
+
+    function initialize(service as MatchService, action as Number) {
+        ConfirmationDelegate.initialize();
+        self.service = service;
+        self.action = action;
+    }
+
+    function onResponse(response) as Boolean {
+        if (response == WatchUi.CONFIRM_YES) {
+            if (action == 1) {
+                service.finishMatch();
+                WatchUi.popView(WatchUi.SLIDE_LEFT);
+                WatchUi.pushView(new MatchCompleteView(service), new MatchCompleteDelegate(service), WatchUi.SLIDE_LEFT);
+            } else if (action == 2) {
+                service.endMatchEarly();
+                WatchUi.popView(WatchUi.SLIDE_LEFT);
+                WatchUi.pushView(new MatchCompleteView(service), new MatchCompleteDelegate(service), WatchUi.SLIDE_LEFT);
+            } else if (action == 3) {
+                service.discardMatch();
+                WatchUi.popView(WatchUi.SLIDE_RIGHT);
+                WatchUi.pushView(new StartView(service), new StartDelegate(service), WatchUi.SLIDE_RIGHT);
+            }
+        }
+        return true;
     }
 }
