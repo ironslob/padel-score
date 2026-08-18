@@ -86,6 +86,18 @@ final class MatchServiceTests: XCTestCase {
         XCTAssertEqual(service.activeMatch?.currentServer, .right)
     }
 
+    func testCompleteWarmUpPersistsAndKeepsServePrompt() {
+        let store = InMemoryMatchStore()
+        let service = MatchService(store: store)
+        service.startMatch()
+        XCTAssertEqual(service.activeMatch?.needsWarmUp, true)
+        XCTAssertEqual(service.activeMatch?.needsServerSelection, true)
+        service.completeWarmUp()
+        XCTAssertEqual(service.activeMatch?.needsWarmUp, false)
+        XCTAssertEqual(service.activeMatch?.needsServerSelection, true)
+        XCTAssertEqual(store.active?.needsWarmUp, false)
+    }
+
     func testNewServeAtTheChangeoverPromptsAndPersists() {
         let store = InMemoryMatchStore()
         let service = MatchService(store: store)

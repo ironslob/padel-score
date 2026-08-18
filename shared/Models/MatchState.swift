@@ -218,6 +218,8 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
     public var winner: Side?
     public var currentServer: Side?
     public var needsServerSelection: Bool
+    /// True while the one-time pre-match warm-up is still waiting to finish or be skipped.
+    public var needsWarmUp: Bool
 
     public init(
         id: UUID = UUID(),
@@ -234,7 +236,8 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         rightSetsWon: Int = 0,
         winner: Side? = nil,
         currentServer: Side? = nil,
-        needsServerSelection: Bool = true
+        needsServerSelection: Bool = true,
+        needsWarmUp: Bool = false
     ) {
         self.id = id
         self.settings = settings
@@ -251,6 +254,7 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         self.winner = winner
         self.currentServer = currentServer
         self.needsServerSelection = needsServerSelection
+        self.needsWarmUp = needsWarmUp
     }
 
     public var duration: TimeInterval {
@@ -272,6 +276,17 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
     /// rotation on. Offered at the changeover between sets.
     public var canChooseNewServer: Bool {
         status == .inProgress && !needsServerSelection && isAtSetStart && !completedSets.isEmpty
+    }
+
+    /// Opening of the match: no serve chosen and no points yet. Warm-up belongs only here.
+    public var isWaitingForFirstServe: Bool {
+        status == .inProgress && needsServerSelection && isAtSetStart && completedSets.isEmpty && !hasScoredPoints
+    }
+
+    public func warmUpRemaining(at date: Date = Date()) -> TimeInterval {
+        guard needsWarmUp else { return 0 }
+        let end = startedAt.addingTimeInterval(settings.warmUpDuration)
+        return max(0, end.timeIntervalSince(date))
     }
 
     public var lastScoringActivityAt: Date {
@@ -434,6 +449,7 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         case winner
         case currentServer
         case needsServerSelection
+        case needsWarmUp
     }
 
     public init(from decoder: Decoder) throws {
@@ -463,5 +479,6 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
             // known, do not block scoring behind a fresh "Who's serving?" prompt.
             needsServerSelection = currentServer == nil && status == .inProgress
         }
+        needsWarmUp = try container.decodeIfPresent(Bool.self, forKey: .needsWarmUp) ?? false
     }
 }

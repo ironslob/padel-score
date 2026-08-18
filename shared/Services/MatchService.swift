@@ -127,6 +127,19 @@ public final class MatchService: ObservableObject {
         }
     }
 
+    /// Ends the pre-match warm-up so the player can choose who serves.
+    public func completeWarmUp() {
+        guard var match = activeMatch, match.status == .inProgress else { return }
+        do {
+            match = try engine.apply(.completeWarmUp, to: match)
+            activeMatch = match
+            persist()
+            logger.info("Warm-up completed")
+        } catch {
+            logger.error("Complete warm-up failed: \(error.localizedDescription)")
+        }
+    }
+
     public func undoLastPoint() {
         guard var match = activeMatch, match.status == .inProgress else { return }
         do {

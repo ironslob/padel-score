@@ -40,6 +40,8 @@ public final class MatchSessionCoordinator: ObservableObject {
     @Published public private(set) var usThemLabels = true
     @Published public private(set) var deuceFormat: DeuceFormat = .goldenPoint
     @Published public private(set) var matchSetFormat: MatchSetFormat = .bestOfThree
+    @Published public private(set) var warmUpEnabled = true
+    @Published public private(set) var warmUpMinutes = MatchSettings.defaultWarmUpMinutes
     @Published public private(set) var isWorkoutSessionActive = false
     @Published public private(set) var isWorkoutPaused = false
     @Published public var workoutErrorMessage: String?
@@ -73,6 +75,8 @@ public final class MatchSessionCoordinator: ObservableObject {
         self.usThemLabels = serveStore.usThemLabels
         self.deuceFormat = serveStore.deuceFormat
         self.matchSetFormat = serveStore.matchSetFormat
+        self.warmUpEnabled = serveStore.warmUpEnabled
+        self.warmUpMinutes = serveStore.warmUpMinutes
         if let raw = modeStore.preferredWorkoutTrackingModeRawValue,
            let mode = WorkoutTrackingMode(rawValue: raw) {
             self.workoutTrackingMode = mode
@@ -121,6 +125,17 @@ public final class MatchSessionCoordinator: ObservableObject {
         serveStore.setMatchSetFormat(value)
     }
 
+    public func setWarmUpEnabled(_ value: Bool) {
+        warmUpEnabled = value
+        serveStore.setWarmUpEnabled(value)
+    }
+
+    public func setWarmUpMinutes(_ value: Int) {
+        let clamped = MatchSettings.clampedWarmUpMinutes(value)
+        warmUpMinutes = clamped
+        serveStore.setWarmUpMinutes(clamped)
+    }
+
     private func syncPreferencesToActiveMatch() {
         service.syncActiveMatchPreferences(
             usThemLabels: usThemLabels,
@@ -138,6 +153,8 @@ public final class MatchSessionCoordinator: ObservableObject {
         settings.askServeAtSetStart = alwaysAskServeAtSetStart
         settings.fixedServerPositions = fixedServerPositions
         settings.usThemLabels = usThemLabels
+        settings.warmUpEnabled = warmUpEnabled
+        settings.warmUpMinutes = warmUpMinutes
         service.startMatch(settings: settings)
         publishSnapshot(for: service.activeMatch)
 

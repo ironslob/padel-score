@@ -1,6 +1,13 @@
 import Foundation
 
 public enum DurationFormatter {
+    public static func countdown(_ interval: TimeInterval) -> String {
+        let total = max(0, Int(interval))
+        let minutes = total / 60
+        let seconds = total % 60
+        return String(format: "%d:%02d", minutes, seconds)
+    }
+
     public static func elapsed(_ interval: TimeInterval) -> String {
         let total = max(0, Int(interval))
         let hours = total / 3600

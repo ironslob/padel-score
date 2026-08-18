@@ -5,4 +5,6 @@
     <property id="usThemLabels" type="boolean">true</property>
     <property id="askServeAtSetStart" type="boolean">false</property>
     <property id="matchSetFormat" type="number">1</property>
+    <property id="warmUpEnabled" type="boolean">true</property>
+    <property id="warmUpMinutes" type="number">5</property>
 </properties>

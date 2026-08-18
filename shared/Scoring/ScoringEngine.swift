@@ -25,7 +25,8 @@ public struct ScoringEngine: Sendable {
             events: [event],
             startedAt: date,
             currentServer: nil,
-            needsServerSelection: true
+            needsServerSelection: true,
+            needsWarmUp: settings.shouldWarmUp
         )
     }
 
@@ -52,6 +53,14 @@ public struct ScoringEngine: Sendable {
             next.currentServer = nil
             next.needsServerSelection = true
             return next
+
+        case .completeWarmUp:
+            guard state.status == .inProgress else { throw ScoringError.matchNotInProgress }
+            guard state.needsWarmUp else { return state }
+            guard state.isWaitingForFirstServe else { return state }
+            var warmed = state
+            warmed.needsWarmUp = false
+            return warmed
 
         case .pointWon(let side):
             guard state.status == .inProgress else { throw ScoringError.matchNotInProgress }
@@ -83,8 +92,11 @@ public struct ScoringEngine: Sendable {
             next.deuceFormatChanges.append(DeuceFormatChange(format: format, at: effective))
             next.settings.deuceFormat = format
             let replayed = replay(events: next.events, onto: blankMatch(from: next))
-            // New Serve is not an event; replay would restore the rotated server.
-            return restoreServerSelectionPrompt(from: state, onto: replayed)
+            // New Serve and warm-up are not events; replay would drop those flags.
+            return restoreWarmUp(
+                from: state,
+                onto: restoreServerSelectionPrompt(from: state, onto: replayed)
+            )
 
         case .undo:
             guard state.status == .inProgress else { throw ScoringError.matchNotInProgress }
@@ -127,10 +139,11 @@ public struct ScoringEngine: Sendable {
     }
 
     /// Rebuilds derived fields from the event stream after a load.
-    /// Keeps an in-progress New Serve prompt, which is not itself an event.
+    /// Keeps an in-progress New Serve prompt and pre-match warm-up, which are not events.
     public func rehydrate(_ state: MatchState) -> MatchState {
         let replayed = replay(events: state.events, onto: blankMatch(from: state))
-        return restoreServerSelectionPrompt(from: state, onto: replayed)
+        let withServe = restoreServerSelectionPrompt(from: state, onto: replayed)
+        return restoreWarmUp(from: state, onto: withServe)
     }
 
     /// Rebuilds derived score state from the authoritative event stream.
@@ -394,6 +407,19 @@ public struct ScoringEngine: Sendable {
         var next = replayed
         next.currentServer = nil
         next.needsServerSelection = true
+        return next
+    }
+
+    /// `completeWarmUp` records no event, so replay would drop the flag. Re-apply it
+    /// only while the match is still waiting for the opening serve.
+    private func restoreWarmUp(from previous: MatchState, onto replayed: MatchState) -> MatchState {
+        guard previous.status == .inProgress,
+              previous.needsWarmUp,
+              replayed.status == .inProgress,
+              replayed.isWaitingForFirstServe
+        else { return replayed }
+        var next = replayed
+        next.needsWarmUp = true
         return next
     }
 

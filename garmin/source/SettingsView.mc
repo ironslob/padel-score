@@ -39,6 +39,14 @@ class SettingsView extends WatchUi.View {
                 color = service.getAskServeAtSetStart() ? Graphics.COLOR_GREEN : Graphics.COLOR_DK_GRAY;
             } else if (i == 4) {
                 color = service.activeMatch == null ? Graphics.COLOR_DK_BLUE : Graphics.COLOR_DK_GRAY;
+            } else if (i == 5) {
+                if (service.activeMatch != null) {
+                    color = Graphics.COLOR_DK_GRAY;
+                } else {
+                    color = service.getWarmUpEnabled() ? Graphics.COLOR_GREEN : Graphics.COLOR_DK_GRAY;
+                }
+            } else if (i == 6) {
+                color = service.activeMatch == null ? Graphics.COLOR_DK_BLUE : Graphics.COLOR_DK_GRAY;
             }
             UiHelpers.drawPrimaryButton(dc, labels[i], 16, y, width - 32, 36, color);
             y += 44;
@@ -55,7 +63,9 @@ class SettingsView extends WatchUi.View {
         var labels = service.getUsThemLabels() ? "Labels: Us/Them" : "Labels: Serve";
         var ask = service.getAskServeAtSetStart() ? "Ask Serve: On" : "Ask Serve: Off";
         var length = "Length: " + matchSetFormatLabel(service.getMatchSetFormat());
-        return [deuce, swap, labels, ask, length] as Array<String>;
+        var warm = service.getWarmUpEnabled() ? "Warm-up: On" : "Warm-up: Off";
+        var mins = "Minutes: " + service.getWarmUpMinutes().toString();
+        return [deuce, swap, labels, ask, length, warm, mins] as Array<String>;
     }
 
     function getScrollIndex() as Number {
@@ -98,6 +108,16 @@ class SettingsDelegate extends WatchUi.BehaviorDelegate {
                 return true;
             }
             service.cycleMatchSetFormat();
+        } else if (index == 5) {
+            if (service.activeMatch != null) {
+                return true;
+            }
+            service.cycleWarmUpEnabled();
+        } else if (index == 6) {
+            if (service.activeMatch != null) {
+                return true;
+            }
+            service.cycleWarmUpMinutes();
         } else {
             return false;
         }
@@ -111,7 +131,7 @@ class SettingsDelegate extends WatchUi.BehaviorDelegate {
             WatchUi.popView(WatchUi.SLIDE_RIGHT);
             return true;
         }
-        if (direction == WatchUi.SWIPE_UP && view.getScrollIndex() + 4 < 5) {
+        if (direction == WatchUi.SWIPE_UP && view.getScrollIndex() + 4 < 7) {
             view.setScrollIndex(view.getScrollIndex() + 1);
             WatchUi.requestUpdate();
             return true;

@@ -80,6 +80,18 @@ class MatchService {
         expireInactiveMatchIfNeeded();
     }
 
+    function completeWarmUp() as Void {
+        if (activeMatch == null || activeMatch.status != MatchStatus.IN_PROGRESS) {
+            return;
+        }
+        var updated = engine.applyCompleteWarmUp(activeMatch);
+        if (updated == null) {
+            return;
+        }
+        activeMatch = updated;
+        persist();
+    }
+
     function undoLastPoint() as Void {
         if (activeMatch == null || activeMatch.status != MatchStatus.IN_PROGRESS) {
             return;
@@ -304,6 +316,45 @@ class MatchService {
         return next;
     }
 
+    function getWarmUpEnabled() as Boolean {
+        var value = Application.Properties.getValue("warmUpEnabled");
+        if (value == null) {
+            return true;
+        }
+        return value as Boolean;
+    }
+
+    function setWarmUpEnabled(enabled as Boolean) as Void {
+        Application.Properties.setValue("warmUpEnabled", enabled);
+    }
+
+    function cycleWarmUpEnabled() as Boolean {
+        var next = !getWarmUpEnabled();
+        setWarmUpEnabled(next);
+        return next;
+    }
+
+    function getWarmUpMinutes() as Number {
+        var value = Application.Properties.getValue("warmUpMinutes");
+        if (value == null) {
+            return MatchSettings.WARM_UP_MINUTES_DEFAULT;
+        }
+        return clampWarmUpMinutes(value as Number);
+    }
+
+    function setWarmUpMinutes(minutes as Number) as Void {
+        Application.Properties.setValue("warmUpMinutes", clampWarmUpMinutes(minutes));
+    }
+
+    function cycleWarmUpMinutes() as Number {
+        var next = getWarmUpMinutes() + 1;
+        if (next > MatchSettings.WARM_UP_MINUTES_MAX) {
+            next = MatchSettings.WARM_UP_MINUTES_MIN;
+        }
+        setWarmUpMinutes(next);
+        return next;
+    }
+
     function settingsForNewMatch() as MatchSettings {
         var settings = new MatchSettings();
         settings.deuceFormat = getDeuceFormat();
@@ -311,6 +362,8 @@ class MatchService {
         settings.usThemLabels = getUsThemLabels();
         settings.askServeAtSetStart = getAskServeAtSetStart();
         applyMatchSetFormat(settings, getMatchSetFormat());
+        settings.warmUpEnabled = getWarmUpEnabled();
+        settings.warmUpMinutes = getWarmUpMinutes();
         return settings;
     }
 

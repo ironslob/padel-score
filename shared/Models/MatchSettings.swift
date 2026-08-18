@@ -80,6 +80,15 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     /// Auto-end or discard an in-progress match after this much time without a new point.
     public static let inactivityTimeoutSeconds: TimeInterval = 30 * 60
 
+    public static let minWarmUpMinutes = 1
+    public static let maxWarmUpMinutes = 30
+    public static let defaultWarmUpMinutes = 5
+    public static let warmUpMinutePresets = [3, 5, 10]
+
+    public static func clampedWarmUpMinutes(_ value: Int) -> Int {
+        min(maxWarmUpMinutes, max(minWarmUpMinutes, value))
+    }
+
     public var setsToWin: Int
     /// When true, the match keeps going after each set until manually finished.
     public var continuousPlay: Bool
@@ -94,6 +103,10 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     public var fixedServerPositions: Bool
     /// When true, score buttons show "Us" / "Them" instead of "Serving" / "Receiving".
     public var usThemLabels: Bool
+    /// When true, a countdown runs once after Start Match, before "Who's serving?".
+    public var warmUpEnabled: Bool
+    /// Length of the pre-match warm-up, in minutes. Clamped to 1...30.
+    public var warmUpMinutes: Int
 
     public init(
         setsToWin: Int = 2,
@@ -103,7 +116,9 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         deuceFormat: DeuceFormat = .goldenPoint,
         askServeAtSetStart: Bool = false,
         fixedServerPositions: Bool = true,
-        usThemLabels: Bool = true
+        usThemLabels: Bool = true,
+        warmUpEnabled: Bool = true,
+        warmUpMinutes: Int = MatchSettings.defaultWarmUpMinutes
     ) {
         self.setsToWin = setsToWin
         self.continuousPlay = continuousPlay
@@ -113,6 +128,8 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         self.askServeAtSetStart = askServeAtSetStart
         self.fixedServerPositions = fixedServerPositions
         self.usThemLabels = usThemLabels
+        self.warmUpEnabled = warmUpEnabled
+        self.warmUpMinutes = Self.clampedWarmUpMinutes(warmUpMinutes)
     }
 
     public static let `default` = MatchSettings()
@@ -124,6 +141,14 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         case 3: return .bestOfFive
         default: return .bestOfThree
         }
+    }
+
+    public var shouldWarmUp: Bool {
+        warmUpEnabled && warmUpMinutes > 0
+    }
+
+    public var warmUpDuration: TimeInterval {
+        TimeInterval(Self.clampedWarmUpMinutes(warmUpMinutes) * 60)
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -138,6 +163,8 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         case askServeAtSetStart
         case fixedServerPositions
         case usThemLabels
+        case warmUpEnabled
+        case warmUpMinutes
         case undoTimeoutSeconds
     }
 
@@ -160,6 +187,10 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         askServeAtSetStart = try container.decodeIfPresent(Bool.self, forKey: .askServeAtSetStart) ?? false
         fixedServerPositions = try container.decodeIfPresent(Bool.self, forKey: .fixedServerPositions) ?? true
         usThemLabels = try container.decodeIfPresent(Bool.self, forKey: .usThemLabels) ?? true
+        warmUpEnabled = try container.decodeIfPresent(Bool.self, forKey: .warmUpEnabled) ?? false
+        let decodedMinutes = try container.decodeIfPresent(Int.self, forKey: .warmUpMinutes)
+            ?? MatchSettings.defaultWarmUpMinutes
+        warmUpMinutes = Self.clampedWarmUpMinutes(decodedMinutes)
         // Legacy per-match value is ignored; timeout is always `quickUndoTimeoutSeconds`.
         _ = try container.decodeIfPresent(TimeInterval.self, forKey: .undoTimeoutSeconds)
     }
@@ -175,5 +206,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         try container.encode(askServeAtSetStart, forKey: .askServeAtSetStart)
         try container.encode(fixedServerPositions, forKey: .fixedServerPositions)
         try container.encode(usThemLabels, forKey: .usThemLabels)
+        try container.encode(warmUpEnabled, forKey: .warmUpEnabled)
+        try container.encode(warmUpMinutes, forKey: .warmUpMinutes)
     }
 }

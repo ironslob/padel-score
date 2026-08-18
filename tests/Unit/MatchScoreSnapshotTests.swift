@@ -173,6 +173,8 @@ final class SettingsCopyTests: XCTestCase {
         XCTAssertFalse(SettingsCopy.fixedServerPositions.isEmpty)
         XCTAssertFalse(SettingsCopy.askServeAtSetStart.isEmpty)
         XCTAssertFalse(SettingsCopy.matchSetFormat.isEmpty)
+        XCTAssertFalse(SettingsCopy.warmUp.isEmpty)
+        XCTAssertFalse(SettingsCopy.workoutTrackingMode.isEmpty)
     }
 }
 
@@ -367,6 +369,50 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
         XCTAssertEqual(store.matchSetFormat, .continuous)
         store.setMatchSetFormat(.bestOfFive)
         XCTAssertEqual(store.matchSetFormat, .bestOfFive)
+    }
+
+    func testWarmUpDefaultsOnAtFiveMinutesAndPersists() {
+        let suiteName = "ServeSelectionPreferenceStoreTests.warmUp.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        let store = UserDefaultsServeSelectionPreferenceStore(defaults: defaults)
+
+        XCTAssertTrue(store.warmUpEnabled)
+        XCTAssertEqual(store.warmUpMinutes, 5)
+        store.setWarmUpEnabled(false)
+        store.setWarmUpMinutes(12)
+        XCTAssertFalse(store.warmUpEnabled)
+        XCTAssertEqual(store.warmUpMinutes, 12)
+        store.setWarmUpMinutes(99)
+        XCTAssertEqual(store.warmUpMinutes, 30)
+        store.setWarmUpMinutes(0)
+        XCTAssertEqual(store.warmUpMinutes, 1)
+    }
+
+    func testDefaultSettingsEnableFiveMinuteWarmUp() {
+        XCTAssertTrue(MatchSettings.default.warmUpEnabled)
+        XCTAssertEqual(MatchSettings.default.warmUpMinutes, 5)
+        XCTAssertTrue(MatchSettings.default.shouldWarmUp)
+    }
+
+    func testLegacySettingsDecodeWithoutWarmUpKeys() throws {
+        let legacy = """
+        {"setsToWin":2,"gamesToWinSet":6,"mustWinByTwoGames":true,"goldenPointEnabled":true}
+        """
+        let settings = try JSONDecoder().decode(MatchSettings.self, from: Data(legacy.utf8))
+        XCTAssertFalse(settings.warmUpEnabled)
+        XCTAssertEqual(settings.warmUpMinutes, 5)
+    }
+
+    func testWarmUpSettingsRoundTripThroughCoding() throws {
+        var settings = MatchSettings.default
+        settings.warmUpEnabled = false
+        settings.warmUpMinutes = 8
+        let decoded = try JSONDecoder().decode(
+            MatchSettings.self,
+            from: try JSONEncoder().encode(settings)
+        )
+        XCTAssertFalse(decoded.warmUpEnabled)
+        XCTAssertEqual(decoded.warmUpMinutes, 8)
     }
 
     func testSnapshotUsesScoreScreenLayoutWhenSidesSwap() throws {

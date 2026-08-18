@@ -37,6 +37,7 @@ enum MatchActionType {
     END_EARLY,
     DISCARD,
     REQUEST_SERVER_SELECTION,
+    COMPLETE_WARM_UP,
     SET_DEUCE_FORMAT
 }
 
@@ -201,9 +202,14 @@ class MatchSettings {
     var askServeAtSetStart as Boolean;
     var fixedServerPositions as Boolean;
     var usThemLabels as Boolean;
+    var warmUpEnabled as Boolean;
+    var warmUpMinutes as Number;
 
     static const QUICK_UNDO_TIMEOUT_MS = 3000;
     static const INACTIVITY_TIMEOUT_S = 30 * 60;
+    static const WARM_UP_MINUTES_MIN = 1;
+    static const WARM_UP_MINUTES_MAX = 30;
+    static const WARM_UP_MINUTES_DEFAULT = 5;
 
     function initialize() {
         setsToWin = 2;
@@ -214,6 +220,8 @@ class MatchSettings {
         askServeAtSetStart = false;
         fixedServerPositions = true;
         usThemLabels = true;
+        warmUpEnabled = true;
+        warmUpMinutes = WARM_UP_MINUTES_DEFAULT;
     }
 
     function copy() as MatchSettings {
@@ -226,8 +234,24 @@ class MatchSettings {
         s.askServeAtSetStart = askServeAtSetStart;
         s.fixedServerPositions = fixedServerPositions;
         s.usThemLabels = usThemLabels;
+        s.warmUpEnabled = warmUpEnabled;
+        s.warmUpMinutes = warmUpMinutes;
         return s;
     }
+
+    function shouldWarmUp() as Boolean {
+        return warmUpEnabled && warmUpMinutes > 0;
+    }
+}
+
+function clampWarmUpMinutes(value as Number) as Number {
+    if (value < MatchSettings.WARM_UP_MINUTES_MIN) {
+        return MatchSettings.WARM_UP_MINUTES_MIN;
+    }
+    if (value > MatchSettings.WARM_UP_MINUTES_MAX) {
+        return MatchSettings.WARM_UP_MINUTES_MAX;
+    }
+    return value;
 }
 
 class GameScore {
@@ -394,6 +418,7 @@ class MatchState {
     var winner as Side or Null;
     var currentServer as Side or Null;
     var needsServerSelection as Boolean;
+    var needsWarmUp as Boolean;
 
     function initialize(id as String, settings as MatchSettings, startedAt as Number) {
         self.id = id;
@@ -411,6 +436,7 @@ class MatchState {
         self.winner = null;
         self.currentServer = null;
         self.needsServerSelection = true;
+        self.needsWarmUp = false;
     }
 
     function hasScoredPoints() as Boolean {
@@ -432,6 +458,19 @@ class MatchState {
     function canChooseNewServer() as Boolean {
         return status == MatchStatus.IN_PROGRESS && !needsServerSelection && isAtSetStart()
             && completedSets.size() > 0;
+    }
+
+    function isWaitingForFirstServe() as Boolean {
+        return status == MatchStatus.IN_PROGRESS && needsServerSelection && isAtSetStart()
+            && completedSets.size() == 0 && !hasScoredPoints();
+    }
+
+    function warmUpRemaining(now as Number) as Number {
+        if (!needsWarmUp) {
+            return 0;
+        }
+        var remaining = (startedAt + settings.warmUpMinutes * 60) - now;
+        return remaining > 0 ? remaining : 0;
     }
 
     function lastScoringActivityAt() as Number {

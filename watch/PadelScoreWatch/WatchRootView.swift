@@ -26,6 +26,8 @@ struct WatchRootView: View {
                             onNext: clearGameInterstitial,
                             onChooseServer: chooseServerForNextSet
                         )
+                    } else if match.needsWarmUp {
+                        WarmUpView(match: match)
                     } else if match.needsServerSelection {
                         SelectServerView()
                     } else {
@@ -683,6 +685,53 @@ struct MatchPreferenceToggles: View {
                 set: { sessionCoordinator.setAlwaysAskServeAtSetStart($0) }
             )
         )
+        if match == nil {
+            WarmUpSettings(showsHelperText: showsHelperText)
+        }
+    }
+}
+
+struct WarmUpSettings: View {
+    @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
+    var showsHelperText = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            PreferenceToggleRow(
+                title: "Warm up before match",
+                helper: SettingsCopy.warmUp,
+                showsHelper: showsHelperText,
+                isOn: Binding(
+                    get: { sessionCoordinator.warmUpEnabled },
+                    set: { sessionCoordinator.setWarmUpEnabled($0) }
+                )
+            )
+            if sessionCoordinator.warmUpEnabled {
+                HStack(spacing: 6) {
+                    ForEach(MatchSettings.warmUpMinutePresets, id: \.self) { minutes in
+                        Button("\(minutes) min") {
+                            sessionCoordinator.setWarmUpMinutes(minutes)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(sessionCoordinator.warmUpMinutes == minutes ? .green : .gray)
+                        .font(.caption)
+                    }
+                }
+                .accessibilityElement(children: .contain)
+
+                Picker(
+                    "Minutes",
+                    selection: Binding(
+                        get: { sessionCoordinator.warmUpMinutes },
+                        set: { sessionCoordinator.setWarmUpMinutes($0) }
+                    )
+                ) {
+                    ForEach(MatchSettings.minWarmUpMinutes...MatchSettings.maxWarmUpMinutes, id: \.self) { minutes in
+                        Text("\(minutes) min").tag(minutes)
+                    }
+                }
+            }
+        }
     }
 }
 

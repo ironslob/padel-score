@@ -41,6 +41,10 @@ public protocol ServeSelectionPreferenceStoring {
     func setDeuceFormat(_ value: DeuceFormat)
     var matchSetFormat: MatchSetFormat { get }
     func setMatchSetFormat(_ value: MatchSetFormat)
+    var warmUpEnabled: Bool { get }
+    func setWarmUpEnabled(_ value: Bool)
+    var warmUpMinutes: Int { get }
+    func setWarmUpMinutes(_ value: Int)
 }
 
 public struct UserDefaultsWristRaiseTipStore: WristRaiseTipStoring {
@@ -84,6 +88,8 @@ public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenc
     private let legacyGoldenPointKey = "goldenPointEnabled"
     private let deuceFormatKey = "deuceFormat"
     private let matchSetFormatKey = "matchSetFormat"
+    private let warmUpEnabledKey = "warmUpEnabled"
+    private let warmUpMinutesKey = "warmUpMinutes"
     private let defaults: UserDefaults
 
     public init(defaults: UserDefaults = .standard) {
@@ -94,6 +100,8 @@ public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenc
             usThemLabelsKey: true,
             fixedServerKey: true,
             matchSetFormatKey: MatchSetFormat.bestOfThree.rawValue,
+            warmUpEnabledKey: true,
+            warmUpMinutesKey: MatchSettings.defaultWarmUpMinutes,
         ])
     }
 
@@ -150,6 +158,22 @@ public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenc
     public func setMatchSetFormat(_ value: MatchSetFormat) {
         defaults.set(value.rawValue, forKey: matchSetFormatKey)
     }
+
+    public var warmUpEnabled: Bool {
+        defaults.bool(forKey: warmUpEnabledKey)
+    }
+
+    public func setWarmUpEnabled(_ value: Bool) {
+        defaults.set(value, forKey: warmUpEnabledKey)
+    }
+
+    public var warmUpMinutes: Int {
+        MatchSettings.clampedWarmUpMinutes(defaults.integer(forKey: warmUpMinutesKey))
+    }
+
+    public func setWarmUpMinutes(_ value: Int) {
+        defaults.set(MatchSettings.clampedWarmUpMinutes(value), forKey: warmUpMinutesKey)
+    }
 }
 
 public enum SettingsCopy {
@@ -174,6 +198,9 @@ public enum SettingsCopy {
 
     public static let workoutTrackingMode =
         "Score only keeps scoring without a Health workout — use it when another app is already tracking. Track as workout lets Padel Score own the session so it can return when you raise your wrist."
+
+    public static let warmUp =
+        "A countdown before you pick who serves. It runs only at match start, not between sets, and is included in the Health workout when tracking is on. Skip it when you are ready to play."
 }
 
 public enum FirstLaunchTipCopy {

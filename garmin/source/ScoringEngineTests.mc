@@ -494,3 +494,68 @@ function testFinishWithoutWinnerEndsEarly(logger as Logger) as Boolean {
     Test.assertEqual(null, state.winner);
     return true;
 }
+
+(:test)
+function testMatchStartArmsWarmUpByDefault(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var settings = new MatchSettings();
+    var state = engine.startMatch(settings, "test-warmup-1", 0);
+    Test.assert(state.needsWarmUp);
+    Test.assert(state.needsServerSelection);
+    Test.assert(state.isWaitingForFirstServe());
+    return true;
+}
+
+(:test)
+function testWarmUpCanBeDisabled(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var settings = new MatchSettings();
+    settings.warmUpEnabled = false;
+    var state = engine.startMatch(settings, "test-warmup-off", 0);
+    Test.assert(!state.needsWarmUp);
+    Test.assert(state.needsServerSelection);
+    return true;
+}
+
+(:test)
+function testCompleteWarmUpClearsFlag(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var settings = new MatchSettings();
+    var state = engine.startMatch(settings, "test-warmup-skip", 0);
+    state = engine.applyCompleteWarmUp(state);
+    Test.assert(!state.needsWarmUp);
+    Test.assert(state.needsServerSelection);
+    Test.assertEqual(null, state.currentServer);
+    return true;
+}
+
+(:test)
+function testWarmUpNotReArmedAtSetStart(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var settings = new MatchSettings();
+    var state = engine.startMatch(settings, "test-warmup-set", 0);
+    state = engine.applyCompleteWarmUp(state);
+    state = engine.applySelectServer(state, Side.LEFT, 1);
+    state = winGames(engine, state, Side.LEFT, 6, 2);
+    Test.assertEqual(1, state.completedSets.size());
+    Test.assert(!state.needsWarmUp);
+    state = engine.applyRequestServerSelection(state);
+    Test.assert(state.needsServerSelection);
+    Test.assert(!state.needsWarmUp);
+    return true;
+}
+
+(:test)
+function testRehydratePreservesWarmUp(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var settings = new MatchSettings();
+    var state = engine.startMatch(settings, "test-warmup-rehydrate", 0);
+    var restored = engine.rehydrate(state);
+    Test.assert(restored.needsWarmUp);
+    Test.assert(restored.needsServerSelection);
+    state = engine.applyCompleteWarmUp(state);
+    restored = engine.rehydrate(state);
+    Test.assert(!restored.needsWarmUp);
+    Test.assert(restored.needsServerSelection);
+    return true;
+}

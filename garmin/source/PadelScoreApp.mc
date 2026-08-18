@@ -32,6 +32,9 @@ function buildRootNavigation(service as MatchService) as [Views] or [Views, Inpu
         return [new StartView(service), new StartDelegate(service)] as [Views] or [Views, InputDelegates];
     }
     if (match.status == MatchStatus.IN_PROGRESS) {
+        if (match.needsWarmUp) {
+            return [new WarmUpView(service), new WarmUpDelegate(service)] as [Views] or [Views, InputDelegates];
+        }
         if (match.needsServerSelection) {
             return [new SelectServerView(service), new SelectServerDelegate(service, true)] as [Views] or [Views, InputDelegates];
         }

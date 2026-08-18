@@ -563,6 +563,92 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertNil(s.currentServer)
     }
 
+    // MARK: - Pre-match warm-up
+
+    func testMatchStartArmsWarmUpByDefault() {
+        let s = startUnselected()
+        XCTAssertTrue(s.needsWarmUp)
+        XCTAssertTrue(s.settings.warmUpEnabled)
+        XCTAssertEqual(s.settings.warmUpMinutes, 5)
+        XCTAssertTrue(s.isWaitingForFirstServe)
+    }
+
+    func testWarmUpCanBeDisabledAtMatchStart() {
+        var settings = MatchSettings.default
+        settings.warmUpEnabled = false
+        let s = engine.startMatch(settings: settings)
+        XCTAssertFalse(s.needsWarmUp)
+        XCTAssertTrue(s.needsServerSelection)
+    }
+
+    func testCompleteWarmUpClearsFlagAndStillAsksWhoServes() throws {
+        let initial = startUnselected()
+        let s = try engine.apply(.completeWarmUp, to: initial)
+        XCTAssertFalse(s.needsWarmUp)
+        XCTAssertTrue(s.needsServerSelection)
+        XCTAssertNil(s.currentServer)
+    }
+
+    func testCompleteWarmUpIsIdempotent() throws {
+        var s = startUnselected()
+        s = try engine.apply(.completeWarmUp, to: s)
+        XCTAssertEqual(try engine.apply(.completeWarmUp, to: s), s)
+    }
+
+    func testWarmUpRemainingUsesStartedAt() {
+        let start = Date(timeIntervalSince1970: 1_000)
+        var settings = MatchSettings.default
+        settings.warmUpMinutes = 5
+        let s = engine.startMatch(settings: settings, at: start)
+        XCTAssertEqual(s.warmUpRemaining(at: start), 300)
+        XCTAssertEqual(s.warmUpRemaining(at: start.addingTimeInterval(60)), 240)
+        XCTAssertEqual(s.warmUpRemaining(at: start.addingTimeInterval(400)), 0)
+        let done = try? engine.apply(.completeWarmUp, to: s)
+        XCTAssertEqual(done?.warmUpRemaining(at: start), 0)
+    }
+
+    func testWarmUpIsNotReArmedAtSetStart() throws {
+        var s = startUnselected()
+        s = try engine.apply(.completeWarmUp, to: s)
+        s = try engine.apply(.selectServer(.left), to: s)
+        for _ in 0..<5 {
+            s = try winGame(for: .left, from: s)
+            s = try winGame(for: .right, from: s)
+        }
+        s = try winGame(for: .left, from: s)
+        s = try winGame(for: .left, from: s)
+        XCTAssertEqual(s.completedSets.count, 1)
+        XCTAssertTrue(s.isAtSetStart)
+        XCTAssertFalse(s.needsWarmUp)
+        s = try engine.apply(.requestServerSelection, to: s)
+        XCTAssertTrue(s.needsServerSelection)
+        XCTAssertFalse(s.needsWarmUp)
+        XCTAssertEqual(try engine.apply(.completeWarmUp, to: s), s)
+    }
+
+    func testRehydratePreservesWarmUp() {
+        let s = startUnselected()
+        XCTAssertTrue(s.needsWarmUp)
+        let rehydrated = engine.rehydrate(s)
+        XCTAssertTrue(rehydrated.needsWarmUp)
+        XCTAssertTrue(rehydrated.needsServerSelection)
+    }
+
+    func testRehydrateDoesNotRestoreCompletedWarmUp() throws {
+        let s = try engine.apply(.completeWarmUp, to: startUnselected())
+        let rehydrated = engine.rehydrate(s)
+        XCTAssertFalse(rehydrated.needsWarmUp)
+        XCTAssertTrue(rehydrated.needsServerSelection)
+    }
+
+    func testDeuceFormatChangeKeepsWarmUp() throws {
+        var s = startUnselected()
+        s = try engine.apply(.setDeuceFormat(.advantage), to: s)
+        XCTAssertTrue(s.needsWarmUp)
+        XCTAssertTrue(s.needsServerSelection)
+        XCTAssertEqual(s.settings.deuceFormat, .advantage)
+    }
+
     func testFixedServerPositionsStillRequiresServerSelectionAtMatchStart() {
         var settings = MatchSettings.default
         settings.fixedServerPositions = true

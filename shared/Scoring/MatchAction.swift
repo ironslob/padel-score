@@ -7,6 +7,8 @@ public enum MatchAction: Equatable, Sendable {
     /// Puts the set in progress back to asking who serves, for when the players
     /// rearranged themselves at the changeover.
     case requestServerSelection
+    /// Ends the pre-match warm-up so the player can choose who serves.
+    case completeWarmUp
     case pointWon(Side)
     /// Changes how games are decided at 40-40 from now on, without touching games
     /// already played.

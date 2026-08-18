@@ -51,7 +51,12 @@ class StartDelegate extends WatchUi.BehaviorDelegate {
             var settings = service.settingsForNewMatch();
             service.startMatch(settings);
             WatchUi.popView(WatchUi.SLIDE_LEFT);
-            WatchUi.pushView(new SelectServerView(service), new SelectServerDelegate(service, true), WatchUi.SLIDE_LEFT);
+            var match = service.activeMatch;
+            if (match != null && match.needsWarmUp) {
+                WatchUi.pushView(new WarmUpView(service), new WarmUpDelegate(service), WatchUi.SLIDE_LEFT);
+            } else {
+                WatchUi.pushView(new SelectServerView(service), new SelectServerDelegate(service, true), WatchUi.SLIDE_LEFT);
+            }
             return true;
         }
         if (x >= width / 2 - 80 && x <= width / 2 + 80 && y >= height / 2 + 58 && y <= height / 2 + 98) {

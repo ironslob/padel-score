@@ -92,7 +92,8 @@ class MatchStore {
             "deuceFormatChanges" => serializeDeuceFormatChanges(match.deuceFormatChanges),
             "startedAt" => match.startedAt,
             "finishedAt" => match.finishedAt,
-            "needsServerSelection" => match.needsServerSelection
+            "needsServerSelection" => match.needsServerSelection,
+            "needsWarmUp" => match.needsWarmUp
         } as Dictionary;
     }
 
@@ -108,7 +109,9 @@ class MatchStore {
             "goldenPointEnabled" => settings.deuceFormat != DeuceFormat.DEUCE_ADVANTAGE,
             "askServeAtSetStart" => settings.askServeAtSetStart,
             "fixedServerPositions" => settings.fixedServerPositions,
-            "usThemLabels" => settings.usThemLabels
+            "usThemLabels" => settings.usThemLabels,
+            "warmUpEnabled" => settings.warmUpEnabled,
+            "warmUpMinutes" => settings.warmUpMinutes
         } as Dictionary;
     }
 
@@ -152,6 +155,10 @@ class MatchStore {
             replayed.currentServer = null;
             replayed.needsServerSelection = true;
         }
+        if (data.hasKey("needsWarmUp") && (data.get("needsWarmUp") as Boolean)
+            && replayed.status == MatchStatus.IN_PROGRESS && replayed.isWaitingForFirstServe()) {
+            replayed.needsWarmUp = true;
+        }
         return replayed;
     }
 
@@ -177,6 +184,12 @@ class MatchStore {
         if (data.hasKey("askServeAtSetStart")) { settings.askServeAtSetStart = data.get("askServeAtSetStart") as Boolean; }
         if (data.hasKey("fixedServerPositions")) { settings.fixedServerPositions = data.get("fixedServerPositions") as Boolean; }
         if (data.hasKey("usThemLabels")) { settings.usThemLabels = data.get("usThemLabels") as Boolean; }
+        if (data.hasKey("warmUpEnabled")) {
+            settings.warmUpEnabled = data.get("warmUpEnabled") as Boolean;
+        } else {
+            settings.warmUpEnabled = false;
+        }
+        if (data.hasKey("warmUpMinutes")) { settings.warmUpMinutes = clampWarmUpMinutes(data.get("warmUpMinutes") as Number); }
         return settings;
     }
 

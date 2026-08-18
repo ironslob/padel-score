@@ -5,6 +5,7 @@ class ScoringEngine {
     function startMatch(settings as MatchSettings, id as String, at as Number) as MatchState {
         var state = new MatchState(id, settings.copy(), at);
         state.events.add(new MatchEvent(MatchEventKind.MATCH_STARTED, null, at));
+        state.needsWarmUp = settings.shouldWarmUp();
         return state;
     }
 
@@ -33,6 +34,20 @@ class ScoringEngine {
         return next;
     }
 
+    function applyCompleteWarmUp(state as MatchState) as MatchState or Null {
+        if (state.status != MatchStatus.IN_PROGRESS) {
+            return null;
+        }
+        if (!state.needsWarmUp || !state.isWaitingForFirstServe()) {
+            return state;
+        }
+        var next = copyStateShell(state);
+        next.events = copyEvents(state.events);
+        next.deuceFormatChanges = copyDeuceFormatChanges(state.deuceFormatChanges);
+        next.needsWarmUp = false;
+        return next;
+    }
+
     function applySetDeuceFormat(state as MatchState, format as DeuceFormat, at as Number) as MatchState or Null {
         if (state.status != MatchStatus.IN_PROGRESS) {
             return null;
@@ -51,7 +66,7 @@ class ScoringEngine {
         next.deuceFormatChanges.add(new DeuceFormatChange(format, effective));
         next.settings.deuceFormat = format;
         var replayed = replay(next.events, blankMatch(next));
-        return restoreServerSelectionPrompt(state, replayed);
+        return restoreWarmUp(state, restoreServerSelectionPrompt(state, replayed));
     }
 
     function applyPointWon(state as MatchState, side as Side, at as Number) as MatchState or Null {
@@ -194,7 +209,7 @@ class ScoringEngine {
 
     function rehydrate(state as MatchState) as MatchState {
         var replayed = replay(state.events, blankMatch(state));
-        return restoreServerSelectionPrompt(state, replayed);
+        return restoreWarmUp(state, restoreServerSelectionPrompt(state, replayed));
     }
 
     private function restoreServerSelectionPrompt(previous as MatchState, replayed as MatchState) as MatchState {
@@ -204,6 +219,15 @@ class ScoringEngine {
         }
         replayed.currentServer = null;
         replayed.needsServerSelection = true;
+        return replayed;
+    }
+
+    private function restoreWarmUp(previous as MatchState, replayed as MatchState) as MatchState {
+        if (previous.status != MatchStatus.IN_PROGRESS || !previous.needsWarmUp
+            || replayed.status != MatchStatus.IN_PROGRESS || !replayed.isWaitingForFirstServe()) {
+            return replayed;
+        }
+        replayed.needsWarmUp = true;
         return replayed;
     }
 
@@ -427,6 +451,7 @@ class ScoringEngine {
         copy.winner = state.winner;
         copy.currentServer = state.currentServer;
         copy.needsServerSelection = state.needsServerSelection;
+        copy.needsWarmUp = state.needsWarmUp;
         copy.deuceFormatChanges = copyDeuceFormatChanges(state.deuceFormatChanges);
         return copy;
     }
