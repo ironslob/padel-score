@@ -26,17 +26,16 @@ class WarmUpView extends WatchUi.View {
         var height = dc.getHeight();
         UiHelpers.drawHeader(dc, "Warm up");
 
-        var remaining = match.warmUpRemaining(Time.now().value());
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.drawText(
             width / 2,
             height / 2 - 28,
             Graphics.FONT_NUMBER_MEDIUM,
-            UiHelpers.formatDuration(remaining * 1000),
+            UiHelpers.formatDuration(match.warmUpElapsed(Time.now().value()) * 1000),
             Graphics.TEXT_JUSTIFY_CENTER
         );
 
-        UiHelpers.drawPrimaryButton(dc, "Skip", width / 2 - 70, height / 2 + 24, 140, 44, Graphics.COLOR_GREEN);
+        UiHelpers.drawPrimaryButton(dc, "Play", width / 2 - 70, height / 2 + 24, 140, 44, Graphics.COLOR_GREEN);
     }
 }
 
@@ -59,7 +58,7 @@ class WarmUpDelegate extends WatchUi.BehaviorDelegate {
             stopTimer();
             return;
         }
-        if (match.warmUpRemaining(Time.now().value()) <= 0) {
+        if (match.isWarmUpExpired(Time.now().value())) {
             advance();
             return;
         }

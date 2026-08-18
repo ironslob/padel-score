@@ -64,7 +64,9 @@ class SettingsView extends WatchUi.View {
         var ask = service.getAskServeAtSetStart() ? "Ask Serve: On" : "Ask Serve: Off";
         var length = "Length: " + matchSetFormatLabel(service.getMatchSetFormat());
         var warm = service.getWarmUpEnabled() ? "Warm-up: On" : "Warm-up: Off";
-        var mins = "Minutes: " + service.getWarmUpMinutes().toString();
+        var mins = service.getWarmUpMinutes() == 0
+            ? "Limit: None"
+            : "Limit: " + service.getWarmUpMinutes().toString() + " min";
         return [deuce, swap, labels, ask, length, warm, mins] as Array<String>;
     }
 

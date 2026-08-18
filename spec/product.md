@@ -274,11 +274,11 @@ Default settings:
 - Tie-break serve rotates every 2 points after the opening point; change sides every 6 points
 - Golden point at deuce
 - Standard scoring
-- Warm-up before the first serve (on, 5 minutes)
+- Warm-up before the first serve (on, no time limit)
 
 Starting a match should remain fast and require no nested configuration.
 
-When warm-up is on, starting a match starts the workout (if tracking as a workout) and shows a countdown. The player can skip it at any time. When the timer ends or is skipped, the watch asks who is serving. Warm-up happens only before the match, never between sets. Warm-up time is included in the Health workout and in match elapsed time.
+When warm-up is on, starting a match starts the workout (if tracking as a workout) and shows a timer. The player taps Play when ready. An optional time limit can auto-advance. Warm-up happens only before the match, never between sets. Warm-up time is included in the Health workout and in match elapsed time.
 
 When warm-up is off, the watch asks who is serving immediately after Start Match.
 

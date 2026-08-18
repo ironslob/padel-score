@@ -14,26 +14,26 @@ struct WarmUpView: View {
                 paused: isLuminanceReduced
             )
         ) { context in
-            let remaining = match.warmUpRemaining(at: context.date)
+            let elapsed = match.warmUpElapsed(at: context.date)
             VStack(spacing: 12) {
                 Text("Warm up")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
 
-                Text(DurationFormatter.countdown(remaining))
+                Text(DurationFormatter.countdown(elapsed))
                     .font(.title.weight(.semibold).monospacedDigit())
                     .minimumScaleFactor(0.7)
                     .lineLimit(1)
                     .frame(maxWidth: .infinity)
-                    .accessibilityLabel("Warm up remaining \(DurationFormatter.countdown(remaining))")
+                    .accessibilityLabel("Warm up \(DurationFormatter.countdown(elapsed))")
 
-                Button("Skip") {
+                Button("Play") {
                     finishWarmUp()
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.green)
                 .frame(maxWidth: .infinity)
-                .accessibilityLabel("Skip warm up")
+                .accessibilityLabel("Play")
                 .accessibilityHint("Go to who is serving")
             }
             .padding()
@@ -49,15 +49,14 @@ struct WarmUpView: View {
     }
 
     private func finishIfExpired() {
-        if match.warmUpRemaining() <= 0 {
+        if match.isWarmUpExpired() {
             finishWarmUp()
         }
     }
 
     private func scheduleCompletion() {
         completionTask?.cancel()
-        let remaining = match.warmUpRemaining()
-        guard remaining > 0 else { return }
+        guard let remaining = match.warmUpRemaining(), remaining > 0 else { return }
         completionTask = Task { @MainActor in
             try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
             if Task.isCancelled { return }

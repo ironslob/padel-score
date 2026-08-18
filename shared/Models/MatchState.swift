@@ -283,10 +283,20 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         status == .inProgress && needsServerSelection && isAtSetStart && completedSets.isEmpty && !hasScoredPoints
     }
 
-    public func warmUpRemaining(at date: Date = Date()) -> TimeInterval {
-        guard needsWarmUp else { return 0 }
+    public func warmUpElapsed(at date: Date = Date()) -> TimeInterval {
+        max(0, date.timeIntervalSince(startedAt))
+    }
+
+    /// Remaining time when a limit is set. `nil` means the timer has no limit.
+    public func warmUpRemaining(at date: Date = Date()) -> TimeInterval? {
+        guard needsWarmUp, settings.hasWarmUpLimit else { return nil }
         let end = startedAt.addingTimeInterval(settings.warmUpDuration)
         return max(0, end.timeIntervalSince(date))
+    }
+
+    public func isWarmUpExpired(at date: Date = Date()) -> Bool {
+        guard let remaining = warmUpRemaining(at: date) else { return false }
+        return remaining <= 0
     }
 
     public var lastScoringActivityAt: Date {

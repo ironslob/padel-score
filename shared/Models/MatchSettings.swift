@@ -80,13 +80,18 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     /// Auto-end or discard an in-progress match after this much time without a new point.
     public static let inactivityTimeoutSeconds: TimeInterval = 30 * 60
 
-    public static let minWarmUpMinutes = 1
+    public static let minWarmUpMinutes = 0
     public static let maxWarmUpMinutes = 30
-    public static let defaultWarmUpMinutes = 5
-    public static let warmUpMinutePresets = [3, 5, 10]
+    public static let defaultWarmUpMinutes = 0
+    public static let warmUpMinutePresets = [0, 3, 5, 10]
 
     public static func clampedWarmUpMinutes(_ value: Int) -> Int {
         min(maxWarmUpMinutes, max(minWarmUpMinutes, value))
+    }
+
+    public static func warmUpMinutesLabel(_ minutes: Int) -> String {
+        let clamped = clampedWarmUpMinutes(minutes)
+        return clamped == 0 ? "No limit" : "\(clamped) min"
     }
 
     public var setsToWin: Int
@@ -103,9 +108,9 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     public var fixedServerPositions: Bool
     /// When true, score buttons show "Us" / "Them" instead of "Serving" / "Receiving".
     public var usThemLabels: Bool
-    /// When true, a countdown runs once after Start Match, before "Who's serving?".
+    /// When true, a timer runs once after Start Match, before "Who's serving?".
     public var warmUpEnabled: Bool
-    /// Length of the pre-match warm-up, in minutes. Clamped to 1...30.
+    /// Optional warm-up time limit in minutes. `0` means no limit — the timer runs until Play.
     public var warmUpMinutes: Int
 
     public init(
@@ -144,7 +149,11 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     }
 
     public var shouldWarmUp: Bool {
-        warmUpEnabled && warmUpMinutes > 0
+        warmUpEnabled
+    }
+
+    public var hasWarmUpLimit: Bool {
+        warmUpMinutes > 0
     }
 
     public var warmUpDuration: TimeInterval {

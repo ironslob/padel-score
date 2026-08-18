@@ -200,7 +200,7 @@ public enum SettingsCopy {
         "Score only keeps scoring without a Health workout — use it when another app is already tracking. Track as workout lets Padel Score own the session so it can return when you raise your wrist."
 
     public static let warmUp =
-        "A countdown before you pick who serves. It runs only at match start, not between sets, and is included in the Health workout when tracking is on. Skip it when you are ready to play."
+        "A timer before you pick who serves. It runs only at match start, not between sets, and is included in the Health workout when tracking is on. Play when you are ready. Leave the limit off, or set one to auto-advance."
 }
 
 public enum FirstLaunchTipCopy {

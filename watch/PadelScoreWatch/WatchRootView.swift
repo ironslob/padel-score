@@ -709,7 +709,7 @@ struct WarmUpSettings: View {
             if sessionCoordinator.warmUpEnabled {
                 HStack(spacing: 6) {
                     ForEach(MatchSettings.warmUpMinutePresets, id: \.self) { minutes in
-                        Button("\(minutes) min") {
+                        Button(MatchSettings.warmUpMinutesLabel(minutes)) {
                             sessionCoordinator.setWarmUpMinutes(minutes)
                         }
                         .buttonStyle(.bordered)
@@ -720,14 +720,14 @@ struct WarmUpSettings: View {
                 .accessibilityElement(children: .contain)
 
                 Picker(
-                    "Minutes",
+                    "Time limit",
                     selection: Binding(
                         get: { sessionCoordinator.warmUpMinutes },
                         set: { sessionCoordinator.setWarmUpMinutes($0) }
                     )
                 ) {
                     ForEach(MatchSettings.minWarmUpMinutes...MatchSettings.maxWarmUpMinutes, id: \.self) { minutes in
-                        Text("\(minutes) min").tag(minutes)
+                        Text(MatchSettings.warmUpMinutesLabel(minutes)).tag(minutes)
                     }
                 }
             }

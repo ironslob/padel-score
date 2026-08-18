@@ -207,9 +207,9 @@ class MatchSettings {
 
     static const QUICK_UNDO_TIMEOUT_MS = 3000;
     static const INACTIVITY_TIMEOUT_S = 30 * 60;
-    static const WARM_UP_MINUTES_MIN = 1;
+    static const WARM_UP_MINUTES_MIN = 0;
     static const WARM_UP_MINUTES_MAX = 30;
-    static const WARM_UP_MINUTES_DEFAULT = 5;
+    static const WARM_UP_MINUTES_DEFAULT = 0;
 
     function initialize() {
         setsToWin = 2;
@@ -240,7 +240,7 @@ class MatchSettings {
     }
 
     function shouldWarmUp() as Boolean {
-        return warmUpEnabled && warmUpMinutes > 0;
+        return warmUpEnabled;
     }
 }
 
@@ -471,6 +471,18 @@ class MatchState {
         }
         var remaining = (startedAt + settings.warmUpMinutes * 60) - now;
         return remaining > 0 ? remaining : 0;
+    }
+
+    function warmUpElapsed(now as Number) as Number {
+        var elapsed = now - startedAt;
+        return elapsed > 0 ? elapsed : 0;
+    }
+
+    function isWarmUpExpired(now as Number) as Boolean {
+        if (!needsWarmUp || settings.warmUpMinutes <= 0) {
+            return false;
+        }
+        return warmUpRemaining(now) <= 0;
     }
 
     function lastScoringActivityAt() as Number {

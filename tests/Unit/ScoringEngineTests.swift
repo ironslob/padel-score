@@ -569,8 +569,9 @@ final class ScoringEngineTests: XCTestCase {
         let s = startUnselected()
         XCTAssertTrue(s.needsWarmUp)
         XCTAssertTrue(s.settings.warmUpEnabled)
-        XCTAssertEqual(s.settings.warmUpMinutes, 5)
+        XCTAssertEqual(s.settings.warmUpMinutes, 0)
         XCTAssertTrue(s.isWaitingForFirstServe)
+        XCTAssertNil(s.warmUpRemaining())
     }
 
     func testWarmUpCanBeDisabledAtMatchStart() {
@@ -604,7 +605,16 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.warmUpRemaining(at: start.addingTimeInterval(60)), 240)
         XCTAssertEqual(s.warmUpRemaining(at: start.addingTimeInterval(400)), 0)
         let done = try? engine.apply(.completeWarmUp, to: s)
-        XCTAssertEqual(done?.warmUpRemaining(at: start), 0)
+        XCTAssertEqual(done?.warmUpRemaining(at: start), nil)
+    }
+
+    func testUnlimitedWarmUpCountsElapsedAndNeverExpires() {
+        let start = Date(timeIntervalSince1970: 1_000)
+        let s = engine.startMatch(at: start)
+        XCTAssertEqual(s.settings.warmUpMinutes, 0)
+        XCTAssertNil(s.warmUpRemaining(at: start.addingTimeInterval(400)))
+        XCTAssertFalse(s.isWarmUpExpired(at: start.addingTimeInterval(400)))
+        XCTAssertEqual(s.warmUpElapsed(at: start.addingTimeInterval(90)), 90)
     }
 
     func testWarmUpIsNotReArmedAtSetStart() throws {

@@ -66,11 +66,11 @@ Documented decisions that were not fully prescribed by `/spec`.
 
 **Choice:** Garmin’s Monkey C engine mirrors Apple for serve rotation at set and tie-break boundaries, New Serve at changeover, mid-match deuce format changes, match-length / ask-serve / Us-Them settings, pre-match warm-up, destructive-action confirmation, and the game/set interstitial.
 
-**Still Garmin-only gaps:** HealthKit / workout recording, phone companion sync, complications, and Live Activities — blocked by Connect IQ APIs. See `garmin/README.md`. Warm-up on Garmin is the same countdown and skip as Apple; it is not recorded as a FIT activity.
+**Still Garmin-only gaps:** HealthKit / workout recording, phone companion sync, complications, and Live Activities — blocked by Connect IQ APIs. See `garmin/README.md`. Warm-up on Garmin is the same elapsed timer and Play action as Apple; it is not recorded as a FIT activity.
 
 ## Pre-match warm-up
 
-**Choice:** Warm-up is a `needsWarmUp` flag on match state, not a new event kind. Completing or skipping it records nothing; remaining time is `startedAt + warmUpMinutes`. Replay restores the flag the same way it restores a New Serve prompt. It is armed only at match start, never at set boundaries.
+**Choice:** Warm-up is a `needsWarmUp` flag on match state, not a new event kind. Completing it records nothing; elapsed time is `now - startedAt`. An optional minute limit can auto-advance; the default is no limit. Replay restores the flag the same way it restores a New Serve prompt. It is armed only at match start, never at set boundaries.
 
 The HealthKit workout still starts once in `startMatch` and ends once when the match completes, ends early, or is discarded. Warm-up, scoring, and set changeovers share that single session. Pause/resume is only the system workout control, not an automatic split between games or sets.
 

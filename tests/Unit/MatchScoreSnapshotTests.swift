@@ -371,13 +371,13 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
         XCTAssertEqual(store.matchSetFormat, .bestOfFive)
     }
 
-    func testWarmUpDefaultsOnAtFiveMinutesAndPersists() {
+    func testWarmUpDefaultsOnWithNoLimitAndPersists() {
         let suiteName = "ServeSelectionPreferenceStoreTests.warmUp.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         let store = UserDefaultsServeSelectionPreferenceStore(defaults: defaults)
 
         XCTAssertTrue(store.warmUpEnabled)
-        XCTAssertEqual(store.warmUpMinutes, 5)
+        XCTAssertEqual(store.warmUpMinutes, 0)
         store.setWarmUpEnabled(false)
         store.setWarmUpMinutes(12)
         XCTAssertFalse(store.warmUpEnabled)
@@ -385,13 +385,16 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
         store.setWarmUpMinutes(99)
         XCTAssertEqual(store.warmUpMinutes, 30)
         store.setWarmUpMinutes(0)
-        XCTAssertEqual(store.warmUpMinutes, 1)
+        XCTAssertEqual(store.warmUpMinutes, 0)
+        store.setWarmUpMinutes(-4)
+        XCTAssertEqual(store.warmUpMinutes, 0)
     }
 
-    func testDefaultSettingsEnableFiveMinuteWarmUp() {
+    func testDefaultSettingsEnableUnlimitedWarmUp() {
         XCTAssertTrue(MatchSettings.default.warmUpEnabled)
-        XCTAssertEqual(MatchSettings.default.warmUpMinutes, 5)
+        XCTAssertEqual(MatchSettings.default.warmUpMinutes, 0)
         XCTAssertTrue(MatchSettings.default.shouldWarmUp)
+        XCTAssertFalse(MatchSettings.default.hasWarmUpLimit)
     }
 
     func testLegacySettingsDecodeWithoutWarmUpKeys() throws {
@@ -400,7 +403,7 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
         """
         let settings = try JSONDecoder().decode(MatchSettings.self, from: Data(legacy.utf8))
         XCTAssertFalse(settings.warmUpEnabled)
-        XCTAssertEqual(settings.warmUpMinutes, 5)
+        XCTAssertEqual(settings.warmUpMinutes, 0)
     }
 
     func testWarmUpSettingsRoundTripThroughCoding() throws {
