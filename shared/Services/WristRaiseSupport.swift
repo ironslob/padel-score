@@ -9,11 +9,11 @@ public enum WorkoutSessionError: Error, Equatable {
     public var userMessage: String {
         switch self {
         case .healthDataUnavailable:
-            return "Health data is not available on this device."
+            return WorkoutConflictCopy.healthUnavailableMessage
         case .authorizationDenied:
-            return "Health permission is required to track workouts."
+            return WorkoutConflictCopy.authorizationDeniedMessage
         case .anotherWorkoutSessionActive:
-            return "Another workout is already running. Use Score only, or end the other workout first."
+            return WorkoutConflictCopy.message
         case .notRunning:
             return "No workout session is active."
         }
@@ -23,11 +23,6 @@ public enum WorkoutSessionError: Error, Equatable {
 public protocol WristRaiseTipStoring {
     var shouldShowTip: Bool { get }
     func markTipSeen()
-}
-
-public protocol WorkoutModePreferenceStoring {
-    var preferredWorkoutTrackingModeRawValue: String? { get }
-    func setPreferredWorkoutTrackingModeRawValue(_ rawValue: String)
 }
 
 public protocol ServeSelectionPreferenceStoring {
@@ -61,23 +56,6 @@ public struct UserDefaultsWristRaiseTipStore: WristRaiseTipStoring {
 
     public func markTipSeen() {
         defaults.set(true, forKey: key)
-    }
-}
-
-public struct UserDefaultsWorkoutModePreferenceStore: WorkoutModePreferenceStoring {
-    private let key = "preferredWorkoutTrackingMode"
-    private let defaults: UserDefaults
-
-    public init(defaults: UserDefaults = .standard) {
-        self.defaults = defaults
-    }
-
-    public var preferredWorkoutTrackingModeRawValue: String? {
-        defaults.string(forKey: key)
-    }
-
-    public func setPreferredWorkoutTrackingModeRawValue(_ rawValue: String) {
-        defaults.set(rawValue, forKey: key)
     }
 }
 
@@ -196,11 +174,11 @@ public enum SettingsCopy {
     public static let matchSetFormat =
         "How many sets decide the match. Continuous keeps scoring until you finish."
 
-    public static let workoutTrackingMode =
-        "Score only keeps scoring without a Health workout — use it when another app is already tracking. Track as workout lets Padel Score own the session so it can return when you raise your wrist."
-
     public static let warmUp =
-        "A timer before you pick who serves. It runs only at match start, not between sets, and is included in the Health workout when tracking is on. Play when you are ready. Leave the limit off, or set one to auto-advance."
+        "A timer before you pick who serves. Only at match start. Tap Play when ready."
+
+    public static let warmUpLimit =
+        "No limit runs until Play. 3, 5, or 10 minutes auto-advances."
 }
 
 public enum FirstLaunchTipCopy {
@@ -218,13 +196,28 @@ public enum FirstLaunchTipCopy {
     ]
 }
 
+public enum WorkoutConflictCopy {
+    public static let title = "Can't track as a workout"
+
+    public static let continueWithoutWorkout = "Track without workout"
+
+    public static let cancelMatchStart = "Cancel match start"
+
+    public static let message =
+        "Another app is already tracking, and Apple Watch only allows one workout at a time. " +
+        "Without a workout, Padel Score usually won't return when you raise your wrist."
+
+    public static let genericFailureMessage =
+        "Could not start a Health workout. Scoring continues, but the app usually won't return when you raise your wrist."
+
+    public static let healthUnavailableMessage =
+        "Health data is not available on this device. Scoring continues, but the app usually won't return when you raise your wrist."
+
+    public static let authorizationDeniedMessage =
+        "Health permission is required to track a workout. Scoring continues, but the app usually won't return when you raise your wrist."
+}
+
 public enum DuringPlayAccessCopy {
-    public static let scoreOnlyConsequence =
-        "Scores the match without starting a Health workout."
-
-    public static let trackAsWorkoutConsequence =
-        "Padel Score owns the workout and usually returns on wrist raise. Only one workout can run at a time."
-
     public static let helpTitle = "During play"
 
     public static let helpSections: [(title: String, body: String)] = [

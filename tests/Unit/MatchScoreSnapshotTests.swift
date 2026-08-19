@@ -161,7 +161,7 @@ final class WristRaiseTipStoreTests: XCTestCase {
 final class WorkoutSessionErrorTests: XCTestCase {
     func testAnotherWorkoutMessage() {
         XCTAssertTrue(
-            WorkoutSessionError.anotherWorkoutSessionActive.userMessage.contains("Another workout")
+            WorkoutSessionError.anotherWorkoutSessionActive.userMessage.contains("raise your wrist")
         )
     }
 }
@@ -174,7 +174,7 @@ final class SettingsCopyTests: XCTestCase {
         XCTAssertFalse(SettingsCopy.askServeAtSetStart.isEmpty)
         XCTAssertFalse(SettingsCopy.matchSetFormat.isEmpty)
         XCTAssertFalse(SettingsCopy.warmUp.isEmpty)
-        XCTAssertFalse(SettingsCopy.workoutTrackingMode.isEmpty)
+        XCTAssertFalse(SettingsCopy.warmUpLimit.isEmpty)
     }
 }
 
@@ -209,22 +209,13 @@ final class DuringPlayAccessCopyTests: XCTestCase {
             DuringPlayAccessCopy.helpSections.contains { $0.body.contains("Match Glance") }
         )
     }
-
-    func testModeConsequencesMentionExpectedBehavior() {
-        XCTAssertTrue(DuringPlayAccessCopy.scoreOnlyConsequence.contains("Health workout"))
-        XCTAssertTrue(DuringPlayAccessCopy.trackAsWorkoutConsequence.contains("one workout"))
-    }
 }
 
-final class WorkoutModePreferenceStoreTests: XCTestCase {
-    func testPreferredModePersists() {
-        let suiteName = "WorkoutModePreferenceStoreTests.\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: suiteName)!
-        let store = UserDefaultsWorkoutModePreferenceStore(defaults: defaults)
-
-        XCTAssertNil(store.preferredWorkoutTrackingModeRawValue)
-        store.setPreferredWorkoutTrackingModeRawValue("trackAsWorkout")
-        XCTAssertEqual(store.preferredWorkoutTrackingModeRawValue, "trackAsWorkout")
+final class WorkoutConflictCopyTests: XCTestCase {
+    func testConflictPromptExplainsWristRaiseCost() {
+        XCTAssertEqual(WorkoutConflictCopy.continueWithoutWorkout, "Track without workout")
+        XCTAssertTrue(WorkoutConflictCopy.message.contains("raise your wrist"))
+        XCTAssertTrue(WorkoutConflictCopy.genericFailureMessage.contains("raise your wrist"))
     }
 }
 
@@ -388,6 +379,15 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
         XCTAssertEqual(store.warmUpMinutes, 0)
         store.setWarmUpMinutes(-4)
         XCTAssertEqual(store.warmUpMinutes, 0)
+    }
+
+    func testNextWarmUpMinutesCyclesPresets() {
+        XCTAssertEqual(MatchSettings.nextWarmUpMinutes(after: 0), 3)
+        XCTAssertEqual(MatchSettings.nextWarmUpMinutes(after: 3), 5)
+        XCTAssertEqual(MatchSettings.nextWarmUpMinutes(after: 5), 10)
+        XCTAssertEqual(MatchSettings.nextWarmUpMinutes(after: 10), 0)
+        XCTAssertEqual(MatchSettings.nextWarmUpMinutes(after: 4), 5)
+        XCTAssertEqual(MatchSettings.nextWarmUpMinutes(after: 12), 0)
     }
 
     func testDefaultSettingsEnableUnlimitedWarmUp() {

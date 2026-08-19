@@ -58,16 +58,15 @@ struct WatchRootView: View {
         } message: {
             Text(sessionCoordinator.workoutErrorMessage ?? "")
         }
-        .alert("Another workout is already active", isPresented: $sessionCoordinator.showWorkoutConflictPrompt) {
-            Button("Use Score only") {
-                sessionCoordinator.resolveWorkoutConflict(.switchToScoreOnly)
+        .alert(WorkoutConflictCopy.title, isPresented: $sessionCoordinator.showWorkoutConflictPrompt) {
+            Button(WorkoutConflictCopy.continueWithoutWorkout) {
+                sessionCoordinator.resolveWorkoutConflict(.continueWithoutWorkout)
             }
-            Button("Cancel match start", role: .destructive) {
+            Button(WorkoutConflictCopy.cancelMatchStart, role: .destructive) {
                 sessionCoordinator.resolveWorkoutConflict(.cancelMatchStart)
             }
-            Button("Dismiss", role: .cancel) {}
         } message: {
-            Text("Apple Watch supports one active workout at a time. Keep this match as Score only, or cancel and end the other workout first.")
+            Text(WorkoutConflictCopy.message)
         }
         .sheet(isPresented: $sessionCoordinator.showFirstLaunchTip, onDismiss: {
             sessionCoordinator.dismissFirstLaunchTip()
@@ -380,8 +379,6 @@ struct StartMatchView: View {
                 .disabled(isStarting)
                 .accessibilityLabel("Start Match")
 
-                WorkoutTrackingModePicker()
-
                 HStack(spacing: 8) {
                     Button("Settings") {
                         showSettings = true
@@ -651,9 +648,6 @@ struct MatchPreferenceToggles: View {
     var showsHelperText = false
 
     var body: some View {
-        if match == nil {
-            WorkoutTrackingModePicker(showsHelperText: showsHelperText)
-        }
         MatchSetFormatPicker(match: match, showsHelperText: showsHelperText)
         DeuceFormatPicker(match: match, showsHelperText: showsHelperText)
         PreferenceToggleRow(
@@ -695,68 +689,45 @@ struct WarmUpSettings: View {
     @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
     var showsHelperText = false
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            PreferenceToggleRow(
-                title: "Warm up before match",
-                helper: SettingsCopy.warmUp,
-                showsHelper: showsHelperText,
-                isOn: Binding(
-                    get: { sessionCoordinator.warmUpEnabled },
-                    set: { sessionCoordinator.setWarmUpEnabled($0) }
-                )
-            )
-            if sessionCoordinator.warmUpEnabled {
-                HStack(spacing: 6) {
-                    ForEach(MatchSettings.warmUpMinutePresets, id: \.self) { minutes in
-                        Button(MatchSettings.warmUpMinutesLabel(minutes)) {
-                            sessionCoordinator.setWarmUpMinutes(minutes)
-                        }
-                        .buttonStyle(.bordered)
-                        .tint(sessionCoordinator.warmUpMinutes == minutes ? .green : .gray)
-                        .font(.caption)
-                    }
-                }
-                .accessibilityElement(children: .contain)
+    private var limitOptions: [Int] {
+        var options = MatchSettings.warmUpMinutePresets
+        let current = sessionCoordinator.warmUpMinutes
+        if !options.contains(current) {
+            options.append(current)
+            options.sort()
+        }
+        return options
+    }
 
+    var body: some View {
+        PreferenceToggleRow(
+            title: "Warm up before match",
+            helper: SettingsCopy.warmUp,
+            showsHelper: showsHelperText,
+            isOn: Binding(
+                get: { sessionCoordinator.warmUpEnabled },
+                set: { sessionCoordinator.setWarmUpEnabled($0) }
+            )
+        )
+        if sessionCoordinator.warmUpEnabled {
+            VStack(alignment: .leading, spacing: 4) {
                 Picker(
-                    "Time limit",
+                    "Warm-up limit",
                     selection: Binding(
                         get: { sessionCoordinator.warmUpMinutes },
                         set: { sessionCoordinator.setWarmUpMinutes($0) }
                     )
                 ) {
-                    ForEach(MatchSettings.minWarmUpMinutes...MatchSettings.maxWarmUpMinutes, id: \.self) { minutes in
+                    ForEach(limitOptions, id: \.self) { minutes in
                         Text(MatchSettings.warmUpMinutesLabel(minutes)).tag(minutes)
                     }
                 }
-            }
-        }
-    }
-}
-
-struct WorkoutTrackingModePicker: View {
-    @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
-    var showsHelperText = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Picker(
-                "Workout",
-                selection: Binding(
-                    get: { sessionCoordinator.workoutTrackingMode },
-                    set: { sessionCoordinator.setWorkoutTrackingMode($0) }
-                )
-            ) {
-                ForEach(MatchSessionCoordinator.WorkoutTrackingMode.allCases) { mode in
-                    Text(mode.label).tag(mode)
+                if showsHelperText {
+                    Text(SettingsCopy.warmUpLimit)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-            }
-            if showsHelperText {
-                Text(SettingsCopy.workoutTrackingMode)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }

@@ -347,9 +347,21 @@ class MatchService {
     }
 
     function cycleWarmUpMinutes() as Number {
-        var next = getWarmUpMinutes() + 1;
-        if (next > MatchSettings.WARM_UP_MINUTES_MAX) {
-            next = MatchSettings.WARM_UP_MINUTES_MIN;
+        var current = getWarmUpMinutes();
+        var presets = [0, 3, 5, 10] as Array<Number>;
+        var next = presets[0];
+        var found = false;
+        for (var i = 0; i < presets.size(); i += 1) {
+            if (presets[i] == current) {
+                next = presets[(i + 1) % presets.size()];
+                found = true;
+                break;
+            }
+            if (!found && presets[i] > current) {
+                next = presets[i];
+                found = true;
+                break;
+            }
         }
         setWarmUpMinutes(next);
         return next;

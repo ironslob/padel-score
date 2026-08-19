@@ -254,16 +254,13 @@ Discarded
 
 # 9. Starting a Match
 
-If no active match exists the watch should display a primary start action and a workout mode choice.
+If no active match exists the watch should display a primary start action.
 
 ```
 Start Match
 ```
 
-Users choose one of two workout ownership modes:
-
-- Score only (best when another workout app such as Bevel is already running)
-- Track as workout (Padel Score owns the workout session)
+Starting a match always tries to start a Health workout so Padel Score can return when the player raises their wrist. If another app already owns the workout session, the watch prompts to continue without a workout (wrist raise usually will not reclaim the app) or cancel so the other workout can be ended first.
 
 Default settings:
 
@@ -278,7 +275,7 @@ Default settings:
 
 Starting a match should remain fast and require no nested configuration.
 
-When warm-up is on, starting a match starts the workout (if tracking as a workout) and shows a timer. The player taps Play when ready. An optional time limit can auto-advance. Warm-up happens only before the match, never between sets. Warm-up time is included in the Health workout and in match elapsed time.
+When warm-up is on, starting a match starts the Health workout when possible and shows a timer. The player taps Play when ready. An optional time limit can auto-advance. Warm-up happens only before the match, never between sets. Warm-up time is included in the Health workout and in match elapsed time.
 
 When warm-up is off, the watch asks who is serving immediately after Start Match.
 

@@ -94,6 +94,13 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         return clamped == 0 ? "No limit" : "\(clamped) min"
     }
 
+    public static func nextWarmUpMinutes(after current: Int) -> Int {
+        if let index = warmUpMinutePresets.firstIndex(of: current) {
+            return warmUpMinutePresets[(index + 1) % warmUpMinutePresets.count]
+        }
+        return warmUpMinutePresets.first { $0 > current } ?? warmUpMinutePresets[0]
+    }
+
     public var setsToWin: Int
     /// When true, the match keeps going after each set until manually finished.
     public var continuousPlay: Bool

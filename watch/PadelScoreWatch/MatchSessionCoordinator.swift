@@ -9,32 +9,10 @@ import WidgetKit
 @MainActor
 public final class MatchSessionCoordinator: ObservableObject {
     public enum WorkoutConflictResolution {
-        case switchToScoreOnly
+        case continueWithoutWorkout
         case cancelMatchStart
     }
 
-    public enum WorkoutTrackingMode: String, CaseIterable, Identifiable {
-        case scoreOnly
-        case trackAsWorkout
-
-        public var id: String { rawValue }
-
-        public var label: String {
-            switch self {
-            case .scoreOnly: return "Score only"
-            case .trackAsWorkout: return "Track as workout"
-            }
-        }
-
-        public var consequenceCopy: String {
-            switch self {
-            case .scoreOnly: return DuringPlayAccessCopy.scoreOnlyConsequence
-            case .trackAsWorkout: return DuringPlayAccessCopy.trackAsWorkoutConsequence
-            }
-        }
-    }
-
-    @Published public private(set) var workoutTrackingMode: WorkoutTrackingMode = .trackAsWorkout
     @Published public private(set) var alwaysAskServeAtSetStart = false
     @Published public private(set) var fixedServerPositions = true
     @Published public private(set) var usThemLabels = true
@@ -51,7 +29,6 @@ public final class MatchSessionCoordinator: ObservableObject {
     private let service: MatchService
     private let workoutManager: WorkoutSessionManaging
     private let tipStore: WristRaiseTipStoring
-    private let modeStore: WorkoutModePreferenceStoring
     private let serveStore: ServeSelectionPreferenceStoring
     private let logger = Logger(subsystem: "com.padelscore", category: "MatchSession")
     private var cancellables = Set<AnyCancellable>()
@@ -62,13 +39,11 @@ public final class MatchSessionCoordinator: ObservableObject {
         healthStore: HKHealthStore? = HKHealthStore.isHealthDataAvailable() ? HKHealthStore() : nil,
         workoutManager: WorkoutSessionManaging? = nil,
         tipStore: WristRaiseTipStoring = UserDefaultsWristRaiseTipStore(),
-        modeStore: WorkoutModePreferenceStoring = UserDefaultsWorkoutModePreferenceStore(),
         serveStore: ServeSelectionPreferenceStoring = UserDefaultsServeSelectionPreferenceStore()
     ) {
         self.service = service
         self.workoutManager = workoutManager ?? HealthKitWorkoutSessionManager(healthStore: healthStore)
         self.tipStore = tipStore
-        self.modeStore = modeStore
         self.serveStore = serveStore
         self.alwaysAskServeAtSetStart = serveStore.alwaysAskServeAtSetStart
         self.fixedServerPositions = serveStore.fixedServerPositions
@@ -77,21 +52,12 @@ public final class MatchSessionCoordinator: ObservableObject {
         self.matchSetFormat = serveStore.matchSetFormat
         self.warmUpEnabled = serveStore.warmUpEnabled
         self.warmUpMinutes = serveStore.warmUpMinutes
-        if let raw = modeStore.preferredWorkoutTrackingModeRawValue,
-           let mode = WorkoutTrackingMode(rawValue: raw) {
-            self.workoutTrackingMode = mode
-        }
         self.workoutManager.pauseStateHandler = { [weak self] isPaused in
             self?.isWorkoutPaused = isPaused
         }
         bindService()
         publishSnapshot(for: service.activeMatch)
         rescheduleInactivityTimer(for: service.activeMatch)
-    }
-
-    public func setWorkoutTrackingMode(_ mode: WorkoutTrackingMode) {
-        workoutTrackingMode = mode
-        modeStore.setPreferredWorkoutTrackingModeRawValue(mode.rawValue)
     }
 
     public func setAlwaysAskServeAtSetStart(_ value: Bool) {
@@ -157,10 +123,7 @@ public final class MatchSessionCoordinator: ObservableObject {
         settings.warmUpMinutes = warmUpMinutes
         service.startMatch(settings: settings)
         publishSnapshot(for: service.activeMatch)
-
-        if workoutTrackingMode == .trackAsWorkout {
-            await startWorkoutSession()
-        }
+        await startWorkoutSession()
     }
 
     public func presentFirstLaunchTipIfNeeded() {
@@ -193,9 +156,8 @@ public final class MatchSessionCoordinator: ObservableObject {
     public func resolveWorkoutConflict(_ resolution: WorkoutConflictResolution) {
         showWorkoutConflictPrompt = false
         switch resolution {
-        case .switchToScoreOnly:
-            setWorkoutTrackingMode(.scoreOnly)
-            workoutErrorMessage = "Switched to Score only mode. Match tracking continues."
+        case .continueWithoutWorkout:
+            workoutErrorMessage = nil
         case .cancelMatchStart:
             service.discardMatch()
             workoutErrorMessage = nil
@@ -272,13 +234,11 @@ public final class MatchSessionCoordinator: ObservableObject {
                 workoutErrorMessage = nil
             } else {
                 workoutErrorMessage = error.userMessage
-                setWorkoutTrackingMode(.scoreOnly)
             }
             logger.error("Workout start failed: \(error.userMessage)")
         } catch {
             isWorkoutSessionActive = false
-            setWorkoutTrackingMode(.scoreOnly)
-            workoutErrorMessage = "Could not start workout tracking. Score only mode is active."
+            workoutErrorMessage = WorkoutConflictCopy.genericFailureMessage
             logger.error("Workout start failed: \(error.localizedDescription)")
         }
     }
