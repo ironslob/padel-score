@@ -321,30 +321,51 @@ private struct GameInterstitialView: View {
 struct SelectServerView: View {
     @EnvironmentObject private var service: MatchService
 
+    /// Only the opening prompt sits on top of Start Match. Between sets the player
+    /// still has to pick a server, otherwise scoring would be blocked.
+    private var canReturnToStart: Bool {
+        service.activeMatch?.isWaitingForFirstServe == true
+    }
+
     var body: some View {
-        VStack(spacing: 10) {
-            Text("Who's serving?")
-                .font(.headline)
-                .multilineTextAlignment(.center)
+        ScrollView {
+            VStack(spacing: 10) {
+                Text("Who's serving?")
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
 
-            Button("We are") {
-                service.selectServer(.left)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.green)
-            .frame(maxWidth: .infinity)
-            .accessibilityLabel("We are serving")
-            .accessibilityHint("Us starts the match on serve")
+                HStack(spacing: 8) {
+                    Button("Us") {
+                        service.selectServer(.left)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+                    .frame(maxWidth: .infinity, minHeight: 52)
+                    .accessibilityLabel("We are serving")
+                    .accessibilityHint("Us starts the match on serve")
 
-            Button("They are") {
-                service.selectServer(.right)
+                    Button("Them") {
+                        service.selectServer(.right)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)
+                    .frame(maxWidth: .infinity, minHeight: 52)
+                    .accessibilityLabel("They are serving")
+                    .accessibilityHint("Them starts the match on serve")
+                }
+
+                if canReturnToStart {
+                    Button("Back") {
+                        service.discardMatch()
+                    }
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityLabel("Back")
+                    .accessibilityHint("Return to the start screen without starting the match")
+                }
             }
-            .buttonStyle(.bordered)
-            .frame(maxWidth: .infinity)
-            .accessibilityLabel("They are serving")
-            .accessibilityHint("Them starts the match on serve")
+            .padding()
         }
-        .padding()
     }
 }
 

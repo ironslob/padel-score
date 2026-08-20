@@ -35,6 +35,14 @@ struct WarmUpView: View {
                 .frame(maxWidth: .infinity)
                 .accessibilityLabel("Play")
                 .accessibilityHint("Go to who is serving")
+
+                Button("Back") {
+                    cancelWarmUp()
+                }
+                .buttonStyle(.bordered)
+                .frame(maxWidth: .infinity)
+                .accessibilityLabel("Back")
+                .accessibilityHint("Return to the start screen without starting the match")
             }
             .padding()
         }
@@ -68,5 +76,11 @@ struct WarmUpView: View {
         completionTask?.cancel()
         completionTask = nil
         service.completeWarmUp()
+    }
+
+    private func cancelWarmUp() {
+        completionTask?.cancel()
+        completionTask = nil
+        service.discardMatch()
     }
 }

@@ -50,6 +50,17 @@ final class MatchServiceTests: XCTestCase {
         XCTAssertNil(store.active)
     }
 
+    func testDiscardBeforeServerSelectionClearsActiveMatch() {
+        let store = InMemoryMatchStore()
+        let service = MatchService(store: store)
+        service.startMatch()
+        XCTAssertEqual(service.activeMatch?.isWaitingForFirstServe, true)
+        service.discardMatch()
+        XCTAssertNil(service.activeMatch)
+        XCTAssertTrue(service.archivedMatches.isEmpty)
+        XCTAssertNil(store.active)
+    }
+
     func testEndEarlyArchivesAndKeepsActiveUntilAck() {
         let store = InMemoryMatchStore()
         let service = MatchService(store: store)

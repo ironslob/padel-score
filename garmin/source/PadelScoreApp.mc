@@ -26,6 +26,12 @@ function getApp() as PadelScoreApp {
     return Application.getApp() as PadelScoreApp;
 }
 
+function returnToStart(service as MatchService) as Void {
+    service.discardMatch();
+    WatchUi.popView(WatchUi.SLIDE_RIGHT);
+    WatchUi.pushView(new StartView(service), new StartDelegate(service), WatchUi.SLIDE_RIGHT);
+}
+
 function buildRootNavigation(service as MatchService) as [Views] or [Views, InputDelegates] {
     var match = service.activeMatch;
     if (match == null) {

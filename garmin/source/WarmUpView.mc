@@ -36,6 +36,7 @@ class WarmUpView extends WatchUi.View {
         );
 
         UiHelpers.drawPrimaryButton(dc, "Play", width / 2 - 70, height / 2 + 24, 140, 44, Graphics.COLOR_GREEN);
+        UiHelpers.drawPrimaryButton(dc, "Back", width / 2 - 70, height / 2 + 76, 140, 36, Graphics.COLOR_DK_GRAY);
     }
 }
 
@@ -75,10 +76,15 @@ class WarmUpDelegate extends WatchUi.BehaviorDelegate {
             advance();
             return true;
         }
+        if (x >= width / 2 - 70 && x <= width / 2 + 70 && y >= height / 2 + 76 && y <= height / 2 + 112) {
+            goBack();
+            return true;
+        }
         return false;
     }
 
     function onBack() as Boolean {
+        goBack();
         return true;
     }
 
@@ -95,6 +101,15 @@ class WarmUpDelegate extends WatchUi.BehaviorDelegate {
             new SelectServerDelegate(service, true),
             WatchUi.SLIDE_LEFT
         );
+    }
+
+    private function goBack() as Void {
+        if (didAdvance) {
+            return;
+        }
+        didAdvance = true;
+        stopTimer();
+        returnToStart(service);
     }
 
     private function stopTimer() as Void {

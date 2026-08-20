@@ -279,6 +279,8 @@ When warm-up is on, starting a match starts the Health workout when possible and
 
 When warm-up is off, the watch asks who is serving immediately after Start Match.
 
+From warm-up or the opening “who is serving?” prompt, Back returns to the start screen and discards the match. Nothing has been scored yet, so there is no history to keep. Between sets the serve prompt has no Back — a server still has to be chosen.
+
 ---
 
 # 10. Active Match
