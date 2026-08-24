@@ -1,5 +1,10 @@
 // Shared drawing helpers for all views.
 
+import Toybox.Graphics;
+import Toybox.Lang;
+import Toybox.System;
+import Toybox.Time;
+
 module UiHelpers {
     const COLOR_LEFT = Graphics.COLOR_BLUE;
     const COLOR_RIGHT = Graphics.COLOR_RED;

@@ -46,12 +46,12 @@ enum MatchActionType {
 }
 
 // How a game is resolved once both sides reach 40.
+// DEUCE_ADVANTAGE: traditional advantage until two clear.
+// DEUCE_SILVER_POINT: one advantage, then decisive point if broken.
+// DEUCE_GOLDEN_POINT: first point at 40-40 wins.
 enum DeuceFormat {
-    // Traditional scoring: advantage repeats until one side wins by two points.
     DEUCE_ADVANTAGE,
-    // One advantage is played. If it is broken, the next point decides the game.
     DEUCE_SILVER_POINT,
-    // No advantage at all — the first point at 40-40 decides the game.
     DEUCE_GOLDEN_POINT
 }
 
