@@ -1,5 +1,7 @@
 // Pure scoring state machine — ported from shared/Scoring/ScoringEngine.swift
 
+import Toybox.Lang;
+
 class ScoringEngine {
 
     function startMatch(settings as MatchSettings, id as String, at as Number) as MatchState {

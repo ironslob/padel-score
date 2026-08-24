@@ -1,5 +1,7 @@
 // Domain constants and enums — ported from shared/Models/
 
+import Toybox.Lang;
+
 enum Side {
     LEFT,
     RIGHT
@@ -29,16 +31,18 @@ enum ScoringError {
     INVALID_ACTION
 }
 
+// Enum member names must be unique across the app (Monkey C puts them in $).
+// Prefix ACTION_ so POINT_WON does not collide with MatchEventKind.POINT_WON.
 enum MatchActionType {
-    SELECT_SERVER,
-    POINT_WON,
-    UNDO,
-    FINISH,
-    END_EARLY,
-    DISCARD,
-    REQUEST_SERVER_SELECTION,
-    COMPLETE_WARM_UP,
-    SET_DEUCE_FORMAT
+    ACTION_SELECT_SERVER,
+    ACTION_POINT_WON,
+    ACTION_UNDO,
+    ACTION_FINISH,
+    ACTION_END_EARLY,
+    ACTION_DISCARD,
+    ACTION_REQUEST_SERVER_SELECTION,
+    ACTION_COMPLETE_WARM_UP,
+    ACTION_SET_DEUCE_FORMAT
 }
 
 // How a game is resolved once both sides reach 40.
