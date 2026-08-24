@@ -82,6 +82,7 @@ jobs:
           GARMIN_DEVELOPER_KEY_BASE64: ${{ secrets.GARMIN_DEVELOPER_KEY_BASE64 }}
         run: |
           docker run --rm \
+            --entrypoint "" \
             -e HOME=/root \
             -e GARMIN_DEVELOPER_KEY_BASE64 \
             -v "${{ github.workspace }}/garmin:/work" -w /work \
