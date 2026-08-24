@@ -27,7 +27,7 @@ class MatchCompleteView extends WatchUi.View {
         dc.drawText(width / 2, 24, Graphics.FONT_SMALL, title, Graphics.TEXT_JUSTIFY_CENTER);
 
         if (match.winner != null) {
-            var winnerLabel = match.winner == LEFT ? "Us win!" : "They win!";
+            var winnerLabel = match.winner == LEFT ? "Won" : "Lost";
             dc.setColor(match.winner == LEFT ? UiHelpers.COLOR_LEFT : UiHelpers.COLOR_RIGHT, Graphics.COLOR_BLACK);
             dc.drawText(width / 2, 52, Graphics.FONT_MEDIUM, winnerLabel, Graphics.TEXT_JUSTIFY_CENTER);
         }
