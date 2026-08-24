@@ -239,7 +239,7 @@ private struct GameInterstitialView: View {
             VStack(spacing: 10) {
                 scoreSummary
 
-                nextButton(progress: 0)
+                nextSetButton
 
                 if offersServeChoice {
                     chooseServerButton
@@ -298,6 +298,17 @@ private struct GameInterstitialView: View {
         .accessibilityHint("Remove the last point")
     }
 
+    private var nextSetButton: some View {
+        Button(action: onNext) {
+            Text("Next set")
+                .font(.body.weight(.semibold))
+                .frame(maxWidth: .infinity, minHeight: 44)
+        }
+        .buttonStyle(.bordered)
+        .accessibilityLabel("Next set")
+        .accessibilityHint("Continue to the next set, keeping the serve rotation")
+    }
+
     private var chooseServerButton: some View {
         Button(action: onChooseServer) {
             Text("New serve")
@@ -342,11 +353,7 @@ private struct GameInterstitialView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(nextLabel)
-        .accessibilityHint(
-            completedSet
-                ? "Continue to the next set, keeping the serve rotation"
-                : "Continue to the next game"
-        )
+        .accessibilityHint("Continue to the next game")
     }
 
     private func nextProgress(at date: Date) -> Double {
