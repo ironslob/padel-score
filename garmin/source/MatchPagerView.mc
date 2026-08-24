@@ -86,10 +86,10 @@ class MatchPagerView extends WatchUi.View {
 
     private function drawScoreButton(dc as Dc, score as String, role as String, x as Number, y as Number, w as Number, h as Number, color as Number, isServing as Boolean, undoProgress as Float) as Void {
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-        dc.fillRoundedRectangle(x, y, w, h, 14);
+        dc.fillRoundedRectangle(x, y, w, h, UiHelpers.BUTTON_CORNER_RADIUS);
         if (undoProgress > 0) {
             dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
-            dc.drawRoundedRectangle(x, y, w, h, 14);
+            dc.drawRoundedRectangle(x, y, w, h, UiHelpers.BUTTON_CORNER_RADIUS);
             dc.fillRectangle(x, y, (w * undoProgress).toNumber(), 4);
         }
         if (isServing) {
@@ -150,7 +150,6 @@ class MatchPagerView extends WatchUi.View {
             keys.add("newServe");
         }
         keys.add("finish");
-        keys.add("endEarly");
         keys.add("discard");
         keys.add("settings");
         return keys;
@@ -159,8 +158,7 @@ class MatchPagerView extends WatchUi.View {
     private function actionLabel(key as String) as String {
         if (key.equals("undo")) { return "Undo"; }
         if (key.equals("newServe")) { return "New Serve"; }
-        if (key.equals("finish")) { return "Finish"; }
-        if (key.equals("endEarly")) { return "End Early"; }
+        if (key.equals("finish")) { return "End Match"; }
         if (key.equals("discard")) { return "Discard"; }
         return "Settings";
     }
@@ -168,8 +166,7 @@ class MatchPagerView extends WatchUi.View {
     private function actionColor(key as String) as Number {
         if (key.equals("undo")) { return Graphics.COLOR_DK_BLUE; }
         if (key.equals("newServe")) { return Graphics.COLOR_PINK; }
-        if (key.equals("finish")) { return Graphics.COLOR_GREEN; }
-        if (key.equals("endEarly")) { return Graphics.COLOR_ORANGE; }
+        if (key.equals("finish")) { return Graphics.COLOR_ORANGE; }
         if (key.equals("discard")) { return Graphics.COLOR_RED; }
         return Graphics.COLOR_DK_GRAY;
     }
@@ -264,13 +261,10 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
             WatchUi.pushView(new SelectServerView(service), new SelectServerDelegate(service, false), WatchUi.SLIDE_LEFT);
             return true;
         } else if (key.equals("finish")) {
-            confirmAction("Finish this match?", 1);
-            return true;
-        } else if (key.equals("endEarly")) {
-            confirmAction("End match early?", 2);
+            confirmAction("End this match?", 1);
             return true;
         } else if (key.equals("discard")) {
-            confirmAction("Discard match?", 3);
+            confirmAction("Discard match?", 2);
             return true;
         } else if (key.equals("settings")) {
             pushSettingsView(service);
@@ -447,10 +441,6 @@ class MatchActionConfirmDelegate extends WatchUi.ConfirmationDelegate {
                 WatchUi.popView(WatchUi.SLIDE_LEFT);
                 WatchUi.pushView(new MatchCompleteView(service), new MatchCompleteDelegate(service), WatchUi.SLIDE_LEFT);
             } else if (action == 2) {
-                service.endMatchEarly();
-                WatchUi.popView(WatchUi.SLIDE_LEFT);
-                WatchUi.pushView(new MatchCompleteView(service), new MatchCompleteDelegate(service), WatchUi.SLIDE_LEFT);
-            } else if (action == 3) {
                 service.discardMatch();
                 WatchUi.popView(WatchUi.SLIDE_RIGHT);
                 WatchUi.pushView(new StartView(service), new StartDelegate(service), WatchUi.SLIDE_RIGHT);

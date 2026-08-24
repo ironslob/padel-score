@@ -5,6 +5,7 @@ module UiHelpers {
     const COLOR_RIGHT = Graphics.COLOR_RED;
     const COLOR_MUTED = Graphics.COLOR_DK_GRAY;
     const COLOR_ACCENT = 0x1E88E5;
+    const BUTTON_CORNER_RADIUS = 12;
 
     function screenSize() as Array<Number> {
         var settings = System.getDeviceSettings();
@@ -31,7 +32,7 @@ module UiHelpers {
 
     function drawPrimaryButton(dc as Dc, label as String, x as Number, y as Number, w as Number, h as Number, fillColor as Number) as Void {
         dc.setColor(fillColor, Graphics.COLOR_TRANSPARENT);
-        dc.fillRoundedRectangle(x, y, w, h, 12);
+        dc.fillRoundedRectangle(x, y, w, h, BUTTON_CORNER_RADIUS);
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         dc.drawText(x + w / 2, y + h / 2 - 8, Graphics.FONT_MEDIUM, label, Graphics.TEXT_JUSTIFY_CENTER);
     }

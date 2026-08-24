@@ -27,20 +27,26 @@ struct WarmUpView: View {
                     .frame(maxWidth: .infinity)
                     .accessibilityLabel("Warm up \(DurationFormatter.countdown(elapsed))")
 
-                Button("Play") {
+                Button {
                     finishWarmUp()
+                } label: {
+                    Text("Play")
+                        .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                .watchButtonBorderShape()
                 .tint(.green)
-                .frame(maxWidth: .infinity)
                 .accessibilityLabel("Play")
                 .accessibilityHint("Go to who is serving")
 
-                Button("Back") {
+                Button {
                     cancelWarmUp()
+                } label: {
+                    Text("Back")
+                        .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
-                .frame(maxWidth: .infinity)
+                .watchButtonBorderShape()
                 .accessibilityLabel("Back")
                 .accessibilityHint("Return to the start screen without starting the match")
             }

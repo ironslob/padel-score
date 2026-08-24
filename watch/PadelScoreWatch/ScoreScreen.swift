@@ -1,5 +1,21 @@
 import SwiftUI
 
+/// Shared Watch control chrome. System `.bordered` buttons default to a capsule
+/// on watchOS; custom score controls already use this 12pt continuous rect.
+enum WatchTheme {
+    static let buttonCornerRadius: CGFloat = 12
+
+    static var buttonShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: buttonCornerRadius, style: .continuous)
+    }
+}
+
+extension View {
+    func watchButtonBorderShape() -> some View {
+        buttonBorderShape(.roundedRectangle(radius: WatchTheme.buttonCornerRadius))
+    }
+}
+
 struct ScoreScreen: View {
     @EnvironmentObject private var service: MatchService
     @Environment(\.isLuminanceReduced) private var isLuminanceReduced
@@ -182,14 +198,14 @@ struct ScoreScreen: View {
             handleTap(logicalSide)
         } label: {
             ZStack {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                WatchTheme.buttonShape
                     .fill(tint.opacity(isLuminanceReduced ? 0.12 : 0.22))
 
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                WatchTheme.buttonShape
                     .strokeBorder(tint.opacity(isLuminanceReduced ? 0.55 : 0.35), lineWidth: isLuminanceReduced ? 2.5 : 2)
 
                 if progress > 0 {
-                    ClockwiseRoundedRectOutline(progress: progress, cornerRadius: 12)
+                    ClockwiseRoundedRectOutline(progress: progress)
                         .stroke(
                             tint,
                             style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
@@ -298,10 +314,10 @@ struct ScoreScreen: View {
     }
 }
 
-/// Draws a rounded-rect stroke that grows clockwise from the top-center.
+/// Draws a continuous rounded-rect stroke that grows clockwise from the top-center.
 struct ClockwiseRoundedRectOutline: Shape {
     var progress: Double
-    var cornerRadius: CGFloat
+    var cornerRadius: CGFloat = WatchTheme.buttonCornerRadius
 
     var animatableData: Double {
         get { progress }
@@ -310,63 +326,31 @@ struct ClockwiseRoundedRectOutline: Shape {
 
     func path(in rect: CGRect) -> Path {
         let radius = min(cornerRadius, min(rect.width, rect.height) / 2)
-        let full = roundedRectPath(in: rect, cornerRadius: radius)
-        return full.trimmedPath(from: 0, to: max(0, min(1, progress)))
+        let full = Path(roundedRect: rect, cornerRadius: radius, style: .continuous)
+        let fraction = max(0, min(1, progress))
+        guard fraction > 0 else { return Path() }
+        if fraction >= 1 { return full }
+
+        let start = Self.topCenterStartFraction(rect: rect, radius: radius)
+        return Self.trimmedWrapping(full, from: start, length: fraction)
     }
 
-    /// Path ordered from top-center, then clockwise around the rect.
-    private func roundedRectPath(in rect: CGRect, cornerRadius r: CGFloat) -> Path {
-        let midX = rect.midX
-        let minX = rect.minX
-        let maxX = rect.maxX
-        let minY = rect.minY
-        let maxY = rect.maxY
+    /// `Path(roundedRect:)` starts at the top-leading end of the top edge, going clockwise.
+    private static func topCenterStartFraction(rect: CGRect, radius: CGFloat) -> CGFloat {
+        let straightWidth = max(0, rect.width - 2 * radius)
+        let straightHeight = max(0, rect.height - 2 * radius)
+        let perimeter = 2 * (straightWidth + straightHeight) + (2 * .pi * radius)
+        guard perimeter > 0 else { return 0 }
+        return (straightWidth / 2) / perimeter
+    }
 
-        var path = Path()
-        path.move(to: CGPoint(x: midX, y: minY))
-
-        // Top edge → top-trailing corner
-        path.addLine(to: CGPoint(x: maxX - r, y: minY))
-        path.addArc(
-            center: CGPoint(x: maxX - r, y: minY + r),
-            radius: r,
-            startAngle: .degrees(-90),
-            endAngle: .degrees(0),
-            clockwise: false
-        )
-
-        // Trailing edge → bottom-trailing corner
-        path.addLine(to: CGPoint(x: maxX, y: maxY - r))
-        path.addArc(
-            center: CGPoint(x: maxX - r, y: maxY - r),
-            radius: r,
-            startAngle: .degrees(0),
-            endAngle: .degrees(90),
-            clockwise: false
-        )
-
-        // Bottom edge → bottom-leading corner
-        path.addLine(to: CGPoint(x: minX + r, y: maxY))
-        path.addArc(
-            center: CGPoint(x: minX + r, y: maxY - r),
-            radius: r,
-            startAngle: .degrees(90),
-            endAngle: .degrees(180),
-            clockwise: false
-        )
-
-        // Leading edge → top-leading corner
-        path.addLine(to: CGPoint(x: minX, y: minY + r))
-        path.addArc(
-            center: CGPoint(x: minX + r, y: minY + r),
-            radius: r,
-            startAngle: .degrees(180),
-            endAngle: .degrees(270),
-            clockwise: false
-        )
-
-        // Back to top-center
-        path.addLine(to: CGPoint(x: midX, y: minY))
-        return path
+    private static func trimmedWrapping(_ path: Path, from start: CGFloat, length: CGFloat) -> Path {
+        let end = start + length
+        if end <= 1 {
+            return path.trimmedPath(from: start, to: end)
+        }
+        var result = path.trimmedPath(from: start, to: 1)
+        result.addPath(path.trimmedPath(from: 0, to: end - 1))
+        return result
     }
 }

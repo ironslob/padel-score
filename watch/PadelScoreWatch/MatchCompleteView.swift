@@ -35,6 +35,7 @@ struct MatchCompleteView: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                .watchButtonBorderShape()
                 .accessibilityLabel("Done")
                 .accessibilityHint("Return to the start screen")
             }

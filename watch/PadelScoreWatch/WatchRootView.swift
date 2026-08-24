@@ -200,7 +200,7 @@ private struct GameInterstitialView: View {
                 gameEndContent
             }
         }
-        .confirmationDialog("End this match?", isPresented: $confirmEndMatch) {
+        .confirmationDialog("End this match? The current score is kept.", isPresented: $confirmEndMatch) {
             Button("End Match", role: .destructive) { service.finishMatch() }
             Button("Cancel", role: .cancel) {}
         }
@@ -255,6 +255,7 @@ private struct GameInterstitialView: View {
                         .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.bordered)
+                .watchButtonBorderShape()
                 .accessibilityLabel("End match")
                 .accessibilityHint("Finish the match and keep the current score")
             }
@@ -287,13 +288,16 @@ private struct GameInterstitialView: View {
     }
 
     private var undoButton: some View {
-        Button("Undo") {
+        Button {
             service.undoLastPoint()
+        } label: {
+            Text("Undo")
+                .frame(maxWidth: .infinity, minHeight: 44)
         }
         .buttonStyle(.borderedProminent)
+        .watchButtonBorderShape()
         .tint(.orange)
         .disabled(!service.canUndo)
-        .frame(maxWidth: .infinity, minHeight: 44)
         .accessibilityLabel("Undo")
         .accessibilityHint("Remove the last point")
     }
@@ -305,6 +309,7 @@ private struct GameInterstitialView: View {
                 .frame(maxWidth: .infinity, minHeight: 44)
         }
         .buttonStyle(.bordered)
+        .watchButtonBorderShape()
         .accessibilityLabel("Next set")
         .accessibilityHint("Continue to the next set, keeping the serve rotation")
     }
@@ -316,6 +321,7 @@ private struct GameInterstitialView: View {
                 .frame(maxWidth: .infinity, minHeight: 44)
         }
         .buttonStyle(.bordered)
+        .watchButtonBorderShape()
         .accessibilityLabel("New serve")
         .accessibilityHint("Start the next set and choose who is serving")
     }
@@ -325,17 +331,17 @@ private struct GameInterstitialView: View {
 
         return Button(action: onNext) {
             ZStack {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                WatchTheme.buttonShape
                     .fill(tint.opacity(isLuminanceReduced ? 0.12 : 0.22))
 
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                WatchTheme.buttonShape
                     .strokeBorder(
                         tint.opacity(isLuminanceReduced ? 0.55 : 0.35),
                         lineWidth: isLuminanceReduced ? 2.5 : 2
                     )
 
                 if progress > 0 {
-                    ClockwiseRoundedRectOutline(progress: progress, cornerRadius: 12)
+                    ClockwiseRoundedRectOutline(progress: progress)
                         .stroke(
                             tint,
                             style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
@@ -379,31 +385,40 @@ struct SelectServerView: View {
                     .multilineTextAlignment(.center)
 
                 HStack(spacing: 8) {
-                    Button("Us") {
+                    Button {
                         service.selectServer(.left)
+                    } label: {
+                        Text("Us")
+                            .frame(maxWidth: .infinity, minHeight: 52)
                     }
                     .buttonStyle(.borderedProminent)
+                    .watchButtonBorderShape()
                     .tint(.blue)
-                    .frame(maxWidth: .infinity, minHeight: 52)
                     .accessibilityLabel("We are serving")
                     .accessibilityHint("Us starts the match on serve")
 
-                    Button("Them") {
+                    Button {
                         service.selectServer(.right)
+                    } label: {
+                        Text("Them")
+                            .frame(maxWidth: .infinity, minHeight: 52)
                     }
                     .buttonStyle(.borderedProminent)
+                    .watchButtonBorderShape()
                     .tint(.red)
-                    .frame(maxWidth: .infinity, minHeight: 52)
                     .accessibilityLabel("They are serving")
                     .accessibilityHint("Them starts the match on serve")
                 }
 
                 if canReturnToStart {
-                    Button("Back") {
+                    Button {
                         service.discardMatch()
+                    } label: {
+                        Text("Back")
+                            .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered)
-                    .frame(maxWidth: .infinity)
+                    .watchButtonBorderShape()
                     .accessibilityLabel("Back")
                     .accessibilityHint("Return to the start screen without starting the match")
                 }
@@ -414,11 +429,9 @@ struct SelectServerView: View {
 }
 
 struct StartMatchView: View {
-    @EnvironmentObject private var service: MatchService
     @EnvironmentObject private var sessionCoordinator: MatchSessionCoordinator
     @State private var isStarting = false
     @State private var showSettings = false
-    @State private var showHistory = false
 
     var body: some View {
         ScrollView {
@@ -438,36 +451,29 @@ struct StartMatchView: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
+                    .lineLimit(1)
                 }
                 .buttonStyle(.borderedProminent)
+                .watchButtonBorderShape()
                 .tint(.green)
                 .disabled(isStarting)
                 .accessibilityLabel("Start Match")
 
-                HStack(spacing: 8) {
-                    Button("Settings") {
-                        showSettings = true
-                    }
-                    .buttonStyle(.bordered)
-                    .frame(maxWidth: .infinity)
-                    .accessibilityLabel("Settings")
-
-                    Button("History") {
-                        showHistory = true
-                    }
-                    .buttonStyle(.bordered)
-                    .frame(maxWidth: .infinity)
-                    .accessibilityLabel("Match History")
-                    .accessibilityHint(historyAccessibilityHint)
+                Button {
+                    showSettings = true
+                } label: {
+                    Text("Settings")
+                        .frame(maxWidth: .infinity)
+                        .lineLimit(1)
                 }
+                .buttonStyle(.bordered)
+                .watchButtonBorderShape()
+                .accessibilityLabel("Settings")
             }
             .padding()
         }
         .sheet(isPresented: $showSettings) {
             SettingsView()
-        }
-        .sheet(isPresented: $showHistory) {
-            WatchMatchHistoryView()
         }
         .onAppear {
             sessionCoordinator.presentFirstLaunchTipIfNeeded()
@@ -479,171 +485,6 @@ struct StartMatchView: View {
         isStarting = true
         defer { isStarting = false }
         await sessionCoordinator.startMatch()
-    }
-
-    private var historyAccessibilityHint: String {
-        if service.archivedMatches.isEmpty {
-            return "No completed matches yet"
-        }
-        return "\(service.archivedMatches.count) completed matches"
-    }
-}
-
-struct WatchMatchHistoryView: View {
-    @EnvironmentObject private var service: MatchService
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            Group {
-                if service.archivedMatches.isEmpty {
-                    VStack(spacing: 8) {
-                        Text("No History")
-                            .font(.headline)
-                        Text("Completed matches will appear here.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding()
-                } else {
-                    List {
-                        ForEach(service.archivedMatches) { match in
-                            NavigationLink {
-                                WatchMatchHistoryDetailView(match: match)
-                            } label: {
-                                WatchMatchHistoryRow(match: match)
-                            }
-                        }
-                    }
-                }
-            }
-            .navigationTitle("History")
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                }
-            }
-        }
-    }
-}
-
-private struct WatchMatchHistoryRow: View {
-    let match: MatchState
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(match.startedAt.formatted(date: .abbreviated, time: .shortened))
-                    .font(.caption.weight(.semibold))
-                Spacer()
-                Text(matchStatusLabel)
-                    .font(.caption2)
-                    .foregroundStyle(statusColor)
-            }
-            Text(scoreSummary)
-                .font(.headline.monospacedDigit())
-            Text(DurationFormatter.detailed(match.duration))
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-        }
-        .padding(.vertical, 2)
-    }
-
-    private var scoreSummary: String {
-        match.finalScoreSummary.isEmpty ? "\(match.leftSetsWon)–\(match.rightSetsWon)" : match.finalScoreSummary
-    }
-
-    private var matchStatusLabel: String {
-        switch match.status {
-        case .completed:
-            if match.winner == .left { return "Won" }
-            if match.winner == .right { return "Lost" }
-            return "Complete"
-        case .endedEarly: return "Ended"
-        case .inProgress: return "Live"
-        case .discarded: return "Discarded"
-        }
-    }
-
-    private var statusColor: Color {
-        switch match.status {
-        case .completed:
-            if match.winner == .left { return .green }
-            if match.winner == .right { return .orange }
-            return .secondary
-        case .endedEarly: return .orange
-        case .inProgress: return .blue
-        case .discarded: return .secondary
-        }
-    }
-}
-
-private struct WatchMatchHistoryDetailView: View {
-    let match: MatchState
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 10) {
-                Text(title)
-                    .font(.headline)
-
-                Text(scoreSummary)
-                    .font(.title3.weight(.semibold).monospacedDigit())
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                labeled("Date", match.startedAt.formatted(date: .abbreviated, time: .shortened))
-                labeled("Duration", DurationFormatter.detailed(match.duration))
-                labeled("Scoring", match.settings.deuceFormat.label)
-                labeled("Format", match.settings.matchSetFormat.label)
-
-                if !match.completedSets.isEmpty || match.displaysIncompleteSet {
-                    Text("Sets")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                    ForEach(Array(match.completedSets.enumerated()), id: \.offset) { index, set in
-                        Text("Set \(index + 1): \(set.leftGames)–\(set.rightGames)")
-                            .font(.caption.monospacedDigit())
-                    }
-                    if match.displaysIncompleteSet {
-                        Text("Set \(match.completedSets.count + 1): \(match.currentSet.leftGames)–\(match.currentSet.rightGames)")
-                            .font(.caption.monospacedDigit())
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 4)
-        }
-        .navigationTitle("Match")
-    }
-
-    private var title: String {
-        switch match.status {
-        case .completed:
-            if match.winner == .left { return "Won" }
-            if match.winner == .right { return "Lost" }
-            return "Complete"
-        case .endedEarly:
-            return "Ended Early"
-        default:
-            return match.status.displayName
-        }
-    }
-
-    private var scoreSummary: String {
-        match.finalScoreSummary.isEmpty ? "\(match.leftSetsWon)–\(match.rightSetsWon)" : match.finalScoreSummary
-    }
-
-    private func labeled(_ title: String, _ value: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.caption.weight(.semibold))
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(title) \(value)")
     }
 }
 
