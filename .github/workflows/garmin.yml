@@ -73,30 +73,27 @@ jobs:
   test:
     name: Unit tests
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/matco/connectiq-tester:latest
-      options: --entrypoint ""
-    defaults:
-      run:
-        working-directory: garmin
-        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Developer key
+      - name: Run Connect IQ tests
         env:
           GARMIN_DEVELOPER_KEY_BASE64: ${{ secrets.GARMIN_DEVELOPER_KEY_BASE64 }}
         run: |
-          if [ -n "${GARMIN_DEVELOPER_KEY_BASE64:-}" ]; then
-            echo "$GARMIN_DEVELOPER_KEY_BASE64" | base64 -d > developer_key.der
-          else
-            openssl genrsa -out developer_key.pem 4096
-            openssl pkcs8 -topk8 -inform PEM -outform DER \
-              -in developer_key.pem -out developer_key.der -nocrypt
-          fi
-
-      - name: Compile and run Connect IQ tests
-        run: |
-          chmod +x ci-test.sh
-          ./ci-test.sh venu3 developer_key.der
+          docker run --rm \
+            -e HOME=/root \
+            -e GARMIN_DEVELOPER_KEY_BASE64 \
+            -v "${{ github.workspace }}/garmin:/work" -w /work \
+            ghcr.io/matco/connectiq-tester:latest \
+            bash -lc '
+              if [ -n "${GARMIN_DEVELOPER_KEY_BASE64:-}" ]; then
+                echo "$GARMIN_DEVELOPER_KEY_BASE64" | base64 -d > developer_key.der
+              else
+                openssl genrsa -out developer_key.pem 4096
+                openssl pkcs8 -topk8 -inform PEM -outform DER \
+                  -in developer_key.pem -out developer_key.der -nocrypt
+              fi
+              chmod +x ci-test.sh
+              ./ci-test.sh venu3 developer_key.der
+            '

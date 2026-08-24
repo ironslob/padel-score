@@ -7,6 +7,10 @@ set -euo pipefail
 DEVICE_ID="${1:-venu3}"
 CERTIFICATE_PATH="${2:-developer_key.der}"
 
+# Connect IQ stores device files under $HOME/.Garmin. GitHub job containers override
+# HOME to the runner user's path; force the image default so the simulator can start.
+export HOME="${HOME:-/root}"
+
 trap 'kill $(jobs -p) 2>/dev/null || true' EXIT
 
 mkdir -p bin
@@ -17,15 +21,29 @@ if [[ ! -f bin/app.prg ]]; then
   exit 1
 fi
 
+echo "Launching simulator..."
 export DISPLAY=:1
 Xvfb "$DISPLAY" -screen 0 1280x1024x24 &
-sleep 5
+sleep 2
 
 simulator >/dev/null 2>&1 &
 sleep 5
 
+echo "Running tests..."
 result_file=/tmp/result.txt
-monkeydo bin/app.prg "$DEVICE_ID" -t >"$result_file" || true
+for i in $(seq 1 6); do
+  timeout 60 monkeydo bin/app.prg "$DEVICE_ID" -t >"$result_file" 2>&1 || true
+  result="$(tail -1 "$result_file")"
+  if [[ "$result" == PASSED* || "$result" == FAILED* ]]; then
+    break
+  fi
+  if ! grep -qi "unable to connect" "$result_file"; then
+    break
+  fi
+  echo "Retry $i: simulator not ready yet..."
+  sleep 5
+done
+
 cat "$result_file"
 
 result="$(tail -1 "$result_file")"
