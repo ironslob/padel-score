@@ -315,7 +315,7 @@ class ScoringEngine {
         state.currentGame.isComplete = true;
         state.currentGame.winner = winner;
         state.currentSet.setGames(7, winner);
-        var nextSetServer as Side or Null = null;
+        var nextSetServer = null;
         var opener = tieBreakOpeningServer(state);
         if (opener != null) {
             nextSetServer = oppositeSide(opener);
@@ -340,7 +340,7 @@ class ScoringEngine {
         var games = state.currentSet.gamesFor(winner) + 1;
         state.currentSet.setGames(games, winner);
 
-        var nextServer as Side or Null = null;
+        var nextServer = null;
         if (state.currentServer != null) {
             nextServer = oppositeSide(state.currentServer);
         }
