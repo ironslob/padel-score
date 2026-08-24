@@ -22,13 +22,13 @@ class MatchCompleteView extends WatchUi.View {
         var width = dc.getWidth();
         var height = dc.getHeight();
 
-        var title = match.status == MatchStatus.COMPLETED ? "Match Complete" : "Match Ended";
+        var title = match.status == COMPLETED ? "Match Complete" : "Match Ended";
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.drawText(width / 2, 24, Graphics.FONT_SMALL, title, Graphics.TEXT_JUSTIFY_CENTER);
 
         if (match.winner != null) {
-            var winnerLabel = match.winner == Side.LEFT ? "Us win!" : "They win!";
-            dc.setColor(match.winner == Side.LEFT ? UiHelpers.COLOR_LEFT : UiHelpers.COLOR_RIGHT, Graphics.COLOR_BLACK);
+            var winnerLabel = match.winner == LEFT ? "Us win!" : "They win!";
+            dc.setColor(match.winner == LEFT ? UiHelpers.COLOR_LEFT : UiHelpers.COLOR_RIGHT, Graphics.COLOR_BLACK);
             dc.drawText(width / 2, 52, Graphics.FONT_MEDIUM, winnerLabel, Graphics.TEXT_JUSTIFY_CENTER);
         }
 

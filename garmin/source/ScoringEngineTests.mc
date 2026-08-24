@@ -8,12 +8,12 @@ function testLoveToGame(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
     var settings = new MatchSettings();
     var state = engine.startMatch(settings, "test-1", 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
+    state = engine.applySelectServer(state, LEFT, 1);
     Test.assertNotEqual(null, state);
-    state = engine.applyPointWon(state, Side.LEFT, 2);
-    state = engine.applyPointWon(state, Side.LEFT, 3);
-    state = engine.applyPointWon(state, Side.LEFT, 4);
-    state = engine.applyPointWon(state, Side.LEFT, 5);
+    state = engine.applyPointWon(state, LEFT, 2);
+    state = engine.applyPointWon(state, LEFT, 3);
+    state = engine.applyPointWon(state, LEFT, 4);
+    state = engine.applyPointWon(state, LEFT, 5);
     Test.assertEqual(1, state.currentSet.leftGames);
     return true;
 }
@@ -27,12 +27,12 @@ function startAtDeuce(engine as ScoringEngine, format as DeuceFormat, id as Stri
     // same serve-rotation path.
     settings.fixedServerPositions = false;
     var state = engine.startMatch(settings, id, 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
+    state = engine.applySelectServer(state, LEFT, 1);
     var t = 2;
     for (var i = 0; i < 3; i += 1) {
-        state = engine.applyPointWon(state, Side.LEFT, t);
+        state = engine.applyPointWon(state, LEFT, t);
         t += 1;
-        state = engine.applyPointWon(state, Side.RIGHT, t);
+        state = engine.applyPointWon(state, RIGHT, t);
         t += 1;
     }
     return state;
@@ -41,15 +41,15 @@ function startAtDeuce(engine as ScoringEngine, format as DeuceFormat, id as Stri
 (:test)
 function testAdvantageWinsGameWhenHeld(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
-    var state = startAtDeuce(engine, DeuceFormat.DEUCE_ADVANTAGE, "test-adv-1");
+    var state = startAtDeuce(engine, DEUCE_ADVANTAGE, "test-adv-1");
     Test.assertEqual("Deuce", state.gameStatusLine());
     Test.assert(!state.currentGame.isGoldenPointActive);
 
-    state = engine.applyPointWon(state, Side.LEFT, 30);
-    Test.assertEqual(Side.LEFT, state.currentGame.advantageSide);
+    state = engine.applyPointWon(state, LEFT, 30);
+    Test.assertEqual(LEFT, state.currentGame.advantageSide);
     Test.assertEqual("Advantage", state.gameStatusLine());
 
-    state = engine.applyPointWon(state, Side.LEFT, 31);
+    state = engine.applyPointWon(state, LEFT, 31);
     Test.assertEqual(1, state.currentSet.leftGames);
     return true;
 }
@@ -57,14 +57,14 @@ function testAdvantageWinsGameWhenHeld(logger as Logger) as Boolean {
 (:test)
 function testAdvantageCyclesIndefinitely(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
-    var state = startAtDeuce(engine, DeuceFormat.DEUCE_ADVANTAGE, "test-adv-2");
+    var state = startAtDeuce(engine, DEUCE_ADVANTAGE, "test-adv-2");
     var t = 30;
     // Three full advantage-then-broken cycles must never become decisive.
     for (var i = 0; i < 3; i += 1) {
-        state = engine.applyPointWon(state, Side.LEFT, t);
+        state = engine.applyPointWon(state, LEFT, t);
         t += 1;
-        Test.assertEqual(Side.LEFT, state.currentGame.advantageSide);
-        state = engine.applyPointWon(state, Side.RIGHT, t);
+        Test.assertEqual(LEFT, state.currentGame.advantageSide);
+        state = engine.applyPointWon(state, RIGHT, t);
         t += 1;
         Test.assertEqual(null, state.currentGame.advantageSide);
         Test.assert(!state.currentGame.isGoldenPointActive);
@@ -78,7 +78,7 @@ function testAdvantageCyclesIndefinitely(logger as Logger) as Boolean {
 (:test)
 function testGoldenPointIsDecisiveImmediatelyAtDeuce(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
-    var state = startAtDeuce(engine, DeuceFormat.DEUCE_GOLDEN_POINT, "test-gp-1");
+    var state = startAtDeuce(engine, DEUCE_GOLDEN_POINT, "test-gp-1");
     // No advantage phase at all: 40-40 is already the deciding rally.
     Test.assert(state.currentGame.isGoldenPointActive);
     Test.assertEqual(null, state.currentGame.advantageSide);
@@ -87,7 +87,7 @@ function testGoldenPointIsDecisiveImmediatelyAtDeuce(logger as Logger) as Boolea
     Test.assertEqual("GP", pair[0]);
     Test.assertEqual("GP", pair[1]);
 
-    state = engine.applyPointWon(state, Side.RIGHT, 30);
+    state = engine.applyPointWon(state, RIGHT, 30);
     Test.assertEqual(1, state.currentSet.rightGames);
     Test.assertEqual(0, state.currentSet.leftGames);
     Test.assert(!state.currentGame.isGoldenPointActive);
@@ -97,8 +97,8 @@ function testGoldenPointIsDecisiveImmediatelyAtDeuce(logger as Logger) as Boolea
 (:test)
 function testGoldenPointNeverAwardsAdvantage(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
-    var state = startAtDeuce(engine, DeuceFormat.DEUCE_GOLDEN_POINT, "test-gp-2");
-    state = engine.applyPointWon(state, Side.LEFT, 30);
+    var state = startAtDeuce(engine, DEUCE_GOLDEN_POINT, "test-gp-2");
+    state = engine.applyPointWon(state, LEFT, 30);
     // The game is over — the point did not become an advantage.
     Test.assertEqual(1, state.currentSet.leftGames);
     Test.assertEqual(null, state.currentGame.advantageSide);
@@ -110,17 +110,17 @@ function testGoldenPointReachedFromUnevenScoreline(logger as Logger) as Boolean 
     // 40-30 → 40-40 must arm the deciding point just the same.
     var engine = new ScoringEngine();
     var settings = new MatchSettings();
-    settings.deuceFormat = DeuceFormat.DEUCE_GOLDEN_POINT;
+    settings.deuceFormat = DEUCE_GOLDEN_POINT;
     settings.fixedServerPositions = false;
     var state = engine.startMatch(settings, "test-gp-3", 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
-    state = engine.applyPointWon(state, Side.LEFT, 2);
-    state = engine.applyPointWon(state, Side.LEFT, 3);
-    state = engine.applyPointWon(state, Side.LEFT, 4); // 40-0
-    state = engine.applyPointWon(state, Side.RIGHT, 5);
-    state = engine.applyPointWon(state, Side.RIGHT, 6); // 40-30
+    state = engine.applySelectServer(state, LEFT, 1);
+    state = engine.applyPointWon(state, LEFT, 2);
+    state = engine.applyPointWon(state, LEFT, 3);
+    state = engine.applyPointWon(state, LEFT, 4); // 40-0
+    state = engine.applyPointWon(state, RIGHT, 5);
+    state = engine.applyPointWon(state, RIGHT, 6); // 40-30
     Test.assert(!state.currentGame.isGoldenPointActive);
-    state = engine.applyPointWon(state, Side.RIGHT, 7); // 40-40
+    state = engine.applyPointWon(state, RIGHT, 7); // 40-40
     Test.assert(state.currentGame.isGoldenPointActive);
     return true;
 }
@@ -128,15 +128,15 @@ function testGoldenPointReachedFromUnevenScoreline(logger as Logger) as Boolean 
 (:test)
 function testSilverPointPlaysOneAdvantageThenDecides(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
-    var state = startAtDeuce(engine, DeuceFormat.DEUCE_SILVER_POINT, "test-sp-1");
+    var state = startAtDeuce(engine, DEUCE_SILVER_POINT, "test-sp-1");
     Test.assert(!state.currentGame.isGoldenPointActive);
     Test.assertEqual("Deuce", state.gameStatusLine());
 
-    state = engine.applyPointWon(state, Side.LEFT, 30); // Ad left
-    Test.assertEqual(Side.LEFT, state.currentGame.advantageSide);
+    state = engine.applyPointWon(state, LEFT, 30); // Ad left
+    Test.assertEqual(LEFT, state.currentGame.advantageSide);
     Test.assert(!state.currentGame.isGoldenPointActive);
 
-    state = engine.applyPointWon(state, Side.RIGHT, 31); // broken → deciding point
+    state = engine.applyPointWon(state, RIGHT, 31); // broken → deciding point
     Test.assert(state.currentGame.isGoldenPointActive);
     Test.assertEqual(null, state.currentGame.advantageSide);
     Test.assertEqual("Silver Point", state.gameStatusLine());
@@ -144,7 +144,7 @@ function testSilverPointPlaysOneAdvantageThenDecides(logger as Logger) as Boolea
     Test.assertEqual("SP", pair[0]);
     Test.assertEqual("SP", pair[1]);
 
-    state = engine.applyPointWon(state, Side.RIGHT, 32);
+    state = engine.applyPointWon(state, RIGHT, 32);
     Test.assertEqual(1, state.currentSet.rightGames);
     Test.assert(!state.currentGame.isGoldenPointActive);
     return true;
@@ -153,9 +153,9 @@ function testSilverPointPlaysOneAdvantageThenDecides(logger as Logger) as Boolea
 (:test)
 function testSilverPointAdvantageHolderStillWinsOnSecondPoint(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
-    var state = startAtDeuce(engine, DeuceFormat.DEUCE_SILVER_POINT, "test-sp-2");
-    state = engine.applyPointWon(state, Side.LEFT, 30); // Ad left
-    state = engine.applyPointWon(state, Side.LEFT, 31); // converts, no decider needed
+    var state = startAtDeuce(engine, DEUCE_SILVER_POINT, "test-sp-2");
+    state = engine.applyPointWon(state, LEFT, 30); // Ad left
+    state = engine.applyPointWon(state, LEFT, 31); // converts, no decider needed
     Test.assertEqual(1, state.currentSet.leftGames);
     return true;
 }
@@ -163,11 +163,11 @@ function testSilverPointAdvantageHolderStillWinsOnSecondPoint(logger as Logger) 
 (:test)
 function testSilverPointDecidingPointWinnableByEitherSide(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
-    var state = startAtDeuce(engine, DeuceFormat.DEUCE_SILVER_POINT, "test-sp-4");
-    state = engine.applyPointWon(state, Side.RIGHT, 30); // Ad right
-    state = engine.applyPointWon(state, Side.LEFT, 31); // broken → deciding point
+    var state = startAtDeuce(engine, DEUCE_SILVER_POINT, "test-sp-4");
+    state = engine.applyPointWon(state, RIGHT, 30); // Ad right
+    state = engine.applyPointWon(state, LEFT, 31); // broken → deciding point
     Test.assert(state.currentGame.isGoldenPointActive);
-    state = engine.applyPointWon(state, Side.LEFT, 32);
+    state = engine.applyPointWon(state, LEFT, 32);
     Test.assertEqual(1, state.currentSet.leftGames);
     return true;
 }
@@ -175,20 +175,20 @@ function testSilverPointDecidingPointWinnableByEitherSide(logger as Logger) as B
 (:test)
 function testUndoSilverPointReturnsToAdvantage(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
-    var state = startAtDeuce(engine, DeuceFormat.DEUCE_SILVER_POINT, "test-sp-3");
-    state = engine.applyPointWon(state, Side.LEFT, 30);
-    state = engine.applyPointWon(state, Side.RIGHT, 31);
+    var state = startAtDeuce(engine, DEUCE_SILVER_POINT, "test-sp-3");
+    state = engine.applyPointWon(state, LEFT, 30);
+    state = engine.applyPointWon(state, RIGHT, 31);
     Test.assert(state.currentGame.isGoldenPointActive);
     state = engine.applyUndo(state);
     Test.assert(!state.currentGame.isGoldenPointActive);
-    Test.assertEqual(Side.LEFT, state.currentGame.advantageSide);
+    Test.assertEqual(LEFT, state.currentGame.advantageSide);
     return true;
 }
 
 (:test)
 function testUndoGoldenPointReturnsToFortyThirty(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
-    var state = startAtDeuce(engine, DeuceFormat.DEUCE_GOLDEN_POINT, "test-gp-4");
+    var state = startAtDeuce(engine, DEUCE_GOLDEN_POINT, "test-gp-4");
     Test.assert(state.currentGame.isGoldenPointActive);
     state = engine.applyUndo(state);
     Test.assert(!state.currentGame.isGoldenPointActive);
@@ -203,9 +203,9 @@ function testUndoRemovesLastPoint(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
     var settings = new MatchSettings();
     var state = engine.startMatch(settings, "test-3", 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
-    state = engine.applyPointWon(state, Side.LEFT, 2);
-    state = engine.applyPointWon(state, Side.RIGHT, 3);
+    state = engine.applySelectServer(state, LEFT, 1);
+    state = engine.applyPointWon(state, LEFT, 2);
+    state = engine.applyPointWon(state, RIGHT, 3);
     state = engine.applyUndo(state);
     var pair = state.gameDisplayPair();
     Test.assertEqual("15", pair[0]);
@@ -216,9 +216,9 @@ function testUndoRemovesLastPoint(logger as Logger) as Boolean {
 (:test)
 function testDeuceFormatStringRoundTrip(logger as Logger) as Boolean {
     var formats = [
-        DeuceFormat.DEUCE_ADVANTAGE,
-        DeuceFormat.DEUCE_SILVER_POINT,
-        DeuceFormat.DEUCE_GOLDEN_POINT
+        DEUCE_ADVANTAGE,
+        DEUCE_SILVER_POINT,
+        DEUCE_GOLDEN_POINT
     ] as Array<DeuceFormat>;
     for (var i = 0; i < formats.size(); i += 1) {
         var raw = deuceFormatToString(formats[i]);
@@ -234,8 +234,8 @@ function testDeuceFormatStringRoundTrip(logger as Logger) as Boolean {
 function testArchivedMatchesKeepSilverPointBehaviour(logger as Logger) as Boolean {
     // Matches written before this setting existed played one advantage before
     // the decisive point, so they must migrate to silver point, not golden.
-    Test.assertEqual(DeuceFormat.DEUCE_SILVER_POINT, deuceFormatFromLegacyArchivedFlag(true));
-    Test.assertEqual(DeuceFormat.DEUCE_ADVANTAGE, deuceFormatFromLegacyArchivedFlag(false));
+    Test.assertEqual(DEUCE_SILVER_POINT, deuceFormatFromLegacyArchivedFlag(true));
+    Test.assertEqual(DEUCE_ADVANTAGE, deuceFormatFromLegacyArchivedFlag(false));
     return true;
 }
 
@@ -243,17 +243,17 @@ function testArchivedMatchesKeepSilverPointBehaviour(logger as Logger) as Boolea
 function testPreferenceMigratesFromLegacyGoldenPointToggle(logger as Logger) as Boolean {
     // Deliberately different from the archived-match rule: only an explicit
     // "off" carries over, everything else lands on the new default.
-    Test.assertEqual(DeuceFormat.DEUCE_ADVANTAGE, deuceFormatFromLegacyPreference(false));
-    Test.assertEqual(DeuceFormat.DEUCE_GOLDEN_POINT, deuceFormatFromLegacyPreference(true));
-    Test.assertEqual(DeuceFormat.DEUCE_GOLDEN_POINT, deuceFormatFromLegacyPreference(null));
+    Test.assertEqual(DEUCE_ADVANTAGE, deuceFormatFromLegacyPreference(false));
+    Test.assertEqual(DEUCE_GOLDEN_POINT, deuceFormatFromLegacyPreference(true));
+    Test.assertEqual(DEUCE_GOLDEN_POINT, deuceFormatFromLegacyPreference(null));
     return true;
 }
 
 (:test)
 function testDefaultSettingsUseGoldenPoint(logger as Logger) as Boolean {
     var settings = new MatchSettings();
-    Test.assertEqual(DeuceFormat.DEUCE_GOLDEN_POINT, settings.deuceFormat);
-    Test.assertEqual(DeuceFormat.DEUCE_GOLDEN_POINT, settings.copy().deuceFormat);
+    Test.assertEqual(DEUCE_GOLDEN_POINT, settings.deuceFormat);
+    Test.assertEqual(DEUCE_GOLDEN_POINT, settings.copy().deuceFormat);
     return true;
 }
 
@@ -262,13 +262,13 @@ function testSixSixStartsTieBreak(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
     var settings = new MatchSettings();
     var state = engine.startMatch(settings, "test-4", 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
+    state = engine.applySelectServer(state, LEFT, 1);
     for (var set = 0; set < 6; set += 1) {
         for (var g = 0; g < 4; g += 1) {
-            state = engine.applyPointWon(state, Side.LEFT, 100 + set * 10 + g);
+            state = engine.applyPointWon(state, LEFT, 100 + set * 10 + g);
         }
         for (var g = 0; g < 4; g += 1) {
-            state = engine.applyPointWon(state, Side.RIGHT, 200 + set * 10 + g);
+            state = engine.applyPointWon(state, RIGHT, 200 + set * 10 + g);
         }
     }
     Test.assert(state.currentGame.isTieBreak);
@@ -282,30 +282,30 @@ function testFinalScoreSummaryFinishMidSetIncludesPartial(logger as Logger) as B
     var engine = new ScoringEngine();
     var settings = new MatchSettings();
     var state = engine.startMatch(settings, "test-5", 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
+    state = engine.applySelectServer(state, LEFT, 1);
     var t = 2;
     for (var i = 0; i < 3; i += 1) {
         for (var p = 0; p < 4; p += 1) {
-            state = engine.applyPointWon(state, Side.LEFT, t);
+            state = engine.applyPointWon(state, LEFT, t);
             t += 1;
         }
     }
     for (var i = 0; i < 2; i += 1) {
         for (var p = 0; p < 4; p += 1) {
-            state = engine.applyPointWon(state, Side.RIGHT, t);
+            state = engine.applyPointWon(state, RIGHT, t);
             t += 1;
         }
     }
-    state = engine.applyPointWon(state, Side.LEFT, t);
+    state = engine.applyPointWon(state, LEFT, t);
     t += 1;
-    state = engine.applyPointWon(state, Side.LEFT, t);
+    state = engine.applyPointWon(state, LEFT, t);
     t += 1;
-    state = engine.applyPointWon(state, Side.LEFT, t);
+    state = engine.applyPointWon(state, LEFT, t);
     t += 1;
-    state = engine.applyPointWon(state, Side.RIGHT, t);
+    state = engine.applyPointWon(state, RIGHT, t);
     t += 1;
     state = engine.applyFinish(state, t);
-    Test.assertEqual(MatchStatus.ENDED_EARLY, state.status);
+    Test.assertEqual(ENDED_EARLY, state.status);
     Test.assertEqual("3-2 (40-15)", state.finalScoreSummary());
     Test.assert(state.displaysIncompleteSet());
     return true;
@@ -316,34 +316,34 @@ function testFinalScoreSummaryFinishMidSetAfterCompletedSet(logger as Logger) as
     var engine = new ScoringEngine();
     var settings = new MatchSettings();
     var state = engine.startMatch(settings, "test-6", 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
+    state = engine.applySelectServer(state, LEFT, 1);
     var t = 2;
     for (var g = 0; g < 6; g += 1) {
         for (var p = 0; p < 4; p += 1) {
-            state = engine.applyPointWon(state, Side.LEFT, t);
+            state = engine.applyPointWon(state, LEFT, t);
             t += 1;
         }
     }
     for (var i = 0; i < 3; i += 1) {
         for (var p = 0; p < 4; p += 1) {
-            state = engine.applyPointWon(state, Side.LEFT, t);
+            state = engine.applyPointWon(state, LEFT, t);
             t += 1;
         }
     }
     for (var i = 0; i < 2; i += 1) {
         for (var p = 0; p < 4; p += 1) {
-            state = engine.applyPointWon(state, Side.RIGHT, t);
+            state = engine.applyPointWon(state, RIGHT, t);
             t += 1;
         }
     }
-    state = engine.applyPointWon(state, Side.LEFT, t);
+    state = engine.applyPointWon(state, LEFT, t);
     t += 1;
-    state = engine.applyPointWon(state, Side.LEFT, t);
+    state = engine.applyPointWon(state, LEFT, t);
     t += 1;
-    state = engine.applyPointWon(state, Side.RIGHT, t);
+    state = engine.applyPointWon(state, RIGHT, t);
     t += 1;
     state = engine.applyFinish(state, t);
-    Test.assertEqual(MatchStatus.ENDED_EARLY, state.status);
+    Test.assertEqual(ENDED_EARLY, state.status);
     Test.assertEqual("6-0, 3-2 (30-15)", state.finalScoreSummary());
     Test.assert(state.displaysIncompleteSet());
     return true;
@@ -355,19 +355,19 @@ function testScoreScreenSidesSwapWhenServeRotates(logger as Logger) as Boolean {
     var settings = new MatchSettings();
     settings.fixedServerPositions = false;
     var state = engine.startMatch(settings, "test-7", 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
-    Test.assertEqual(Side.LEFT, state.scoreScreenSides()[0]);
+    state = engine.applySelectServer(state, LEFT, 1);
+    Test.assertEqual(LEFT, state.scoreScreenSides()[0]);
     Test.assertEqual("Us", state.servingRoleLabels()[0]);
     Test.assertEqual("Them", state.servingRoleLabels()[1]);
 
     for (var p = 0; p < 4; p += 1) {
-        state = engine.applyPointWon(state, Side.LEFT, 10 + p);
+        state = engine.applyPointWon(state, LEFT, 10 + p);
     }
-    Test.assertEqual(Side.RIGHT, state.currentServer);
-    Test.assertEqual(Side.RIGHT, state.scoreScreenSides()[0]);
+    Test.assertEqual(RIGHT, state.currentServer);
+    Test.assertEqual(RIGHT, state.scoreScreenSides()[0]);
     Test.assertEqual("Them", state.servingRoleLabels()[0]);
     Test.assertEqual("Us", state.servingRoleLabels()[1]);
-    Test.assertEqual(Side.RIGHT, state.logicalSideForVisual(Side.LEFT));
+    Test.assertEqual(RIGHT, state.logicalSideForVisual(LEFT));
     return true;
 }
 
@@ -377,13 +377,13 @@ function testFixedServerPositionsRotatesServeButKeepsLayout(logger as Logger) as
     var settings = new MatchSettings();
     settings.fixedServerPositions = true;
     var state = engine.startMatch(settings, "test-8", 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
+    state = engine.applySelectServer(state, LEFT, 1);
     for (var p = 0; p < 4; p += 1) {
-        state = engine.applyPointWon(state, Side.LEFT, 10 + p);
+        state = engine.applyPointWon(state, LEFT, 10 + p);
     }
-    Test.assertEqual(Side.RIGHT, state.currentServer);
-    Test.assertEqual(Side.LEFT, state.scoreScreenSides()[0]);
-    Test.assertEqual(Side.RIGHT, state.scoreScreenSides()[1]);
+    Test.assertEqual(RIGHT, state.currentServer);
+    Test.assertEqual(LEFT, state.scoreScreenSides()[0]);
+    Test.assertEqual(RIGHT, state.scoreScreenSides()[1]);
     Test.assertEqual("Us", state.servingRoleLabels()[0]);
     Test.assertEqual("Them", state.servingRoleLabels()[1]);
     return true;
@@ -409,12 +409,12 @@ function testServeRotatesIntoFirstGameOfNextSet(logger as Logger) as Boolean {
     var settings = new MatchSettings();
     settings.fixedServerPositions = false;
     var state = engine.startMatch(settings, "test-set-serve", 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
-    state = winGames(engine, state, Side.LEFT, 6, 2);
+    state = engine.applySelectServer(state, LEFT, 1);
+    state = winGames(engine, state, LEFT, 6, 2);
     Test.assertEqual(1, state.completedSets.size());
     Test.assertEqual(0, state.currentSet.leftGames);
     Test.assert(!state.needsServerSelection);
-    Test.assertEqual(Side.LEFT, state.currentServer);
+    Test.assertEqual(LEFT, state.currentServer);
     return true;
 }
 
@@ -424,20 +424,20 @@ function testTieBreakOpensOnRotatedServe(logger as Logger) as Boolean {
     var settings = new MatchSettings();
     settings.fixedServerPositions = false;
     var state = engine.startMatch(settings, "test-tb-serve", 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
+    state = engine.applySelectServer(state, LEFT, 1);
     var t = 2;
     for (var i = 0; i < 6; i += 1) {
         for (var p = 0; p < 4; p += 1) {
-            state = engine.applyPointWon(state, Side.LEFT, t);
+            state = engine.applyPointWon(state, LEFT, t);
             t += 1;
         }
         for (var p = 0; p < 4; p += 1) {
-            state = engine.applyPointWon(state, Side.RIGHT, t);
+            state = engine.applyPointWon(state, RIGHT, t);
             t += 1;
         }
     }
     Test.assert(state.currentGame.isTieBreak);
-    Test.assertEqual(Side.LEFT, state.currentServer);
+    Test.assertEqual(LEFT, state.currentServer);
     return true;
 }
 
@@ -446,7 +446,7 @@ function testNewServeNotOfferedBeforeFirstSet(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
     var settings = new MatchSettings();
     var state = engine.startMatch(settings, "test-no-serve", 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
+    state = engine.applySelectServer(state, LEFT, 1);
     Test.assertEqual(0, state.completedSets.size());
     Test.assert(state.isAtSetStart());
     Test.assert(!state.canChooseNewServer());
@@ -458,8 +458,8 @@ function testNewServeAtChangeover(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
     var settings = new MatchSettings();
     var state = engine.startMatch(settings, "test-new-serve", 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
-    state = winGames(engine, state, Side.LEFT, 6, 2);
+    state = engine.applySelectServer(state, LEFT, 1);
+    state = winGames(engine, state, LEFT, 6, 2);
     Test.assert(state.canChooseNewServer());
     state = engine.applyRequestServerSelection(state);
     Test.assert(state.needsServerSelection);
@@ -472,13 +472,13 @@ function testDeuceFormatChangeKeepsNewServePrompt(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
     var settings = new MatchSettings();
     var state = engine.startMatch(settings, "test-deuce-serve", 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
-    state = winGames(engine, state, Side.LEFT, 6, 2);
+    state = engine.applySelectServer(state, LEFT, 1);
+    state = winGames(engine, state, LEFT, 6, 2);
     state = engine.applyRequestServerSelection(state);
-    state = engine.applySetDeuceFormat(state, DeuceFormat.DEUCE_ADVANTAGE, 100);
+    state = engine.applySetDeuceFormat(state, DEUCE_ADVANTAGE, 100);
     Test.assert(state.needsServerSelection);
     Test.assertEqual(null, state.currentServer);
-    Test.assertEqual(DeuceFormat.DEUCE_ADVANTAGE, state.settings.deuceFormat);
+    Test.assertEqual(DEUCE_ADVANTAGE, state.settings.deuceFormat);
     return true;
 }
 
@@ -487,10 +487,10 @@ function testFinishWithoutWinnerEndsEarly(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
     var settings = new MatchSettings();
     var state = engine.startMatch(settings, "test-finish-early", 0);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
-    state = engine.applyPointWon(state, Side.LEFT, 2);
+    state = engine.applySelectServer(state, LEFT, 1);
+    state = engine.applyPointWon(state, LEFT, 2);
     state = engine.applyFinish(state, 3);
-    Test.assertEqual(MatchStatus.ENDED_EARLY, state.status);
+    Test.assertEqual(ENDED_EARLY, state.status);
     Test.assertEqual(null, state.winner);
     return true;
 }
@@ -535,8 +535,8 @@ function testWarmUpNotReArmedAtSetStart(logger as Logger) as Boolean {
     var settings = new MatchSettings();
     var state = engine.startMatch(settings, "test-warmup-set", 0);
     state = engine.applyCompleteWarmUp(state);
-    state = engine.applySelectServer(state, Side.LEFT, 1);
-    state = winGames(engine, state, Side.LEFT, 6, 2);
+    state = engine.applySelectServer(state, LEFT, 1);
+    state = winGames(engine, state, LEFT, 6, 2);
     Test.assertEqual(1, state.completedSets.size());
     Test.assert(!state.needsWarmUp);
     state = engine.applyRequestServerSelection(state);

@@ -28,7 +28,7 @@ class SettingsView extends WatchUi.View {
         var y = 36;
         var shown = 0;
         for (var i = scrollIndex; i < labels.size() && shown < 4; i += 1) {
-            var color = i == 0 && service.getDeuceFormat() == DeuceFormat.DEUCE_ADVANTAGE
+            var color = i == 0 && service.getDeuceFormat() == DEUCE_ADVANTAGE
                 ? Graphics.COLOR_DK_GRAY
                 : Graphics.COLOR_GREEN;
             if (i == 1) {

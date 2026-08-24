@@ -75,8 +75,8 @@ class MatchPagerView extends WatchUi.View {
         var buttonH = height / 2 - 30;
         var buttonW = width / 2 - 10;
 
-        var leftColor = sides[0] == Side.LEFT ? UiHelpers.COLOR_LEFT : UiHelpers.COLOR_RIGHT;
-        var rightColor = sides[1] == Side.LEFT ? UiHelpers.COLOR_LEFT : UiHelpers.COLOR_RIGHT;
+        var leftColor = sides[0] == LEFT ? UiHelpers.COLOR_LEFT : UiHelpers.COLOR_RIGHT;
+        var rightColor = sides[1] == LEFT ? UiHelpers.COLOR_LEFT : UiHelpers.COLOR_RIGHT;
         var leftServing = match.currentServer != null && match.currentServer == sides[0];
         var rightServing = match.currentServer != null && match.currentServer == sides[1];
 
@@ -220,7 +220,7 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
             return false;
         }
 
-        var visual = x < width / 2 ? Side.LEFT : Side.RIGHT;
+        var visual = x < width / 2 ? LEFT : RIGHT;
         var side = match.logicalSideForVisual(visual);
         var now = Time.now().value();
 
@@ -235,7 +235,7 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
         service.awardPoint(side);
         var updated = service.activeMatch;
         checkMatchComplete(match, updated);
-        if (service.activeMatch != null && service.activeMatch.status == MatchStatus.IN_PROGRESS
+        if (service.activeMatch != null && service.activeMatch.status == IN_PROGRESS
             && !didPointEndGame(match, service.activeMatch)) {
             startUndoWindow(side, now);
         }
@@ -363,7 +363,7 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
             progress = 1;
         }
         var visual = service.activeMatch.visualSideForLogical(undoSide);
-        if (visual == Side.LEFT) {
+        if (visual == LEFT) {
             view.undoProgressLeft = progress;
             view.undoProgressRight = 0.0;
         } else {
@@ -389,7 +389,7 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
     }
 
     private function didPointEndGame(previous as MatchState, updated as MatchState) as Boolean {
-        if (previous.status != MatchStatus.IN_PROGRESS || updated.status != MatchStatus.IN_PROGRESS) {
+        if (previous.status != IN_PROGRESS || updated.status != IN_PROGRESS) {
             return false;
         }
         var oldGames = previous.currentSet.leftGames + previous.currentSet.rightGames;
@@ -402,7 +402,7 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
         if (match == null) {
             return;
         }
-        if (match.status == MatchStatus.COMPLETED || match.status == MatchStatus.ENDED_EARLY) {
+        if (match.status == COMPLETED || match.status == ENDED_EARLY) {
             navigateToComplete();
             return;
         }
