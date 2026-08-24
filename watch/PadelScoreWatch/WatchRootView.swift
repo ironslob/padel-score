@@ -166,6 +166,8 @@ private struct GameInterstitialView: View {
     let onNext: () -> Void
     let onChooseServer: () -> Void
 
+    @State private var confirmEndMatch = false
+
     private var sets: (left: String, right: String) { match.matchSetsDisplay }
     private var games: (left: String, right: String) {
         if completedSet, let finishedSet = match.completedSets.last {
@@ -191,81 +193,116 @@ private struct GameInterstitialView: View {
     }
 
     var body: some View {
+        Group {
+            if completedSet {
+                setEndContent
+            } else {
+                gameEndContent
+            }
+        }
+        .confirmationDialog("End this match?", isPresented: $confirmEndMatch) {
+            Button("End Match", role: .destructive) { service.finishMatch() }
+            Button("Cancel", role: .cancel) {}
+        }
+    }
+
+    /// Between games the likely actions fit on one row, and a countdown carries on
+    /// if nobody taps.
+    private var gameEndContent: some View {
         TimelineView(
             .animation(
                 minimumInterval: 1.0 / 30.0,
-                // Nothing counts down without a timeout, so stop redrawing entirely
-                // rather than animate a ring that never appears.
                 paused: isLuminanceReduced || timeout <= 0
             )
         ) { context in
             let progress = nextProgress(at: context.date)
 
             ScrollView {
-                // The serve choice is a third control on a screen sized for two, so the
-                // set summary gives up its breathing room to keep it above the fold on
-                // the smallest watch.
-                VStack(spacing: offersServeChoice ? 6 : 10) {
-                    Text(headline)
-                        .font(.headline.weight(.bold))
-                        .frame(maxWidth: .infinity)
-
-                    if offersServeChoice {
-                        // Both scores on one line: the third button needs the height.
-                        HStack(spacing: 6) {
-                            Text("Games \(games.left) – \(games.right)")
-                                .font(.subheadline.weight(.semibold).monospacedDigit())
-                            Text("Sets \(sets.left) – \(sets.right)")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        }
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                        .frame(maxWidth: .infinity)
-                    } else {
-                        VStack(spacing: 4) {
-                            if isTieBreak {
-                                Text("First to 7, win by 2")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            } else {
-                                Text("Sets \(sets.left) – \(sets.right)")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Text("Games \(games.left) – \(games.right)")
-                                .font(.title3.weight(.semibold).monospacedDigit())
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
+                VStack(spacing: 10) {
+                    scoreSummary
 
                     HStack(spacing: 8) {
-                        Button("Undo") {
-                            service.undoLastPoint()
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.orange)
-                        .disabled(!service.canUndo)
-                        .frame(maxWidth: .infinity)
-
+                        undoButton
                         nextButton(progress: isLuminanceReduced ? 0 : progress)
-                    }
-
-                    if offersServeChoice {
-                        chooseServerButton
                     }
                 }
                 .padding(.horizontal)
-                .padding(.vertical, offersServeChoice ? 6 : 16)
+                .padding(.vertical, 16)
             }
         }
+    }
+
+    /// Between sets there is time to look, so buttons stay full size and scroll in
+    /// the order they are most likely needed: continue, new serve, undo, then stop.
+    private var setEndContent: some View {
+        ScrollView {
+            VStack(spacing: 10) {
+                scoreSummary
+
+                nextButton(progress: 0)
+
+                if offersServeChoice {
+                    chooseServerButton
+                }
+
+                undoButton
+
+                Button(role: .destructive) {
+                    confirmEndMatch = true
+                } label: {
+                    Text("End match")
+                        .font(.body.weight(.semibold))
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.bordered)
+                .accessibilityLabel("End match")
+                .accessibilityHint("Finish the match and keep the current score")
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 16)
+        }
+    }
+
+    private var scoreSummary: some View {
+        VStack(spacing: 10) {
+            Text(headline)
+                .font(.headline.weight(.bold))
+                .frame(maxWidth: .infinity)
+
+            VStack(spacing: 4) {
+                if isTieBreak {
+                    Text("First to 7, win by 2")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Sets \(sets.left) – \(sets.right)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Text("Games \(games.left) – \(games.right)")
+                    .font(.title3.weight(.semibold).monospacedDigit())
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    private var undoButton: some View {
+        Button("Undo") {
+            service.undoLastPoint()
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(.orange)
+        .disabled(!service.canUndo)
+        .frame(maxWidth: .infinity, minHeight: 44)
+        .accessibilityLabel("Undo")
+        .accessibilityHint("Remove the last point")
     }
 
     private var chooseServerButton: some View {
         Button(action: onChooseServer) {
             Text("New serve")
-                .font(.caption.weight(.semibold))
-                .frame(maxWidth: .infinity, minHeight: 30)
+                .font(.body.weight(.semibold))
+                .frame(maxWidth: .infinity, minHeight: 44)
         }
         .buttonStyle(.bordered)
         .accessibilityLabel("New serve")
@@ -301,7 +338,7 @@ private struct GameInterstitialView: View {
                     .minimumScaleFactor(0.8)
                     .lineLimit(1)
             }
-            .frame(maxWidth: .infinity, minHeight: offersServeChoice ? 40 : 44)
+            .frame(maxWidth: .infinity, minHeight: 44)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(nextLabel)

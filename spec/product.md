@@ -431,6 +431,22 @@ If Undo is selected:
 
 After the timeout expires the point becomes part of permanent match history.
 
+When a game ends, a brief summary offers Undo and Next. It continues on its own if nobody taps.
+
+When a set ends and the match is still in progress, the summary stays until the player chooses. Buttons stay normal size and scroll, with the most likely actions first:
+
+```
+Next set
+
+New serve
+
+Undo
+
+End match
+```
+
+New serve is available while the new set has not been played into. End match requires confirmation and keeps the current score.
+
 ---
 
 # 16. Match Screen
