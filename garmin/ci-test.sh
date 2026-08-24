@@ -11,7 +11,7 @@ CERTIFICATE_PATH="${2:-developer_key.der}"
 # HOME to the runner user's path; force the image default so the simulator can start.
 export HOME="${HOME:-/root}"
 
-trap 'kill $(jobs -p) 2>/dev/null || true' EXIT
+trap 'jobs -p | xargs -r kill 2>/dev/null || true' EXIT
 
 mkdir -p bin
 monkeyc -f monkey.jungle -d "$DEVICE_ID" -o bin/app.prg -y "$CERTIFICATE_PATH" -t -l 0 -w

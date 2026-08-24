@@ -9,7 +9,7 @@ function testLoveToGame(logger as Logger) as Boolean {
     var settings = new MatchSettings();
     var state = engine.startMatch(settings, "test-1", 0);
     state = engine.applySelectServer(state, LEFT, 1);
-    Test.assertNotEqual(null, state);
+    Test.assert(state != null);
     state = engine.applyPointWon(state, LEFT, 2);
     state = engine.applyPointWon(state, LEFT, 3);
     state = engine.applyPointWon(state, LEFT, 4);
@@ -66,7 +66,7 @@ function testAdvantageCyclesIndefinitely(logger as Logger) as Boolean {
         Test.assertEqual(LEFT, state.currentGame.advantageSide);
         state = engine.applyPointWon(state, RIGHT, t);
         t += 1;
-        Test.assertEqual(null, state.currentGame.advantageSide);
+        Test.assert(state.currentGame.advantageSide == null);
         Test.assert(!state.currentGame.isGoldenPointActive);
         Test.assertEqual("Deuce", state.gameStatusLine());
     }
@@ -81,7 +81,7 @@ function testGoldenPointIsDecisiveImmediatelyAtDeuce(logger as Logger) as Boolea
     var state = startAtDeuce(engine, DEUCE_GOLDEN_POINT, "test-gp-1");
     // No advantage phase at all: 40-40 is already the deciding rally.
     Test.assert(state.currentGame.isGoldenPointActive);
-    Test.assertEqual(null, state.currentGame.advantageSide);
+    Test.assert(state.currentGame.advantageSide == null);
     Test.assertEqual("Golden Point", state.gameStatusLine());
     var pair = state.gameDisplayPair();
     Test.assertEqual("GP", pair[0]);
@@ -101,7 +101,7 @@ function testGoldenPointNeverAwardsAdvantage(logger as Logger) as Boolean {
     state = engine.applyPointWon(state, LEFT, 30);
     // The game is over — the point did not become an advantage.
     Test.assertEqual(1, state.currentSet.leftGames);
-    Test.assertEqual(null, state.currentGame.advantageSide);
+    Test.assert(state.currentGame.advantageSide == null);
     return true;
 }
 
@@ -138,7 +138,7 @@ function testSilverPointPlaysOneAdvantageThenDecides(logger as Logger) as Boolea
 
     state = engine.applyPointWon(state, RIGHT, 31); // broken → deciding point
     Test.assert(state.currentGame.isGoldenPointActive);
-    Test.assertEqual(null, state.currentGame.advantageSide);
+    Test.assert(state.currentGame.advantageSide == null);
     Test.assertEqual("Silver Point", state.gameStatusLine());
     var pair = state.gameDisplayPair();
     Test.assertEqual("SP", pair[0]);
@@ -225,8 +225,8 @@ function testDeuceFormatStringRoundTrip(logger as Logger) as Boolean {
         Test.assertEqual(formats[i], deuceFormatFromString(raw));
     }
     // Unknown and absent values fall through so callers can apply migration.
-    Test.assertEqual(null, deuceFormatFromString(null));
-    Test.assertEqual(null, deuceFormatFromString("nonsense"));
+    Test.assert(deuceFormatFromString(null) == null);
+    Test.assert(deuceFormatFromString("nonsense") == null);
     return true;
 }
 
@@ -463,7 +463,7 @@ function testNewServeAtChangeover(logger as Logger) as Boolean {
     Test.assert(state.canChooseNewServer());
     state = engine.applyRequestServerSelection(state);
     Test.assert(state.needsServerSelection);
-    Test.assertEqual(null, state.currentServer);
+    Test.assert(state.currentServer == null);
     return true;
 }
 
@@ -477,7 +477,7 @@ function testDeuceFormatChangeKeepsNewServePrompt(logger as Logger) as Boolean {
     state = engine.applyRequestServerSelection(state);
     state = engine.applySetDeuceFormat(state, DEUCE_ADVANTAGE, 100);
     Test.assert(state.needsServerSelection);
-    Test.assertEqual(null, state.currentServer);
+    Test.assert(state.currentServer == null);
     Test.assertEqual(DEUCE_ADVANTAGE, state.settings.deuceFormat);
     return true;
 }
@@ -491,7 +491,7 @@ function testFinishWithoutWinnerEndsEarly(logger as Logger) as Boolean {
     state = engine.applyPointWon(state, LEFT, 2);
     state = engine.applyFinish(state, 3);
     Test.assertEqual(ENDED_EARLY, state.status);
-    Test.assertEqual(null, state.winner);
+    Test.assert(state.winner == null);
     return true;
 }
 
@@ -525,7 +525,7 @@ function testCompleteWarmUpClearsFlag(logger as Logger) as Boolean {
     state = engine.applyCompleteWarmUp(state);
     Test.assert(!state.needsWarmUp);
     Test.assert(state.needsServerSelection);
-    Test.assertEqual(null, state.currentServer);
+    Test.assert(state.currentServer == null);
     return true;
 }
 
