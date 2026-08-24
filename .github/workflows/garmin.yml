@@ -98,6 +98,7 @@ jobs:
 
       - name: Compile and run Connect IQ tests
         run: |
+          set -euo pipefail
           mkdir -p bin
           # Gradual/strict typing (-l 1+) fails on nullable test assertions; compile
           # tests with typecheck off to match the build job's effective settings.
@@ -107,7 +108,7 @@ jobs:
           sleep 5
           simulator >/dev/null 2>&1 &
           sleep 5
-          monkeydo bin/app.prg venu3 -t | tee /tmp/result.txt
+          timeout 120 monkeydo bin/app.prg venu3 -t | tee /tmp/result.txt
           result="$(tail -1 /tmp/result.txt)"
           echo "$result"
           case "$result" in PASSED*) exit 0 ;; *) exit 1 ;; esac
