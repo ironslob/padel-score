@@ -98,17 +98,5 @@ jobs:
 
       - name: Compile and run Connect IQ tests
         run: |
-          set -euo pipefail
-          mkdir -p bin
-          # Gradual/strict typing (-l 1+) fails on nullable test assertions; compile
-          # tests with typecheck off to match the build job's effective settings.
-          monkeyc -f monkey.jungle -d venu3 -o bin/app.prg -y developer_key.der -t -l 0 -w
-          export DISPLAY=:1
-          Xvfb "$DISPLAY" -screen 0 1280x1024x24 &
-          sleep 5
-          simulator >/dev/null 2>&1 &
-          sleep 5
-          timeout 120 monkeydo bin/app.prg venu3 -t | tee /tmp/result.txt
-          result="$(tail -1 /tmp/result.txt)"
-          echo "$result"
-          case "$result" in PASSED*) exit 0 ;; *) exit 1 ;; esac
+          chmod +x ci-test.sh
+          ./ci-test.sh venu3 developer_key.der
