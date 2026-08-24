@@ -31,20 +31,6 @@ enum ScoringError {
     INVALID_ACTION
 }
 
-// Enum member names must be unique across the app (Monkey C puts them in $).
-// Prefix ACTION_ so POINT_WON does not collide with MatchEventKind.POINT_WON.
-enum MatchActionType {
-    ACTION_SELECT_SERVER,
-    ACTION_POINT_WON,
-    ACTION_UNDO,
-    ACTION_FINISH,
-    ACTION_END_EARLY,
-    ACTION_DISCARD,
-    ACTION_REQUEST_SERVER_SELECTION,
-    ACTION_COMPLETE_WARM_UP,
-    ACTION_SET_DEUCE_FORMAT
-}
-
 // How a game is resolved once both sides reach 40.
 // DEUCE_ADVANTAGE: traditional advantage until two clear.
 // DEUCE_SILVER_POINT: one advantage, then decisive point if broken.
@@ -55,135 +41,11 @@ enum DeuceFormat {
     DEUCE_GOLDEN_POINT
 }
 
-// Persisted as a string so stored values survive enum reordering.
-function deuceFormatToString(format as DeuceFormat) as String {
-    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
-        return "advantage";
-    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
-        return "silverPoint";
-    }
-    return "goldenPoint";
-}
-
-function deuceFormatFromString(raw as String or Null) as DeuceFormat or Null {
-    if (raw == null) {
-        return null;
-    }
-    if (raw.equals("advantage")) {
-        return DeuceFormat.DEUCE_ADVANTAGE;
-    } else if (raw.equals("silverPoint")) {
-        return DeuceFormat.DEUCE_SILVER_POINT;
-    } else if (raw.equals("goldenPoint")) {
-        return DeuceFormat.DEUCE_GOLDEN_POINT;
-    }
-    return null;
-}
-
-// Migration for a match archived before silver point existed. The old
-// `goldenPointEnabled` flag played one advantage before the decisive point,
-// which is silver point — so map it there to keep archived scorelines faithful
-// to how they were actually played.
-function deuceFormatFromLegacyArchivedFlag(goldenPointEnabled as Boolean) as DeuceFormat {
-    return goldenPointEnabled ? DeuceFormat.DEUCE_SILVER_POINT : DeuceFormat.DEUCE_ADVANTAGE;
-}
-
-// Migration for the stored user preference, which deliberately differs from the
-// archived-match rule above: someone who turned the old toggle off wanted full
-// advantage scoring, so honour that. Everyone else gets the new default, which
-// is what the old "Golden Point" label promised.
-function deuceFormatFromLegacyPreference(goldenPointEnabled as Boolean or Null) as DeuceFormat {
-    if (goldenPointEnabled != null && !goldenPointEnabled) {
-        return DeuceFormat.DEUCE_ADVANTAGE;
-    }
-    return DeuceFormat.DEUCE_GOLDEN_POINT;
-}
-
-// Settings label. Kept compact because the settings button renders at
-// FONT_MEDIUM and does not truncate.
-function deuceFormatLabel(format as DeuceFormat) as String {
-    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
-        return "Regular";
-    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
-        return "Silver";
-    }
-    return "Golden";
-}
-
-// Name for the decisive point, shown on the score screen.
-function deuceFormatDecidingPointLabel(format as DeuceFormat) as String {
-    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
-        return "Deuce";
-    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
-        return "Silver Point";
-    }
-    return "Golden Point";
-}
-
-// Two-character form for the score readout.
-function deuceFormatDecidingPointShortLabel(format as DeuceFormat) as String {
-    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
-        return "40";
-    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
-        return "SP";
-    }
-    return "GP";
-}
-
 enum MatchSetFormat {
     SET_FORMAT_BEST_OF_ONE,
     SET_FORMAT_BEST_OF_THREE,
     SET_FORMAT_BEST_OF_FIVE,
     SET_FORMAT_CONTINUOUS
-}
-
-function matchSetFormatFromSettings(settings as MatchSettings) as MatchSetFormat {
-    if (settings.continuousPlay) {
-        return MatchSetFormat.SET_FORMAT_CONTINUOUS;
-    }
-    if (settings.setsToWin == 1) {
-        return MatchSetFormat.SET_FORMAT_BEST_OF_ONE;
-    }
-    if (settings.setsToWin == 3) {
-        return MatchSetFormat.SET_FORMAT_BEST_OF_FIVE;
-    }
-    return MatchSetFormat.SET_FORMAT_BEST_OF_THREE;
-}
-
-function applyMatchSetFormat(settings as MatchSettings, format as MatchSetFormat) as Void {
-    if (format == MatchSetFormat.SET_FORMAT_BEST_OF_ONE) {
-        settings.setsToWin = 1;
-        settings.continuousPlay = false;
-    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_FIVE) {
-        settings.setsToWin = 3;
-        settings.continuousPlay = false;
-    } else if (format == MatchSetFormat.SET_FORMAT_CONTINUOUS) {
-        settings.continuousPlay = true;
-    } else {
-        settings.setsToWin = 2;
-        settings.continuousPlay = false;
-    }
-}
-
-function matchSetFormatLabel(format as MatchSetFormat) as String {
-    if (format == MatchSetFormat.SET_FORMAT_BEST_OF_ONE) {
-        return "1 set";
-    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_FIVE) {
-        return "Best of 5";
-    } else if (format == MatchSetFormat.SET_FORMAT_CONTINUOUS) {
-        return "Continuous";
-    }
-    return "Best of 3";
-}
-
-function nextMatchSetFormat(format as MatchSetFormat) as MatchSetFormat {
-    if (format == MatchSetFormat.SET_FORMAT_BEST_OF_ONE) {
-        return MatchSetFormat.SET_FORMAT_BEST_OF_THREE;
-    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_THREE) {
-        return MatchSetFormat.SET_FORMAT_BEST_OF_FIVE;
-    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_FIVE) {
-        return MatchSetFormat.SET_FORMAT_CONTINUOUS;
-    }
-    return MatchSetFormat.SET_FORMAT_BEST_OF_ONE;
 }
 
 class DeuceFormatChange {
@@ -246,16 +108,6 @@ class MatchSettings {
     function shouldWarmUp() as Boolean {
         return warmUpEnabled;
     }
-}
-
-function clampWarmUpMinutes(value as Number) as Number {
-    if (value < MatchSettings.WARM_UP_MINUTES_MIN) {
-        return MatchSettings.WARM_UP_MINUTES_MIN;
-    }
-    if (value > MatchSettings.WARM_UP_MINUTES_MAX) {
-        return MatchSettings.WARM_UP_MINUTES_MAX;
-    }
-    return value;
 }
 
 class GameScore {
@@ -653,6 +505,128 @@ class MatchState {
         }
         return result;
     }
+}
+
+// Module-level helpers live after enums and classes (Monkey C compile order).
+function deuceFormatToString(format as DeuceFormat) as String {
+    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
+        return "advantage";
+    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
+        return "silverPoint";
+    }
+    return "goldenPoint";
+}
+
+function deuceFormatFromString(raw as String or Null) as DeuceFormat or Null {
+    if (raw == null) {
+        return null;
+    }
+    if (raw.equals("advantage")) {
+        return DeuceFormat.DEUCE_ADVANTAGE;
+    } else if (raw.equals("silverPoint")) {
+        return DeuceFormat.DEUCE_SILVER_POINT;
+    } else if (raw.equals("goldenPoint")) {
+        return DeuceFormat.DEUCE_GOLDEN_POINT;
+    }
+    return null;
+}
+
+function deuceFormatFromLegacyArchivedFlag(goldenPointEnabled as Boolean) as DeuceFormat {
+    return goldenPointEnabled ? DeuceFormat.DEUCE_SILVER_POINT : DeuceFormat.DEUCE_ADVANTAGE;
+}
+
+function deuceFormatFromLegacyPreference(goldenPointEnabled as Boolean or Null) as DeuceFormat {
+    if (goldenPointEnabled != null && !goldenPointEnabled) {
+        return DeuceFormat.DEUCE_ADVANTAGE;
+    }
+    return DeuceFormat.DEUCE_GOLDEN_POINT;
+}
+
+function deuceFormatLabel(format as DeuceFormat) as String {
+    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
+        return "Regular";
+    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
+        return "Silver";
+    }
+    return "Golden";
+}
+
+function deuceFormatDecidingPointLabel(format as DeuceFormat) as String {
+    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
+        return "Deuce";
+    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
+        return "Silver Point";
+    }
+    return "Golden Point";
+}
+
+function deuceFormatDecidingPointShortLabel(format as DeuceFormat) as String {
+    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
+        return "40";
+    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
+        return "SP";
+    }
+    return "GP";
+}
+
+function matchSetFormatFromSettings(settings as MatchSettings) as MatchSetFormat {
+    if (settings.continuousPlay) {
+        return MatchSetFormat.SET_FORMAT_CONTINUOUS;
+    }
+    if (settings.setsToWin == 1) {
+        return MatchSetFormat.SET_FORMAT_BEST_OF_ONE;
+    }
+    if (settings.setsToWin == 3) {
+        return MatchSetFormat.SET_FORMAT_BEST_OF_FIVE;
+    }
+    return MatchSetFormat.SET_FORMAT_BEST_OF_THREE;
+}
+
+function applyMatchSetFormat(settings as MatchSettings, format as MatchSetFormat) as Void {
+    if (format == MatchSetFormat.SET_FORMAT_BEST_OF_ONE) {
+        settings.setsToWin = 1;
+        settings.continuousPlay = false;
+    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_FIVE) {
+        settings.setsToWin = 3;
+        settings.continuousPlay = false;
+    } else if (format == MatchSetFormat.SET_FORMAT_CONTINUOUS) {
+        settings.continuousPlay = true;
+    } else {
+        settings.setsToWin = 2;
+        settings.continuousPlay = false;
+    }
+}
+
+function matchSetFormatLabel(format as MatchSetFormat) as String {
+    if (format == MatchSetFormat.SET_FORMAT_BEST_OF_ONE) {
+        return "1 set";
+    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_FIVE) {
+        return "Best of 5";
+    } else if (format == MatchSetFormat.SET_FORMAT_CONTINUOUS) {
+        return "Continuous";
+    }
+    return "Best of 3";
+}
+
+function nextMatchSetFormat(format as MatchSetFormat) as MatchSetFormat {
+    if (format == MatchSetFormat.SET_FORMAT_BEST_OF_ONE) {
+        return MatchSetFormat.SET_FORMAT_BEST_OF_THREE;
+    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_THREE) {
+        return MatchSetFormat.SET_FORMAT_BEST_OF_FIVE;
+    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_FIVE) {
+        return MatchSetFormat.SET_FORMAT_CONTINUOUS;
+    }
+    return MatchSetFormat.SET_FORMAT_BEST_OF_ONE;
+}
+
+function clampWarmUpMinutes(value as Number) as Number {
+    if (value < MatchSettings.WARM_UP_MINUTES_MIN) {
+        return MatchSettings.WARM_UP_MINUTES_MIN;
+    }
+    if (value > MatchSettings.WARM_UP_MINUTES_MAX) {
+        return MatchSettings.WARM_UP_MINUTES_MAX;
+    }
+    return value;
 }
 
 function oppositeSide(side as Side) as Side {
