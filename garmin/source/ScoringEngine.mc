@@ -1,26 +1,28 @@
 // Pure scoring state machine — ported from shared/Scoring/ScoringEngine.swift
 
+import Toybox.Lang;
+
 class ScoringEngine {
 
     function startMatch(settings as MatchSettings, id as String, at as Number) as MatchState {
         var state = new MatchState(id, settings.copy(), at);
-        state.events.add(new MatchEvent(MatchEventKind.MATCH_STARTED, null, at));
+        state.events.add(new MatchEvent(MATCH_STARTED, null, at));
         state.needsWarmUp = settings.shouldWarmUp();
         return state;
     }
 
     function applySelectServer(state as MatchState, side as Side, at as Number) as MatchState or Null {
-        if (state.status != MatchStatus.IN_PROGRESS || !state.needsServerSelection) {
+        if (state.status != IN_PROGRESS || !state.needsServerSelection) {
             return null;
         }
         var next = copyStateShell(state);
         next.events = copyEvents(state.events);
-        next.events.add(new MatchEvent(MatchEventKind.SERVER_SELECTED, side, at));
+        next.events.add(new MatchEvent(SERVER_SELECTED, side, at));
         return replay(next.events, blankMatch(state));
     }
 
     function applyRequestServerSelection(state as MatchState) as MatchState or Null {
-        if (state.status != MatchStatus.IN_PROGRESS || !state.isAtSetStart()) {
+        if (state.status != IN_PROGRESS || !state.isAtSetStart()) {
             return null;
         }
         if (state.needsServerSelection) {
@@ -35,7 +37,7 @@ class ScoringEngine {
     }
 
     function applyCompleteWarmUp(state as MatchState) as MatchState or Null {
-        if (state.status != MatchStatus.IN_PROGRESS) {
+        if (state.status != IN_PROGRESS) {
             return null;
         }
         if (!state.needsWarmUp || !state.isWaitingForFirstServe()) {
@@ -49,7 +51,7 @@ class ScoringEngine {
     }
 
     function applySetDeuceFormat(state as MatchState, format as DeuceFormat, at as Number) as MatchState or Null {
-        if (state.status != MatchStatus.IN_PROGRESS) {
+        if (state.status != IN_PROGRESS) {
             return null;
         }
         if (state.settings.deuceFormat == format) {
@@ -70,29 +72,29 @@ class ScoringEngine {
     }
 
     function applyPointWon(state as MatchState, side as Side, at as Number) as MatchState or Null {
-        if (state.status != MatchStatus.IN_PROGRESS || state.needsServerSelection) {
+        if (state.status != IN_PROGRESS || state.needsServerSelection) {
             return null;
         }
         var next = copyStateShell(state);
         next.events = copyEvents(state.events);
-        next.events.add(new MatchEvent(MatchEventKind.POINT_WON, side, at));
+        next.events.add(new MatchEvent(POINT_WON, side, at));
         var result = replay(next.events, blankMatch(state));
-        if (result.status == MatchStatus.COMPLETED) {
+        if (result.status == COMPLETED) {
             result.finishedAt = at;
-            if (result.events.size() == 0 || result.events[result.events.size() - 1].kind != MatchEventKind.MATCH_FINISHED) {
-                result.events.add(new MatchEvent(MatchEventKind.MATCH_FINISHED, null, at));
+            if (result.events.size() == 0 || result.events[result.events.size() - 1].kind != MATCH_FINISHED) {
+                result.events.add(new MatchEvent(MATCH_FINISHED, null, at));
             }
         }
         return result;
     }
 
     function applyUndo(state as MatchState) as MatchState or Null {
-        if (state.status != MatchStatus.IN_PROGRESS) {
+        if (state.status != IN_PROGRESS) {
             return null;
         }
         var index = -1;
         for (var i = state.events.size() - 1; i >= 0; i -= 1) {
-            if (state.events[i].kind == MatchEventKind.POINT_WON) {
+            if (state.events[i].kind == POINT_WON) {
                 index = i;
                 break;
             }
@@ -106,7 +108,7 @@ class ScoringEngine {
     }
 
     function applyFinish(state as MatchState, at as Number) as MatchState or Null {
-        if (state.status != MatchStatus.IN_PROGRESS) {
+        if (state.status != IN_PROGRESS) {
             return null;
         }
         var next = copyStateShell(state);
@@ -114,36 +116,36 @@ class ScoringEngine {
         var winner = naturalWinner(state);
         if (winner != null) {
             next.winner = winner;
-            next.status = MatchStatus.COMPLETED;
+            next.status = COMPLETED;
         } else {
-            next.status = MatchStatus.ENDED_EARLY;
+            next.status = ENDED_EARLY;
         }
         next.finishedAt = at;
-        next.events.add(new MatchEvent(MatchEventKind.MATCH_FINISHED, null, at));
+        next.events.add(new MatchEvent(MATCH_FINISHED, null, at));
         return next;
     }
 
     function applyEndEarly(state as MatchState, at as Number) as MatchState or Null {
-        if (state.status != MatchStatus.IN_PROGRESS) {
+        if (state.status != IN_PROGRESS) {
             return null;
         }
         var next = copyStateShell(state);
         next.events = copyEvents(state.events);
-        next.status = MatchStatus.ENDED_EARLY;
+        next.status = ENDED_EARLY;
         next.finishedAt = at;
-        next.events.add(new MatchEvent(MatchEventKind.MATCH_ENDED_EARLY, null, at));
+        next.events.add(new MatchEvent(MATCH_ENDED_EARLY, null, at));
         return next;
     }
 
     function applyDiscard(state as MatchState, at as Number) as MatchState or Null {
-        if (state.status != MatchStatus.IN_PROGRESS) {
+        if (state.status != IN_PROGRESS) {
             return null;
         }
         var next = copyStateShell(state);
         next.events = copyEvents(state.events);
-        next.status = MatchStatus.DISCARDED;
+        next.status = DISCARDED;
         next.finishedAt = at;
-        next.events.add(new MatchEvent(MatchEventKind.MATCH_DISCARDED, null, at));
+        next.events.add(new MatchEvent(MATCH_DISCARDED, null, at));
         return next;
     }
 
@@ -164,39 +166,39 @@ class ScoringEngine {
             }
             state.events.add(event);
             switch (event.kind) {
-                case MatchEventKind.MATCH_STARTED:
+                case MATCH_STARTED:
                     state.startedAt = event.timestamp;
-                    state.status = MatchStatus.IN_PROGRESS;
+                    state.status = IN_PROGRESS;
                     state.needsServerSelection = true;
                     break;
-                case MatchEventKind.SERVER_SELECTED:
-                    if (event.side != null && state.status == MatchStatus.IN_PROGRESS
+                case SERVER_SELECTED:
+                    if (event.side != null && state.status == IN_PROGRESS
                         && (state.needsServerSelection || state.isAtSetStart())) {
                         state.currentServer = event.side;
                         state.needsServerSelection = false;
                     }
                     break;
-                case MatchEventKind.POINT_WON:
-                    if (event.side != null && state.status == MatchStatus.IN_PROGRESS) {
+                case POINT_WON:
+                    if (event.side != null && state.status == IN_PROGRESS) {
                         awardPoint(event.side, state, deuceFormat);
                     }
                     break;
-                case MatchEventKind.MATCH_FINISHED:
+                case MATCH_FINISHED:
                     state.finishedAt = event.timestamp;
                     var winner = naturalWinner(state);
                     if (winner != null) {
-                        state.status = MatchStatus.COMPLETED;
+                        state.status = COMPLETED;
                         state.winner = winner;
                     } else {
-                        state.status = MatchStatus.ENDED_EARLY;
+                        state.status = ENDED_EARLY;
                     }
                     break;
-                case MatchEventKind.MATCH_ENDED_EARLY:
-                    state.status = MatchStatus.ENDED_EARLY;
+                case MATCH_ENDED_EARLY:
+                    state.status = ENDED_EARLY;
                     state.finishedAt = event.timestamp;
                     break;
-                case MatchEventKind.MATCH_DISCARDED:
-                    state.status = MatchStatus.DISCARDED;
+                case MATCH_DISCARDED:
+                    state.status = DISCARDED;
                     state.finishedAt = event.timestamp;
                     break;
             }
@@ -213,8 +215,8 @@ class ScoringEngine {
     }
 
     private function restoreServerSelectionPrompt(previous as MatchState, replayed as MatchState) as MatchState {
-        if (previous.status != MatchStatus.IN_PROGRESS || !previous.needsServerSelection
-            || replayed.status != MatchStatus.IN_PROGRESS || !replayed.isAtSetStart()) {
+        if (previous.status != IN_PROGRESS || !previous.needsServerSelection
+            || replayed.status != IN_PROGRESS || !replayed.isAtSetStart()) {
             return replayed;
         }
         replayed.currentServer = null;
@@ -223,8 +225,8 @@ class ScoringEngine {
     }
 
     private function restoreWarmUp(previous as MatchState, replayed as MatchState) as MatchState {
-        if (previous.status != MatchStatus.IN_PROGRESS || !previous.needsWarmUp
-            || replayed.status != MatchStatus.IN_PROGRESS || !replayed.isWaitingForFirstServe()) {
+        if (previous.status != IN_PROGRESS || !previous.needsWarmUp
+            || replayed.status != IN_PROGRESS || !replayed.isWaitingForFirstServe()) {
             return replayed;
         }
         replayed.needsWarmUp = true;
@@ -232,12 +234,12 @@ class ScoringEngine {
     }
 
     private function applyDeuceFormat(format as DeuceFormat, state as MatchState) as Void {
-        if (state.status != MatchStatus.IN_PROGRESS || state.currentGame.isComplete
+        if (state.status != IN_PROGRESS || state.currentGame.isComplete
             || state.currentGame.isTieBreak
             || state.currentGame.leftPoints < 3 || state.currentGame.rightPoints < 3) {
             return;
         }
-        if (format == DeuceFormat.DEUCE_GOLDEN_POINT) {
+        if (format == DEUCE_GOLDEN_POINT) {
             state.currentGame.advantageSide = null;
             state.currentGame.isGoldenPointActive = true;
         } else {
@@ -246,7 +248,7 @@ class ScoringEngine {
     }
 
     private function awardPoint(side as Side, state as MatchState, deuceFormat as DeuceFormat) as Void {
-        if (state.currentGame.isComplete || state.status != MatchStatus.IN_PROGRESS) {
+        if (state.currentGame.isComplete || state.status != IN_PROGRESS) {
             return;
         }
         if (state.currentGame.isTieBreak) {
@@ -274,7 +276,7 @@ class ScoringEngine {
                 // advantage, so the next point decides; regular scoring keeps cycling.
                 state.currentGame.advantageSide = null;
                 state.currentGame.isGoldenPointActive =
-                    deuceFormat == DeuceFormat.DEUCE_SILVER_POINT;
+                    deuceFormat == DEUCE_SILVER_POINT;
             }
             return;
         }
@@ -288,7 +290,7 @@ class ScoringEngine {
 
         // Golden point: no advantage phase at all, so reaching 40-40 makes the very
         // next rally decisive.
-        if (deuceFormat == DeuceFormat.DEUCE_GOLDEN_POINT
+        if (deuceFormat == DEUCE_GOLDEN_POINT
             && state.currentGame.leftPoints >= 3
             && state.currentGame.rightPoints >= 3) {
             state.currentGame.isGoldenPointActive = true;
@@ -315,7 +317,7 @@ class ScoringEngine {
         state.currentGame.isComplete = true;
         state.currentGame.winner = winner;
         state.currentSet.setGames(7, winner);
-        var nextSetServer as Side or Null = null;
+        var nextSetServer = null;
         var opener = tieBreakOpeningServer(state);
         if (opener != null) {
             nextSetServer = oppositeSide(opener);
@@ -340,7 +342,7 @@ class ScoringEngine {
         var games = state.currentSet.gamesFor(winner) + 1;
         state.currentSet.setGames(games, winner);
 
-        var nextServer as Side or Null = null;
+        var nextServer = null;
         if (state.currentServer != null) {
             nextServer = oppositeSide(state.currentServer);
         }
@@ -378,7 +380,7 @@ class ScoringEngine {
         state.currentSet.winner = winner;
         state.completedSets.add(copySetScore(state.currentSet));
 
-        if (winner == Side.LEFT) {
+        if (winner == LEFT) {
             state.leftSetsWon += 1;
         } else {
             state.rightSetsWon += 1;
@@ -389,13 +391,13 @@ class ScoringEngine {
             state.currentGame = new GameScore();
             beginNextSetServe(nextSetServer, state);
         } else if (state.leftSetsWon >= state.settings.setsToWin) {
-            state.winner = Side.LEFT;
-            state.status = MatchStatus.COMPLETED;
+            state.winner = LEFT;
+            state.status = COMPLETED;
             state.finishedAt = state.events[state.events.size() - 1].timestamp;
             state.currentGame = new GameScore();
         } else if (state.rightSetsWon >= state.settings.setsToWin) {
-            state.winner = Side.RIGHT;
-            state.status = MatchStatus.COMPLETED;
+            state.winner = RIGHT;
+            state.status = COMPLETED;
             state.finishedAt = state.events[state.events.size() - 1].timestamp;
             state.currentGame = new GameScore();
         } else {
@@ -417,18 +419,18 @@ class ScoringEngine {
     private function naturalWinner(state as MatchState) as Side or Null {
         if (state.settings.continuousPlay) {
             if (state.leftSetsWon > state.rightSetsWon) {
-                return Side.LEFT;
+                return LEFT;
             }
             if (state.rightSetsWon > state.leftSetsWon) {
-                return Side.RIGHT;
+                return RIGHT;
             }
             return null;
         }
         if (state.leftSetsWon >= state.settings.setsToWin) {
-            return Side.LEFT;
+            return LEFT;
         }
         if (state.rightSetsWon >= state.settings.setsToWin) {
-            return Side.RIGHT;
+            return RIGHT;
         }
         return state.winner;
     }

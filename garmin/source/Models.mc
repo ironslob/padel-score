@@ -1,5 +1,7 @@
 // Domain constants and enums — ported from shared/Models/
 
+import Toybox.Lang;
+
 enum Side {
     LEFT,
     RIGHT
@@ -29,100 +31,14 @@ enum ScoringError {
     INVALID_ACTION
 }
 
-enum MatchActionType {
-    SELECT_SERVER,
-    POINT_WON,
-    UNDO,
-    FINISH,
-    END_EARLY,
-    DISCARD,
-    REQUEST_SERVER_SELECTION,
-    COMPLETE_WARM_UP,
-    SET_DEUCE_FORMAT
-}
-
 // How a game is resolved once both sides reach 40.
+// DEUCE_ADVANTAGE: traditional advantage until two clear.
+// DEUCE_SILVER_POINT: one advantage, then decisive point if broken.
+// DEUCE_GOLDEN_POINT: first point at 40-40 wins.
 enum DeuceFormat {
-    // Traditional scoring: advantage repeats until one side wins by two points.
     DEUCE_ADVANTAGE,
-    // One advantage is played. If it is broken, the next point decides the game.
     DEUCE_SILVER_POINT,
-    // No advantage at all — the first point at 40-40 decides the game.
     DEUCE_GOLDEN_POINT
-}
-
-// Persisted as a string so stored values survive enum reordering.
-function deuceFormatToString(format as DeuceFormat) as String {
-    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
-        return "advantage";
-    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
-        return "silverPoint";
-    }
-    return "goldenPoint";
-}
-
-function deuceFormatFromString(raw as String or Null) as DeuceFormat or Null {
-    if (raw == null) {
-        return null;
-    }
-    if (raw.equals("advantage")) {
-        return DeuceFormat.DEUCE_ADVANTAGE;
-    } else if (raw.equals("silverPoint")) {
-        return DeuceFormat.DEUCE_SILVER_POINT;
-    } else if (raw.equals("goldenPoint")) {
-        return DeuceFormat.DEUCE_GOLDEN_POINT;
-    }
-    return null;
-}
-
-// Migration for a match archived before silver point existed. The old
-// `goldenPointEnabled` flag played one advantage before the decisive point,
-// which is silver point — so map it there to keep archived scorelines faithful
-// to how they were actually played.
-function deuceFormatFromLegacyArchivedFlag(goldenPointEnabled as Boolean) as DeuceFormat {
-    return goldenPointEnabled ? DeuceFormat.DEUCE_SILVER_POINT : DeuceFormat.DEUCE_ADVANTAGE;
-}
-
-// Migration for the stored user preference, which deliberately differs from the
-// archived-match rule above: someone who turned the old toggle off wanted full
-// advantage scoring, so honour that. Everyone else gets the new default, which
-// is what the old "Golden Point" label promised.
-function deuceFormatFromLegacyPreference(goldenPointEnabled as Boolean or Null) as DeuceFormat {
-    if (goldenPointEnabled != null && !goldenPointEnabled) {
-        return DeuceFormat.DEUCE_ADVANTAGE;
-    }
-    return DeuceFormat.DEUCE_GOLDEN_POINT;
-}
-
-// Settings label. Kept compact because the settings button renders at
-// FONT_MEDIUM and does not truncate.
-function deuceFormatLabel(format as DeuceFormat) as String {
-    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
-        return "Regular";
-    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
-        return "Silver";
-    }
-    return "Golden";
-}
-
-// Name for the decisive point, shown on the score screen.
-function deuceFormatDecidingPointLabel(format as DeuceFormat) as String {
-    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
-        return "Deuce";
-    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
-        return "Silver Point";
-    }
-    return "Golden Point";
-}
-
-// Two-character form for the score readout.
-function deuceFormatDecidingPointShortLabel(format as DeuceFormat) as String {
-    if (format == DeuceFormat.DEUCE_ADVANTAGE) {
-        return "40";
-    } else if (format == DeuceFormat.DEUCE_SILVER_POINT) {
-        return "SP";
-    }
-    return "GP";
 }
 
 enum MatchSetFormat {
@@ -130,56 +46,6 @@ enum MatchSetFormat {
     SET_FORMAT_BEST_OF_THREE,
     SET_FORMAT_BEST_OF_FIVE,
     SET_FORMAT_CONTINUOUS
-}
-
-function matchSetFormatFromSettings(settings as MatchSettings) as MatchSetFormat {
-    if (settings.continuousPlay) {
-        return MatchSetFormat.SET_FORMAT_CONTINUOUS;
-    }
-    if (settings.setsToWin == 1) {
-        return MatchSetFormat.SET_FORMAT_BEST_OF_ONE;
-    }
-    if (settings.setsToWin == 3) {
-        return MatchSetFormat.SET_FORMAT_BEST_OF_FIVE;
-    }
-    return MatchSetFormat.SET_FORMAT_BEST_OF_THREE;
-}
-
-function applyMatchSetFormat(settings as MatchSettings, format as MatchSetFormat) as Void {
-    if (format == MatchSetFormat.SET_FORMAT_BEST_OF_ONE) {
-        settings.setsToWin = 1;
-        settings.continuousPlay = false;
-    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_FIVE) {
-        settings.setsToWin = 3;
-        settings.continuousPlay = false;
-    } else if (format == MatchSetFormat.SET_FORMAT_CONTINUOUS) {
-        settings.continuousPlay = true;
-    } else {
-        settings.setsToWin = 2;
-        settings.continuousPlay = false;
-    }
-}
-
-function matchSetFormatLabel(format as MatchSetFormat) as String {
-    if (format == MatchSetFormat.SET_FORMAT_BEST_OF_ONE) {
-        return "1 set";
-    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_FIVE) {
-        return "Best of 5";
-    } else if (format == MatchSetFormat.SET_FORMAT_CONTINUOUS) {
-        return "Continuous";
-    }
-    return "Best of 3";
-}
-
-function nextMatchSetFormat(format as MatchSetFormat) as MatchSetFormat {
-    if (format == MatchSetFormat.SET_FORMAT_BEST_OF_ONE) {
-        return MatchSetFormat.SET_FORMAT_BEST_OF_THREE;
-    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_THREE) {
-        return MatchSetFormat.SET_FORMAT_BEST_OF_FIVE;
-    } else if (format == MatchSetFormat.SET_FORMAT_BEST_OF_FIVE) {
-        return MatchSetFormat.SET_FORMAT_CONTINUOUS;
-    }
-    return MatchSetFormat.SET_FORMAT_BEST_OF_ONE;
 }
 
 class DeuceFormatChange {
@@ -216,7 +82,7 @@ class MatchSettings {
         continuousPlay = false;
         gamesToWinSet = 6;
         mustWinByTwoGames = true;
-        deuceFormat = DeuceFormat.DEUCE_GOLDEN_POINT;
+        deuceFormat = DEUCE_GOLDEN_POINT;
         askServeAtSetStart = false;
         fixedServerPositions = true;
         usThemLabels = true;
@@ -244,16 +110,6 @@ class MatchSettings {
     }
 }
 
-function clampWarmUpMinutes(value as Number) as Number {
-    if (value < MatchSettings.WARM_UP_MINUTES_MIN) {
-        return MatchSettings.WARM_UP_MINUTES_MIN;
-    }
-    if (value > MatchSettings.WARM_UP_MINUTES_MAX) {
-        return MatchSettings.WARM_UP_MINUTES_MAX;
-    }
-    return value;
-}
-
 class GameScore {
     var leftPoints as Number;
     var rightPoints as Number;
@@ -276,11 +132,11 @@ class GameScore {
     }
 
     function pointsFor(side as Side) as Number {
-        return side == Side.LEFT ? leftPoints : rightPoints;
+        return side == LEFT ? leftPoints : rightPoints;
     }
 
     function setPoints(value as Number, side as Side) as Void {
-        if (side == Side.LEFT) {
+        if (side == LEFT) {
             leftPoints = value;
         } else {
             rightPoints = value;
@@ -303,7 +159,7 @@ class GameScore {
             return [label, label] as Array<String>;
         }
         if (advantageSide != null) {
-            if (advantageSide == Side.LEFT) {
+            if (advantageSide == LEFT) {
                 return ["Ad", "40"] as Array<String>;
             }
             return ["40", "Ad"] as Array<String>;
@@ -373,11 +229,11 @@ class SetScore {
     }
 
     function gamesFor(side as Side) as Number {
-        return side == Side.LEFT ? leftGames : rightGames;
+        return side == LEFT ? leftGames : rightGames;
     }
 
     function setGames(value as Number, side as Side) as Void {
-        if (side == Side.LEFT) {
+        if (side == LEFT) {
             leftGames = value;
         } else {
             rightGames = value;
@@ -423,7 +279,7 @@ class MatchState {
     function initialize(id as String, settings as MatchSettings, startedAt as Number) {
         self.id = id;
         self.settings = settings;
-        self.status = MatchStatus.IN_PROGRESS;
+        self.status = IN_PROGRESS;
         self.events = [] as Array<MatchEvent>;
         self.deuceFormatChanges = [] as Array<DeuceFormatChange>;
         self.startedAt = startedAt;
@@ -441,7 +297,7 @@ class MatchState {
 
     function hasScoredPoints() as Boolean {
         for (var i = 0; i < events.size(); i += 1) {
-            if (events[i].kind == MatchEventKind.POINT_WON) {
+            if (events[i].kind == POINT_WON) {
                 return true;
             }
         }
@@ -456,12 +312,12 @@ class MatchState {
     }
 
     function canChooseNewServer() as Boolean {
-        return status == MatchStatus.IN_PROGRESS && !needsServerSelection && isAtSetStart()
+        return status == IN_PROGRESS && !needsServerSelection && isAtSetStart()
             && completedSets.size() > 0;
     }
 
     function isWaitingForFirstServe() as Boolean {
-        return status == MatchStatus.IN_PROGRESS && needsServerSelection && isAtSetStart()
+        return status == IN_PROGRESS && needsServerSelection && isAtSetStart()
             && completedSets.size() == 0 && !hasScoredPoints();
     }
 
@@ -487,7 +343,7 @@ class MatchState {
 
     function lastScoringActivityAt() as Number {
         for (var i = events.size() - 1; i >= 0; i -= 1) {
-            if (events[i].kind == MatchEventKind.POINT_WON) {
+            if (events[i].kind == POINT_WON) {
                 return events[i].timestamp;
             }
         }
@@ -495,7 +351,7 @@ class MatchState {
     }
 
     function isInactive(now as Number) as Boolean {
-        if (status != MatchStatus.IN_PROGRESS) {
+        if (status != IN_PROGRESS) {
             return false;
         }
         return (now - lastScoringActivityAt()) >= MatchSettings.INACTIVITY_TIMEOUT_S;
@@ -510,12 +366,12 @@ class MatchState {
     // When off, Us/Them stay fixed as logical left/right.
     function scoreScreenSides() as Array<Side> {
         if (settings.fixedServerPositions) {
-            return [Side.LEFT, Side.RIGHT] as Array<Side>;
+            return [LEFT, RIGHT] as Array<Side>;
         }
-        if (currentServer == Side.RIGHT) {
-            return [Side.RIGHT, Side.LEFT] as Array<Side>;
+        if (currentServer == RIGHT) {
+            return [RIGHT, LEFT] as Array<Side>;
         }
-        return [Side.LEFT, Side.RIGHT] as Array<Side>;
+        return [LEFT, RIGHT] as Array<Side>;
     }
 
     // Game point labels for the current game, using this match's deuce format.
@@ -552,19 +408,19 @@ class MatchState {
 
     function logicalSideForVisual(visual as Side) as Side {
         var sides = scoreScreenSides();
-        return visual == Side.LEFT ? sides[0] : sides[1];
+        return visual == LEFT ? sides[0] : sides[1];
     }
 
     function visualSideForLogical(logical as Side) as Side {
         var sides = scoreScreenSides();
-        return sides[0] == logical ? Side.LEFT : Side.RIGHT;
+        return sides[0] == logical ? LEFT : RIGHT;
     }
 
     private function remapForScoreScreen(pair as Array<String>) as Array<String> {
         if (settings.fixedServerPositions) {
             return pair;
         }
-        if (currentServer == Side.RIGHT) {
+        if (currentServer == RIGHT) {
             return [pair[1], pair[0]] as Array<String>;
         }
         return pair;
@@ -576,7 +432,7 @@ class MatchState {
             var set = completedSets[i];
             lines.add(set.leftGames.toString() + "-" + set.rightGames.toString());
         }
-        if (status == MatchStatus.IN_PROGRESS || status == MatchStatus.ENDED_EARLY || status == MatchStatus.COMPLETED) {
+        if (status == IN_PROGRESS || status == ENDED_EARLY || status == COMPLETED) {
             if (!currentSet.isComplete) {
                 lines.add(currentSet.leftGames.toString() + "-" + currentSet.rightGames.toString());
             }
@@ -601,17 +457,17 @@ class MatchState {
         if (currentSet.isComplete) {
             return false;
         }
-        if (status == MatchStatus.IN_PROGRESS) {
+        if (status == IN_PROGRESS) {
             return true;
         }
-        if (status == MatchStatus.COMPLETED || status == MatchStatus.ENDED_EARLY) {
+        if (status == COMPLETED || status == ENDED_EARLY) {
             return currentSet.leftGames > 0 || currentSet.rightGames > 0 || hasInProgressGameScore();
         }
         return false;
     }
 
     private function partialSetLineForIncompleteTerminal() as String or Null {
-        if ((status != MatchStatus.ENDED_EARLY && status != MatchStatus.COMPLETED) || currentSet.isComplete) {
+        if ((status != ENDED_EARLY && status != COMPLETED) || currentSet.isComplete) {
             return null;
         }
         if (currentSet.leftGames == 0 && currentSet.rightGames == 0 && !hasInProgressGameScore()) {
@@ -651,21 +507,143 @@ class MatchState {
     }
 }
 
+// Module-level helpers live after enums and classes (Monkey C compile order).
+function deuceFormatToString(format as DeuceFormat) as String {
+    if (format == DEUCE_ADVANTAGE) {
+        return "advantage";
+    } else if (format == DEUCE_SILVER_POINT) {
+        return "silverPoint";
+    }
+    return "goldenPoint";
+}
+
+function deuceFormatFromString(raw as String or Null) as DeuceFormat or Null {
+    if (raw == null) {
+        return null;
+    }
+    if (raw.equals("advantage")) {
+        return DEUCE_ADVANTAGE;
+    } else if (raw.equals("silverPoint")) {
+        return DEUCE_SILVER_POINT;
+    } else if (raw.equals("goldenPoint")) {
+        return DEUCE_GOLDEN_POINT;
+    }
+    return null;
+}
+
+function deuceFormatFromLegacyArchivedFlag(goldenPointEnabled as Boolean) as DeuceFormat {
+    return goldenPointEnabled ? DEUCE_SILVER_POINT : DEUCE_ADVANTAGE;
+}
+
+function deuceFormatFromLegacyPreference(goldenPointEnabled as Boolean or Null) as DeuceFormat {
+    if (goldenPointEnabled != null && !goldenPointEnabled) {
+        return DEUCE_ADVANTAGE;
+    }
+    return DEUCE_GOLDEN_POINT;
+}
+
+function deuceFormatLabel(format as DeuceFormat) as String {
+    if (format == DEUCE_ADVANTAGE) {
+        return "Regular";
+    } else if (format == DEUCE_SILVER_POINT) {
+        return "Silver";
+    }
+    return "Golden";
+}
+
+function deuceFormatDecidingPointLabel(format as DeuceFormat) as String {
+    if (format == DEUCE_ADVANTAGE) {
+        return "Deuce";
+    } else if (format == DEUCE_SILVER_POINT) {
+        return "Silver Point";
+    }
+    return "Golden Point";
+}
+
+function deuceFormatDecidingPointShortLabel(format as DeuceFormat) as String {
+    if (format == DEUCE_ADVANTAGE) {
+        return "40";
+    } else if (format == DEUCE_SILVER_POINT) {
+        return "SP";
+    }
+    return "GP";
+}
+
+function matchSetFormatFromSettings(settings as MatchSettings) as MatchSetFormat {
+    if (settings.continuousPlay) {
+        return SET_FORMAT_CONTINUOUS;
+    }
+    if (settings.setsToWin == 1) {
+        return SET_FORMAT_BEST_OF_ONE;
+    }
+    if (settings.setsToWin == 3) {
+        return SET_FORMAT_BEST_OF_FIVE;
+    }
+    return SET_FORMAT_BEST_OF_THREE;
+}
+
+function applyMatchSetFormat(settings as MatchSettings, format as MatchSetFormat) as Void {
+    if (format == SET_FORMAT_BEST_OF_ONE) {
+        settings.setsToWin = 1;
+        settings.continuousPlay = false;
+    } else if (format == SET_FORMAT_BEST_OF_FIVE) {
+        settings.setsToWin = 3;
+        settings.continuousPlay = false;
+    } else if (format == SET_FORMAT_CONTINUOUS) {
+        settings.continuousPlay = true;
+    } else {
+        settings.setsToWin = 2;
+        settings.continuousPlay = false;
+    }
+}
+
+function matchSetFormatLabel(format as MatchSetFormat) as String {
+    if (format == SET_FORMAT_BEST_OF_ONE) {
+        return "1 set";
+    } else if (format == SET_FORMAT_BEST_OF_FIVE) {
+        return "Best of 5";
+    } else if (format == SET_FORMAT_CONTINUOUS) {
+        return "Continuous";
+    }
+    return "Best of 3";
+}
+
+function nextMatchSetFormat(format as MatchSetFormat) as MatchSetFormat {
+    if (format == SET_FORMAT_BEST_OF_ONE) {
+        return SET_FORMAT_BEST_OF_THREE;
+    } else if (format == SET_FORMAT_BEST_OF_THREE) {
+        return SET_FORMAT_BEST_OF_FIVE;
+    } else if (format == SET_FORMAT_BEST_OF_FIVE) {
+        return SET_FORMAT_CONTINUOUS;
+    }
+    return SET_FORMAT_BEST_OF_ONE;
+}
+
+function clampWarmUpMinutes(value as Number) as Number {
+    if (value < MatchSettings.WARM_UP_MINUTES_MIN) {
+        return MatchSettings.WARM_UP_MINUTES_MIN;
+    }
+    if (value > MatchSettings.WARM_UP_MINUTES_MAX) {
+        return MatchSettings.WARM_UP_MINUTES_MAX;
+    }
+    return value;
+}
+
 function oppositeSide(side as Side) as Side {
-    return side == Side.LEFT ? Side.RIGHT : Side.LEFT;
+    return side == LEFT ? RIGHT : LEFT;
 }
 
 function statusDisplayName(status as MatchStatus) as String {
-    if (status == MatchStatus.IN_PROGRESS) {
+    if (status == IN_PROGRESS) {
         return "In Progress";
-    } else if (status == MatchStatus.COMPLETED) {
+    } else if (status == COMPLETED) {
         return "Completed";
-    } else if (status == MatchStatus.ENDED_EARLY) {
+    } else if (status == ENDED_EARLY) {
         return "Ended Early";
     }
     return "Discarded";
 }
 
 function sideDisplayName(side as Side) as String {
-    return side == Side.LEFT ? "Us" : "Them";
+    return side == LEFT ? "Us" : "Them";
 }

@@ -106,7 +106,7 @@ class MatchStore {
             "deuceFormat" => deuceFormatToString(settings.deuceFormat),
             // Pre-silver-point key, still written so an older build reading this
             // store keeps scoring these matches the same way.
-            "goldenPointEnabled" => settings.deuceFormat != DeuceFormat.DEUCE_ADVANTAGE,
+            "goldenPointEnabled" => settings.deuceFormat != DEUCE_ADVANTAGE,
             "askServeAtSetStart" => settings.askServeAtSetStart,
             "fixedServerPositions" => settings.fixedServerPositions,
             "usThemLabels" => settings.usThemLabels,
@@ -151,12 +151,12 @@ class MatchStore {
         var engine = new ScoringEngine();
         var replayed = engine.replay(events, state);
         if (data.hasKey("needsServerSelection") && (data.get("needsServerSelection") as Boolean)
-            && replayed.status == MatchStatus.IN_PROGRESS && replayed.isAtSetStart()) {
+            && replayed.status == IN_PROGRESS && replayed.isAtSetStart()) {
             replayed.currentServer = null;
             replayed.needsServerSelection = true;
         }
         if (data.hasKey("needsWarmUp") && (data.get("needsWarmUp") as Boolean)
-            && replayed.status == MatchStatus.IN_PROGRESS && replayed.isWaitingForFirstServe()) {
+            && replayed.status == IN_PROGRESS && replayed.isWaitingForFirstServe()) {
             replayed.needsWarmUp = true;
         }
         return replayed;

@@ -13,7 +13,7 @@ class PadelScoreApp extends Application.AppBase {
     function onStart(state as Dictionary or Null) as Void {
     }
 
-    function onStop() as Void {
+    function onStop(state as Dictionary or Null) as Void {
     }
 
     function getInitialView() as [Views] or [Views, InputDelegates] {
@@ -35,20 +35,20 @@ function returnToStart(service as MatchService) as Void {
 function buildRootNavigation(service as MatchService) as [Views] or [Views, InputDelegates] {
     var match = service.activeMatch;
     if (match == null) {
-        return [new StartView(service), new StartDelegate(service)] as [Views] or [Views, InputDelegates];
+        return [new StartView(service), new StartDelegate(service)];
     }
-    if (match.status == MatchStatus.IN_PROGRESS) {
+    if (match.status == IN_PROGRESS) {
         if (match.needsWarmUp) {
-            return [new WarmUpView(service), new WarmUpDelegate(service)] as [Views] or [Views, InputDelegates];
+            return [new WarmUpView(service), new WarmUpDelegate(service)];
         }
         if (match.needsServerSelection) {
-            return [new SelectServerView(service), new SelectServerDelegate(service, true)] as [Views] or [Views, InputDelegates];
+            return [new SelectServerView(service), new SelectServerDelegate(service, true)];
         }
         var pager = new MatchPagerView(service, 1);
-        return [pager, new MatchPagerDelegate(service, pager)] as [Views] or [Views, InputDelegates];
+        return [pager, new MatchPagerDelegate(service, pager)];
     }
-    if (match.status == MatchStatus.COMPLETED || match.status == MatchStatus.ENDED_EARLY) {
-        return [new MatchCompleteView(service), new MatchCompleteDelegate(service)] as [Views] or [Views, InputDelegates];
+    if (match.status == COMPLETED || match.status == ENDED_EARLY) {
+        return [new MatchCompleteView(service), new MatchCompleteDelegate(service)];
     }
-    return [new StartView(service), new StartDelegate(service)] as [Views] or [Views, InputDelegates];
+    return [new StartView(service), new StartDelegate(service)];
 }

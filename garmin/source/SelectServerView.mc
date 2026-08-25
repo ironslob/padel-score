@@ -64,7 +64,7 @@ class SelectServerDelegate extends WatchUi.BehaviorDelegate {
             }
         }
 
-        var side = x < width / 2 ? Side.LEFT : Side.RIGHT;
+        var side = x < width / 2 ? LEFT : RIGHT;
         service.selectServer(side);
         WatchUi.popView(WatchUi.SLIDE_LEFT);
         if (pushPagerAfter) {

@@ -38,7 +38,7 @@ class MatchService {
     }
 
     function awardPoint(side as Side) as Void {
-        if (activeMatch == null || activeMatch.status != MatchStatus.IN_PROGRESS) {
+        if (activeMatch == null || activeMatch.status != IN_PROGRESS) {
             return;
         }
         var updated = engine.applyPointWon(activeMatch, side, Time.now().value());
@@ -46,7 +46,7 @@ class MatchService {
             return;
         }
         activeMatch = updated;
-        if (activeMatch.status == MatchStatus.COMPLETED) {
+        if (activeMatch.status == COMPLETED) {
             finalizeActiveMatch();
         } else {
             persist();
@@ -55,7 +55,7 @@ class MatchService {
     }
 
     function selectServer(side as Side) as Void {
-        if (activeMatch == null || activeMatch.status != MatchStatus.IN_PROGRESS) {
+        if (activeMatch == null || activeMatch.status != IN_PROGRESS) {
             return;
         }
         var updated = engine.applySelectServer(activeMatch, side, Time.now().value());
@@ -68,7 +68,7 @@ class MatchService {
     }
 
     function requestServerSelection() as Void {
-        if (activeMatch == null || activeMatch.status != MatchStatus.IN_PROGRESS) {
+        if (activeMatch == null || activeMatch.status != IN_PROGRESS) {
             return;
         }
         var updated = engine.applyRequestServerSelection(activeMatch);
@@ -81,7 +81,7 @@ class MatchService {
     }
 
     function completeWarmUp() as Void {
-        if (activeMatch == null || activeMatch.status != MatchStatus.IN_PROGRESS) {
+        if (activeMatch == null || activeMatch.status != IN_PROGRESS) {
             return;
         }
         var updated = engine.applyCompleteWarmUp(activeMatch);
@@ -93,7 +93,7 @@ class MatchService {
     }
 
     function undoLastPoint() as Void {
-        if (activeMatch == null || activeMatch.status != MatchStatus.IN_PROGRESS) {
+        if (activeMatch == null || activeMatch.status != IN_PROGRESS) {
             return;
         }
         var updated = engine.applyUndo(activeMatch);
@@ -106,11 +106,11 @@ class MatchService {
     }
 
     function canUndo() as Boolean {
-        if (activeMatch == null || activeMatch.status != MatchStatus.IN_PROGRESS) {
+        if (activeMatch == null || activeMatch.status != IN_PROGRESS) {
             return false;
         }
         for (var i = 0; i < activeMatch.events.size(); i += 1) {
-            if (activeMatch.events[i].kind == MatchEventKind.POINT_WON) {
+            if (activeMatch.events[i].kind == POINT_WON) {
                 return true;
             }
         }
@@ -118,7 +118,7 @@ class MatchService {
     }
 
     function finishMatch() as Void {
-        if (activeMatch == null || activeMatch.status != MatchStatus.IN_PROGRESS) {
+        if (activeMatch == null || activeMatch.status != IN_PROGRESS) {
             return;
         }
         var updated = engine.applyFinish(activeMatch, Time.now().value());
@@ -130,7 +130,7 @@ class MatchService {
     }
 
     function endMatchEarly() as Void {
-        if (activeMatch == null || activeMatch.status != MatchStatus.IN_PROGRESS) {
+        if (activeMatch == null || activeMatch.status != IN_PROGRESS) {
             return;
         }
         var updated = engine.applyEndEarly(activeMatch, Time.now().value());
@@ -142,7 +142,7 @@ class MatchService {
     }
 
     function discardMatch() as Void {
-        if (activeMatch == null || activeMatch.status != MatchStatus.IN_PROGRESS) {
+        if (activeMatch == null || activeMatch.status != IN_PROGRESS) {
             return;
         }
         var updated = engine.applyDiscard(activeMatch, Time.now().value());
@@ -158,7 +158,7 @@ class MatchService {
             store.saveActiveMatch(null);
             return;
         }
-        if (activeMatch.status == MatchStatus.DISCARDED) {
+        if (activeMatch.status == DISCARDED) {
             activeMatch = null;
             store.saveActiveMatch(null);
             return;
@@ -185,7 +185,7 @@ class MatchService {
     }
 
     function syncActiveMatchPreferences(usThemLabels as Boolean, fixedServerPositions as Boolean, askServeAtSetStart as Boolean) as Void {
-        if (activeMatch == null || activeMatch.status != MatchStatus.IN_PROGRESS) {
+        if (activeMatch == null || activeMatch.status != IN_PROGRESS) {
             return;
         }
         activeMatch.settings.usThemLabels = usThemLabels;
@@ -209,7 +209,7 @@ class MatchService {
 
     function setDeuceFormat(format as DeuceFormat) as Void {
         Application.Properties.setValue("deuceFormat", deuceFormatToString(format));
-        if (activeMatch != null && activeMatch.status == MatchStatus.IN_PROGRESS) {
+        if (activeMatch != null && activeMatch.status == IN_PROGRESS) {
             var updated = engine.applySetDeuceFormat(activeMatch, format, Time.now().value());
             if (updated != null) {
                 activeMatch = updated;
@@ -221,11 +221,11 @@ class MatchService {
     // Advances the setting through Regular → Silver → Golden → Regular.
     function cycleDeuceFormat() as DeuceFormat {
         var current = getDeuceFormat();
-        var next = DeuceFormat.DEUCE_ADVANTAGE;
-        if (current == DeuceFormat.DEUCE_ADVANTAGE) {
-            next = DeuceFormat.DEUCE_SILVER_POINT;
-        } else if (current == DeuceFormat.DEUCE_SILVER_POINT) {
-            next = DeuceFormat.DEUCE_GOLDEN_POINT;
+        var next = DEUCE_ADVANTAGE;
+        if (current == DEUCE_ADVANTAGE) {
+            next = DEUCE_SILVER_POINT;
+        } else if (current == DEUCE_SILVER_POINT) {
+            next = DEUCE_GOLDEN_POINT;
         }
         setDeuceFormat(next);
         return next;
@@ -242,7 +242,7 @@ class MatchService {
 
     function setRotateServeEnabled(enabled as Boolean) as Void {
         Application.Properties.setValue("rotateServeEnabled", enabled);
-        if (activeMatch != null && activeMatch.status == MatchStatus.IN_PROGRESS) {
+        if (activeMatch != null && activeMatch.status == IN_PROGRESS) {
             activeMatch.settings.fixedServerPositions = !enabled;
             persist();
         }
@@ -258,7 +258,7 @@ class MatchService {
 
     function setUsThemLabels(enabled as Boolean) as Void {
         Application.Properties.setValue("usThemLabels", enabled);
-        if (activeMatch != null && activeMatch.status == MatchStatus.IN_PROGRESS) {
+        if (activeMatch != null && activeMatch.status == IN_PROGRESS) {
             activeMatch.settings.usThemLabels = enabled;
             persist();
         }
@@ -280,7 +280,7 @@ class MatchService {
 
     function setAskServeAtSetStart(enabled as Boolean) as Void {
         Application.Properties.setValue("askServeAtSetStart", enabled);
-        if (activeMatch != null && activeMatch.status == MatchStatus.IN_PROGRESS) {
+        if (activeMatch != null && activeMatch.status == IN_PROGRESS) {
             activeMatch.settings.askServeAtSetStart = enabled;
             persist();
         }
@@ -296,14 +296,14 @@ class MatchService {
         var raw = Application.Properties.getValue("matchSetFormat");
         if (raw != null) {
             var value = raw as Number;
-            if (value == MatchSetFormat.SET_FORMAT_BEST_OF_ONE
-                || value == MatchSetFormat.SET_FORMAT_BEST_OF_THREE
-                || value == MatchSetFormat.SET_FORMAT_BEST_OF_FIVE
-                || value == MatchSetFormat.SET_FORMAT_CONTINUOUS) {
+            if (value == SET_FORMAT_BEST_OF_ONE
+                || value == SET_FORMAT_BEST_OF_THREE
+                || value == SET_FORMAT_BEST_OF_FIVE
+                || value == SET_FORMAT_CONTINUOUS) {
                 return value as MatchSetFormat;
             }
         }
-        return MatchSetFormat.SET_FORMAT_BEST_OF_THREE;
+        return SET_FORMAT_BEST_OF_THREE;
     }
 
     function setMatchSetFormat(format as MatchSetFormat) as Void {
@@ -383,7 +383,7 @@ class MatchService {
         if (activeMatch == null) {
             return;
         }
-        if (activeMatch.status != MatchStatus.DISCARDED) {
+        if (activeMatch.status != DISCARDED) {
             store.archiveMatch(activeMatch);
             archivedMatches = filterDiscarded(store.loadArchivedMatches());
         }
@@ -397,7 +397,7 @@ class MatchService {
     private function filterDiscarded(matches as Array<MatchState>) as Array<MatchState> {
         var result = [] as Array<MatchState>;
         for (var i = 0; i < matches.size(); i += 1) {
-            if (matches[i].status != MatchStatus.DISCARDED) {
+            if (matches[i].status != DISCARDED) {
                 result.add(matches[i]);
             }
         }
@@ -414,9 +414,9 @@ class MatchService {
     }
 
     private function isTerminal(status as MatchStatus) as Boolean {
-        return status == MatchStatus.COMPLETED
-            || status == MatchStatus.ENDED_EARLY
-            || status == MatchStatus.DISCARDED;
+        return status == COMPLETED
+            || status == ENDED_EARLY
+            || status == DISCARDED;
     }
 
     private function generateMatchId() as String {
