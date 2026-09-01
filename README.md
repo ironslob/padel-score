@@ -1,6 +1,6 @@
 # Padel Score
 
-Apple Watch–first padel scoring app with an iPhone companion for match history.
+Apple Watch–first padel scoring app with an iPhone companion for match history, plus Garmin and Wear OS watch ports.
 
 V1 is fully on-device. No backend, authentication, CloudKit, or statistics.
 
@@ -119,8 +119,9 @@ Separate GitHub Actions workflows (path-filtered so each platform only builds wh
 |----------|------|----------------|
 | [Apple](.github/workflows/apple.yml) | `watch/`, `iPhone/`, `shared/`, `tests/` | Unit tests, Watch + iPhone compile (unsigned) |
 | [Garmin](.github/workflows/garmin.yml) | `garmin/` | Connect IQ compile for touchscreen devices + Monkey C tests |
+| [Wear OS](.github/workflows/wear.yml) | `android/` | Kotlin domain unit tests + Wear debug APK |
 
-Neither workflow requires secrets for compile checks. For a stable Garmin signing key in CI, set `GARMIN_DEVELOPER_KEY_BASE64` (see [`garmin/README.md`](garmin/README.md)).
+Neither Apple nor Garmin workflow requires secrets for compile checks. For a stable Garmin signing key in CI, set `GARMIN_DEVELOPER_KEY_BASE64` (see [`garmin/README.md`](garmin/README.md)). Wear OS CI needs no secrets.
 
 ## Project layout
 
@@ -130,9 +131,10 @@ shared/         Scoring engine, models, persistence, services, sync
 watch/          Watch SwiftUI app
 iPhone/         iPhone companion SwiftUI app
 garmin/         Garmin Connect IQ watch app (Monkey C)
+android/        Wear OS app (Kotlin domain + Compose UI)
 tests/Unit/     Scoring + persistence unit tests
 docs/           Decision log
-.github/        CI workflows (Apple + Garmin)
+.github/        CI workflows (Apple + Garmin + Wear OS)
 project.yml     XcodeGen manifest
 PadelScore.xcodeproj
 ```

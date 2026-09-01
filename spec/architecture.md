@@ -50,16 +50,18 @@ The local device is always authoritative while a match is in progress.
 
 ## Shared Business Logic
 
-Scoring rules should exist exactly once.
+Scoring rules should exist exactly once in product behaviour.
 
-The same implementation should be used by:
+The Swift engine in `shared/Scoring/` is the source of truth. Garmin (Monkey C) and Wear OS (Kotlin) keep faithful ports, each with their own unit tests. Behaviour must stay identical.
+
+The same rules are used by:
 
 - Apple Watch
 - iPhone
+- Wear OS
+- Garmin
 - future backend validation
 - automated tests
-
-There should never be duplicate scoring logic.
 
 ---
 

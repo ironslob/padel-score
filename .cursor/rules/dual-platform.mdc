@@ -1,28 +1,30 @@
 ---
-description: Ensure new features are designed and implemented for both Apple Watch and Garmin
+description: Ensure new features are designed and implemented for Apple Watch, Garmin, and Wear OS
 alwaysApply: true
 ---
 
 # Dual-platform watch apps
 
-Padel Score ships on **two watch platforms**:
+Padel Score ships on **three watch platforms**:
 
 | Platform | Path | Stack |
 |----------|------|-------|
 | Apple Watch | `watch/`, `shared/` | Swift, SwiftUI, WatchConnectivity |
 | Garmin | `garmin/` | Monkey C, Connect IQ |
+| Wear OS | `android/domain/`, `android/wear/` | Kotlin, Jetpack Compose for Wear OS |
 
-The **iPhone app** (`iPhone/`) is an Apple companion only — not a third primary target.
+The **iPhone app** (`iPhone/`) is an Apple companion only — not a fourth primary target. There is no Android phone companion yet.
 
 ## When adding or changing a feature
 
 Before finishing work, answer:
 
 1. **Does this belong in shared domain logic?** (scoring rules, match lifecycle, persistence shape, product behaviour)
-   - If yes: update **both** `shared/` (Swift) and `garmin/source/` (Monkey C), and extend tests in `tests/Unit/` and `garmin/source/ScoringEngineTests.mc`.
-2. **Is this watch UX?** Implement on both platforms where APIs allow, or document a deliberate gap.
-3. **Is this Apple-only?** (HealthKit, complications, Live Activities, WatchConnectivity) — note the Garmin equivalent or mark as deferred in `docs/DECISIONS.md`.
-4. **Is this Garmin-only?** (Connect IQ widgets, FIT recording, BLE via Garmin Connect Mobile) — note the Apple equivalent or mark as deferred.
+   - If yes: update **`shared/`** (Swift), **`garmin/source/`** (Monkey C), and **`android/domain/`** (Kotlin), and extend tests in `tests/Unit/`, `garmin/source/ScoringEngineTests.mc`, and `android/domain/src/test/`.
+2. **Is this watch UX?** Implement on all three platforms where APIs allow, or document a deliberate gap.
+3. **Is this Apple-only?** (HealthKit, complications, Live Activities, WatchConnectivity) — note the Garmin/Wear equivalent or mark as deferred in `docs/DECISIONS.md`.
+4. **Is this Garmin-only?** (Connect IQ widgets, FIT recording, BLE via Garmin Connect Mobile) — note the Apple/Wear equivalent or mark as deferred.
+5. **Is this Wear-only?** (Health Services, tiles, Data Layer) — note the Apple/Garmin equivalent or mark as deferred.
 
 ## Scoring parity (non-negotiable)
 
@@ -30,21 +32,22 @@ Scoring behaviour must stay identical across platforms:
 
 - Swift source of truth: `shared/Scoring/ScoringEngine.swift`, `shared/Models/`
 - Garmin port: `garmin/source/ScoringEngine.mc`, `garmin/source/Models.mc`
+- Wear OS port: `android/domain/src/main/kotlin/com/padelscore/domain/ScoringEngine.kt`
 - Spec reference: `spec/product.md`
 
-When changing scoring rules, update both engines and add/adjust tests on both sides.
+When changing scoring rules, update all three engines and add/adjust tests on all sides.
 
 ## Platform mapping
 
-| Concern | Apple | Garmin |
-|---------|-------|--------|
-| Scoring engine | `shared/Scoring/` | `garmin/source/ScoringEngine.mc` |
-| Match service | `shared/Services/MatchService.swift` | `garmin/source/MatchService.mc` |
-| Persistence | `shared/Persistence/` | `garmin/source/MatchStore.mc` |
-| Watch UI | `watch/PadelScoreWatch/` | `garmin/source/*View.mc` |
-| Glance / complication | `watch/PadelScoreComplications/` | `garmin/` widget (not yet built) |
-| Phone sync | `shared/Sync/` | Connect IQ Mobile SDK (not yet built) |
-| Workout tracking | HealthKit | FIT / activity APIs (not yet built) |
+| Concern | Apple | Garmin | Wear OS |
+|---------|-------|--------|---------|
+| Scoring engine | `shared/Scoring/` | `garmin/source/ScoringEngine.mc` | `android/domain/.../ScoringEngine.kt` |
+| Match service | `shared/Services/MatchService.swift` | `garmin/source/MatchService.mc` | `android/domain/.../MatchService.kt` |
+| Persistence | `shared/Persistence/` | `garmin/source/MatchStore.mc` | `android/domain/.../MatchStore.kt` |
+| Watch UI | `watch/PadelScoreWatch/` | `garmin/source/*View.mc` | `android/wear/` |
+| Glance / complication | `watch/PadelScoreComplications/` | widget (not yet built) | tiles (not yet built) |
+| Phone sync | `shared/Sync/` | Connect IQ Mobile SDK (not yet built) | Data Layer (not yet built) |
+| Workout tracking | HealthKit | FIT / activity APIs (not yet built) | Health Services |
 
 ## If parity isn't feasible now
 

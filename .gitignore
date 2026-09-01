@@ -32,3 +32,10 @@ build/
 playground.xcworkspace
 timeline.xctimeline
 xcuserdata/
+
+# Android / Wear OS
+android/.gradle/
+android/**/build/
+android/local.properties
+android/.kotlin/
+*.iml

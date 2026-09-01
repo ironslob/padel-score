@@ -42,9 +42,9 @@ The application should feel faster than asking another player for the score and 
 
 The Apple Watch is the primary product.
 
-A Garmin Connect IQ port ships in parallel. Scoring behaviour must stay identical.
+A Garmin Connect IQ port and a Wear OS port ship in parallel. Scoring behaviour must stay identical.
 
-The iPhone exists to support the Watch experience by providing history, review and future synchronisation.
+The iPhone exists to support the Apple Watch experience by providing history, review and future synchronisation. Wear OS is standalone in this version — there is no Android phone companion yet.
 
 ---
 
@@ -161,6 +161,7 @@ Primary:
 
 - Apple Watch
 - Garmin touchscreen watches (Connect IQ)
+- Wear OS watches (Pixel Watch, Galaxy Watch, and other Wear OS 4+ devices)
 
 Secondary:
 
@@ -170,7 +171,7 @@ No iPad.
 
 No Mac.
 
-No Android.
+No Android phone app.
 
 ---
 
