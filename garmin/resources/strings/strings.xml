@@ -1,3 +1,9 @@
 <strings>
     <string id="AppName">Padel Score</string>
+    <string id="fitMatchScoreLabel">Match score</string>
+    <string id="fitMatchScoreUnits">-</string>
+    <string id="fitSetsUsLabel">Sets us</string>
+    <string id="fitSetsThemLabel">Sets them</string>
+    <string id="fitSetsUnits">sets</string>
+    <string id="fitConflictMessage">Can't record activity. Yes = continue without recording. No = cancel match start.</string>
 </strings>

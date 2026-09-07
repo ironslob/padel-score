@@ -261,7 +261,7 @@ If no active match exists the watch should display a primary start action.
 Start Match
 ```
 
-Starting a match always tries to start a Health workout so Padel Score can return when the player raises their wrist. If another app already owns the workout session, the watch prompts to continue without a workout (wrist raise usually will not reclaim the app) or cancel so the other workout can be ended first.
+Starting a match always tries to start a platform workout/activity so the match is tracked as training and — where the platform supports it — so Padel Score can return when the player raises their wrist (Health workout on Apple Watch, Health Services exercise on Wear OS, FIT activity on Garmin). If another app already owns the session, the watch prompts to continue without a workout/activity or cancel so the other session can be ended first.
 
 Default settings:
 
@@ -284,7 +284,7 @@ Match length is a Settings preference (pre-match only):
 
 Starting a match should remain fast and require no nested configuration.
 
-When warm-up is on, starting a match starts the Health workout when possible and shows a timer. The player taps Play when ready. An optional time limit can auto-advance. Warm-up happens only before the match, never between sets. Warm-up time is included in the Health workout and in match elapsed time.
+When warm-up is on, starting a match starts the platform workout/activity when possible and shows a timer. The player taps Play when ready. An optional time limit can auto-advance. Warm-up happens only before the match, never between sets. Warm-up time is included in the workout/activity and in match elapsed time.
 
 When warm-up is off, the watch asks who is serving immediately after Start Match.
 

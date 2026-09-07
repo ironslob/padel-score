@@ -66,13 +66,15 @@ Documented decisions that were not fully prescribed by `/spec`.
 
 **Choice:** Garmin’s Monkey C engine mirrors Apple for serve rotation at set and tie-break boundaries, New Serve at changeover, mid-match deuce format changes, match-length / ask-serve / Us-Them settings, pre-match warm-up, destructive-action confirmation, and the game/set interstitial.
 
-**Still Garmin-only gaps:** HealthKit / workout recording, phone companion sync, complications, and Live Activities — blocked by Connect IQ APIs. See `garmin/README.md`. Warm-up on Garmin is the same elapsed timer and Play action as Apple; it is not recorded as a FIT activity.
+**Workout / FIT recording:** Start Match always tries to open an `ActivityRecording` session (`FitActivityManager`) so the match is a real Garmin activity with score written via FitContributor session fields. Sport typing is tennis + `SUB_SPORT_PADEL` when available, else tennis + `SUB_SPORT_MATCH`, named `"Padel"`. One session spans warm-up through complete / end-early; discard drops the FIT. `AppBase.onStop` saves an in-progress session to avoid orphaned recordings (CIQQA-4693); restoring an in-progress match starts a continuation session, so leaving the app mid-match can yield multiple Connect activities. Custom FitContributor fields appear in Garmin Connect for store/beta installs (not sideloads); the FIT file still contains them. Wrist reclaim via owning a recording is best-effort on Garmin — the load-bearing goal is Connect activity + scoreline.
+
+**Still Garmin-only gaps:** phone companion sync, complications, and Live Activities. See `garmin/README.md`.
 
 ## Pre-match warm-up
 
 **Choice:** Warm-up is a `needsWarmUp` flag on match state, not a new event kind. Completing it records nothing; elapsed time is `now - startedAt`. An optional minute limit can auto-advance; the default is no limit. Replay restores the flag the same way it restores a New Serve prompt. It is armed only at match start, never at set boundaries.
 
-The HealthKit workout still starts once in `startMatch` and ends once when the match completes, ends early, or is discarded. Warm-up, scoring, and set changeovers share that single session. Pause/resume is only the system workout control, not an automatic split between games or sets.
+The HealthKit workout (Apple), Health Services exercise (Wear), and FIT activity (Garmin) still start once in `startMatch` and end once when the match completes, ends early, or is discarded. Warm-up, scoring, and set changeovers share that single session. Pause/resume is only the system workout control, not an automatic split between games or sets.
 
 **Why:** Older builds sharing the archive cannot decode a new event kind. A flag matches New Serve, and one workout per match is what Apple Health already recorded.
 
@@ -80,7 +82,7 @@ The HealthKit workout still starts once in `startMatch` and ends once when the m
 
 **Choice:** Start Match always tries to start a HealthKit workout. There is no home-screen or Settings choice between “Track as workout” and “Score only”. If another app already owns the session, the watch prompts to continue without a workout or cancel the match start. The next Start Match tries again.
 
-**Why:** HealthKit has no API to detect another session in advance, and owning the workout is what makes wrist-raise return to Padel Score. Asking every time added a control most starts do not need. Garmin has no equivalent; it cannot start a HealthKit session.
+**Why:** HealthKit has no API to detect another session in advance, and owning the workout is what makes wrist-raise return to Padel Score. Asking every time added a control most starts do not need. Garmin mirrors the always-try / continue-without / cancel shape with FIT `ActivityRecording` (see Garmin scoring parity); wrist reclaim is best-effort rather than HealthKit-equivalent.
 
 ## Wear OS watch app
 

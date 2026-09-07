@@ -17,12 +17,14 @@ garmin/
 ├── source/
 │   ├── Models.mc         # Domain types (Side, MatchState, GameScore, …)
 │   ├── ScoringEngine.mc  # Pure scoring state machine (ported from Swift)
-│   ├── MatchService.mc   # Match lifecycle + persistence coordination
+│   ├── MatchService.mc   # Match lifecycle + persistence + FIT coordination
+│   ├── FitActivityManager.mc  # ActivityRecording / FitContributor session
 │   ├── MatchStore.mc     # Application.Storage persistence
 │   ├── PadelScoreApp.mc  # App entry point
 │   └── *View.mc          # Watch UI screens
 └── resources/
     ├── strings/
+    ├── fitcontributions/
     └── drawables/
 ```
 
@@ -68,10 +70,21 @@ base64 -i developer_key.der | pbcopy
 - Finish / end early / discard (with confirmation)
 - Match history, match length, ask-serve, and Us/Them settings
 - Local persistence via `Application.Storage`
+- FIT activity recording for each match (tennis / padel sport type) with score written into the FIT via FitContributor
 
 ## Scoring parity
 
 The Monkey C `ScoringEngine` is a direct port of `shared/Scoring/ScoringEngine.swift`. When changing scoring rules, update both implementations and run the Swift unit tests in `tests/Unit/ScoringEngineTests.swift`.
+
+## FIT / activity recording
+
+Start Match always tries to open an `ActivityRecording` session (`FitActivityManager.mc`). Warm-up is included. Completed and ended-early matches are saved; discarded matches discard the FIT. Score summary fields sync on each point.
+
+**Permissions:** `Fit`, `FitContributor`, `PersistedContent` (no GPS / `Positioning`).
+
+**Connect visibility:** Custom FitContributor fields show in Garmin Connect when the app is installed from the Connect IQ Store (including beta). Sideloaded builds still write the fields into the FIT file; verify with the activity list / FitCSVTool.
+
+**App exit:** `onStop` saves an in-progress session so wrist-off cannot orphan a recording. Reopening an in-progress match starts a continuation session (may produce multiple Connect activities for one match).
 
 ## Supported devices
 
@@ -81,7 +94,6 @@ Secondary (touch + buttons): Fenix 7 series, Epix 2 series
 
 ## Not yet ported
 
-- HealthKit / workout recording
 - Phone companion sync (WatchConnectivity → would need Connect IQ Mobile SDK)
 - Complications / glance widget
 - Live Activities
@@ -89,3 +101,11 @@ Secondary (touch + buttons): Fenix 7 series, Epix 2 series
 ## App store submission
 
 Generate a developer key via the SDK Manager, update `manifest.xml` with your own application UUID, and follow [Garmin's submission guide](https://developer.garmin.com/connect-iq/submit-an-app/).
+
+### Simulator / device verification notes
+
+1. Start match → warm-up → points → complete → confirm an activity appears in the device activity list.
+2. Discard a match → no activity saved.
+3. Force FIT start failure (another activity recording) → Confirmation Yes continues scoring without FIT; No cancels and discards.
+4. Leave the app mid-match → activity saved on exit; reopen continues scoring with a new session.
+5. Store/beta install required to see Match score / Sets fields in Garmin Connect UI.

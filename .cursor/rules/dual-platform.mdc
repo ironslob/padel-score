@@ -47,7 +47,7 @@ When changing scoring rules, update all three engines and add/adjust tests on al
 | Watch UI | `watch/PadelScoreWatch/` | `garmin/source/*View.mc` | `android/wear/` |
 | Glance / complication | `watch/PadelScoreComplications/` | widget (not yet built) | tiles (not yet built) |
 | Phone sync | `shared/Sync/` | Connect IQ Mobile SDK (not yet built) | Data Layer (not yet built) |
-| Workout tracking | HealthKit | FIT / activity APIs (not yet built) | Health Services |
+| Workout tracking | HealthKit | FIT / ActivityRecording + FitContributor | Health Services |
 
 ## If parity isn't feasible now
 

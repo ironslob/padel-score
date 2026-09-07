@@ -14,6 +14,7 @@ class PadelScoreApp extends Application.AppBase {
     }
 
     function onStop(state as Dictionary or Null) as Void {
+        matchService.saveFitSessionOnStop();
     }
 
     function getInitialView() as [Views] or [Views, InputDelegates] {
@@ -30,6 +31,15 @@ function returnToStart(service as MatchService) as Void {
     service.discardMatch();
     WatchUi.popView(WatchUi.SLIDE_RIGHT);
     WatchUi.pushView(new StartView(service), new StartDelegate(service), WatchUi.SLIDE_RIGHT);
+}
+
+function pushMatchStartViews(service as MatchService) as Void {
+    var match = service.activeMatch;
+    if (match != null && match.needsWarmUp) {
+        WatchUi.pushView(new WarmUpView(service), new WarmUpDelegate(service), WatchUi.SLIDE_LEFT);
+    } else {
+        WatchUi.pushView(new SelectServerView(service), new SelectServerDelegate(service, true), WatchUi.SLIDE_LEFT);
+    }
 }
 
 function buildRootNavigation(service as MatchService) as [Views] or [Views, InputDelegates] {

@@ -8,16 +8,20 @@ import Toybox.Time;
 class MatchService {
     private var engine as ScoringEngine;
     private var store as MatchStore;
+    private var fitManager as FitActivityManager;
     var activeMatch as MatchState or Null;
     var archivedMatches as Array<MatchState>;
     var isRestored as Boolean;
+    var lastFitStartFailed as Boolean;
 
     function initialize() {
         engine = new ScoringEngine();
         store = new MatchStore();
+        fitManager = new FitActivityManager();
         activeMatch = null;
         archivedMatches = [] as Array<MatchState>;
         isRestored = false;
+        lastFitStartFailed = false;
     }
 
     function restore() as Void {
@@ -25,6 +29,7 @@ class MatchService {
         archivedMatches = filterDiscarded(store.loadArchivedMatches());
         isRestored = true;
         expireInactiveMatchIfNeeded();
+        resumeFitSessionIfNeeded();
     }
 
     function startMatch(settings as MatchSettings or Null) as Void {
@@ -35,17 +40,26 @@ class MatchService {
         var id = generateMatchId();
         activeMatch = engine.startMatch(matchSettings, id, Time.now().value());
         persist();
+        lastFitStartFailed = !fitManager.startSession();
+        if (!lastFitStartFailed && activeMatch != null) {
+            fitManager.updateScore(activeMatch);
+        }
     }
 
     function awardPoint(side as Side) as Void {
         if (activeMatch == null || activeMatch.status != IN_PROGRESS) {
             return;
         }
+        var previousSetCount = activeMatch.completedSets.size();
         var updated = engine.applyPointWon(activeMatch, side, Time.now().value());
         if (updated == null) {
             return;
         }
         activeMatch = updated;
+        fitManager.updateScore(activeMatch);
+        if (activeMatch.completedSets.size() > previousSetCount) {
+            fitManager.addLap();
+        }
         if (activeMatch.status == COMPLETED) {
             finalizeActiveMatch();
         } else {
@@ -101,8 +115,34 @@ class MatchService {
             return;
         }
         activeMatch = updated;
+        fitManager.updateScore(activeMatch);
         persist();
         expireInactiveMatchIfNeeded();
+    }
+
+    function saveFitSessionOnStop() as Void {
+        if (activeMatch == null || activeMatch.status != IN_PROGRESS) {
+            return;
+        }
+        if (!fitManager.isRecording()) {
+            return;
+        }
+        fitManager.updateScore(activeMatch);
+        fitManager.endSession(true);
+    }
+
+    function resumeFitSessionIfNeeded() as Void {
+        if (activeMatch == null || activeMatch.status != IN_PROGRESS) {
+            return;
+        }
+        if (fitManager.isRecording()) {
+            fitManager.updateScore(activeMatch);
+            return;
+        }
+        // Continuation after onStop/save or process death — fail silently.
+        if (fitManager.startSession()) {
+            fitManager.updateScore(activeMatch);
+        }
     }
 
     function canUndo() as Boolean {
@@ -149,6 +189,8 @@ class MatchService {
         if (updated == null) {
             return;
         }
+        fitManager.endSession(false);
+        lastFitStartFailed = false;
         activeMatch = null;
         store.saveActiveMatch(null);
     }
@@ -378,6 +420,9 @@ class MatchService {
         if (activeMatch == null) {
             return;
         }
+        fitManager.updateScore(activeMatch);
+        fitManager.endSession(true);
+        lastFitStartFailed = false;
         if (activeMatch.status != DISCARDED) {
             store.archiveMatch(activeMatch);
             archivedMatches = filterDiscarded(store.loadArchivedMatches());

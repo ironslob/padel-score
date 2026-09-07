@@ -1,5 +1,6 @@
 import Toybox.Graphics;
 import Toybox.Lang;
+import Toybox.System;
 import Toybox.WatchUi;
 
 class StartView extends WatchUi.View {
@@ -50,13 +51,16 @@ class StartDelegate extends WatchUi.BehaviorDelegate {
         if (x >= width / 2 - 80 && x <= width / 2 + 80 && y >= height / 2 && y <= height / 2 + 50) {
             var settings = service.settingsForNewMatch();
             service.startMatch(settings);
-            WatchUi.popView(WatchUi.SLIDE_LEFT);
-            var match = service.activeMatch;
-            if (match != null && match.needsWarmUp) {
-                WatchUi.pushView(new WarmUpView(service), new WarmUpDelegate(service), WatchUi.SLIDE_LEFT);
-            } else {
-                WatchUi.pushView(new SelectServerView(service), new SelectServerDelegate(service, true), WatchUi.SLIDE_LEFT);
+            if (service.lastFitStartFailed) {
+                WatchUi.pushView(
+                    new WatchUi.Confirmation(WatchUi.loadResource(Rez.Strings.fitConflictMessage) as String),
+                    new FitConflictConfirmDelegate(service),
+                    WatchUi.SLIDE_IMMEDIATE
+                );
+                return true;
             }
+            WatchUi.popView(WatchUi.SLIDE_LEFT);
+            pushMatchStartViews(service);
             return true;
         }
         if (x >= width / 2 - 80 && x <= width / 2 + 80 && y >= height / 2 + 58 && y <= height / 2 + 98) {
@@ -77,6 +81,28 @@ class StartDelegate extends WatchUi.BehaviorDelegate {
 
     function onMenu() as Boolean {
         pushSettingsView(service);
+        return true;
+    }
+}
+
+class FitConflictConfirmDelegate extends WatchUi.ConfirmationDelegate {
+    private var service as MatchService;
+
+    function initialize(service as MatchService) {
+        ConfirmationDelegate.initialize();
+        self.service = service;
+    }
+
+    function onResponse(response) as Boolean {
+        if (response == WatchUi.CONFIRM_YES) {
+            // Continue without recording — match already started.
+            // Confirmation dismisses itself; pop StartView then push match flow.
+            service.lastFitStartFailed = false;
+            WatchUi.popView(WatchUi.SLIDE_LEFT);
+            pushMatchStartViews(service);
+        } else {
+            service.discardMatch();
+        }
         return true;
     }
 }
