@@ -30,14 +30,18 @@ public enum TieBreakNotice: Equatable, Sendable {
 }
 
 /// Mutable projection of the current game (derived from events).
-public struct GameScore: Codable, Sendable, Equatable {
+public struct GameScore: Sendable, Equatable {
     /// 0 = love, 1 = 15, 2 = 30, 3 = 40 (or tie-break point count when `isTieBreak`)
     public var leftPoints: Int
     public var rightPoints: Int
     public var advantageSide: Side?
-    /// True while a single decisive rally is in progress: immediately at 40-40 under
-    /// golden point, or after an advantage is broken under silver point.
+    /// True while a single decisive rally is in progress under any capped deuce
+    /// format (golden at 40-40, silver after one broken advantage, star after two).
+    /// Historical name kept for archive compatibility.
     public var isGoldenPointActive: Bool
+    /// How many times advantage has been broken in this game. Reconstructed by
+    /// replay; used by capped formats to know when the next rally decides.
+    public var brokenAdvantageCount: Int
     public var isTieBreak: Bool
     public var isComplete: Bool
     public var winner: Side?
@@ -47,6 +51,7 @@ public struct GameScore: Codable, Sendable, Equatable {
         rightPoints: Int = 0,
         advantageSide: Side? = nil,
         isGoldenPointActive: Bool = false,
+        brokenAdvantageCount: Int = 0,
         isTieBreak: Bool = false,
         isComplete: Bool = false,
         winner: Side? = nil
@@ -55,6 +60,7 @@ public struct GameScore: Codable, Sendable, Equatable {
         self.rightPoints = rightPoints
         self.advantageSide = advantageSide
         self.isGoldenPointActive = isGoldenPointActive
+        self.brokenAdvantageCount = brokenAdvantageCount
         self.isTieBreak = isTieBreak
         self.isComplete = isComplete
         self.winner = winner
@@ -122,9 +128,15 @@ public struct GameScore: Codable, Sendable, Equatable {
             return deuceFormat.decidingPointLabel
         }
         if advantageSide != nil {
+            if deuceFormat.numbersDeuceCycles {
+                return "Advantage \(brokenAdvantageCount + 1)"
+            }
             return "Advantage"
         }
         if leftPoints >= 3 && rightPoints >= 3 {
+            if deuceFormat.numbersDeuceCycles {
+                return "Deuce \(brokenAdvantageCount + 1)"
+            }
             return "Deuce"
         }
         return nil
@@ -137,6 +149,44 @@ public struct GameScore: Codable, Sendable, Equatable {
         case 2: return "30"
         default: return "40"
         }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case leftPoints
+        case rightPoints
+        case advantageSide
+        case isGoldenPointActive
+        case brokenAdvantageCount
+        case isTieBreak
+        case isComplete
+        case winner
+    }
+}
+
+extension GameScore: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        leftPoints = try container.decode(Int.self, forKey: .leftPoints)
+        rightPoints = try container.decode(Int.self, forKey: .rightPoints)
+        advantageSide = try container.decodeIfPresent(Side.self, forKey: .advantageSide)
+        isGoldenPointActive = try container.decodeIfPresent(Bool.self, forKey: .isGoldenPointActive) ?? false
+        // Absent on snapshots written before Star Point existed.
+        brokenAdvantageCount = try container.decodeIfPresent(Int.self, forKey: .brokenAdvantageCount) ?? 0
+        isTieBreak = try container.decodeIfPresent(Bool.self, forKey: .isTieBreak) ?? false
+        isComplete = try container.decodeIfPresent(Bool.self, forKey: .isComplete) ?? false
+        winner = try container.decodeIfPresent(Side.self, forKey: .winner)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(leftPoints, forKey: .leftPoints)
+        try container.encode(rightPoints, forKey: .rightPoints)
+        try container.encodeIfPresent(advantageSide, forKey: .advantageSide)
+        try container.encode(isGoldenPointActive, forKey: .isGoldenPointActive)
+        try container.encode(brokenAdvantageCount, forKey: .brokenAdvantageCount)
+        try container.encode(isTieBreak, forKey: .isTieBreak)
+        try container.encode(isComplete, forKey: .isComplete)
+        try container.encodeIfPresent(winner, forKey: .winner)
     }
 }
 

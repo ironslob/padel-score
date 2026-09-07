@@ -16,7 +16,7 @@ public final class MatchSessionCoordinator: ObservableObject {
     @Published public private(set) var alwaysAskServeAtSetStart = false
     @Published public private(set) var fixedServerPositions = true
     @Published public private(set) var usThemLabels = true
-    @Published public private(set) var deuceFormat: DeuceFormat = .goldenPoint
+    @Published public private(set) var deuceFormat: DeuceFormat = MatchSettings.default.deuceFormat
     @Published public private(set) var matchSetFormat: MatchSetFormat = .bestOfThree
     @Published public private(set) var warmUpEnabled = true
     @Published public private(set) var warmUpMinutes = MatchSettings.defaultWarmUpMinutes

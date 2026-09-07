@@ -250,11 +250,13 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
         XCTAssertFalse(store.usThemLabels)
     }
 
-    func testDeuceFormatDefaultsGoldenPointAndPersists() {
+    func testDeuceFormatDefaultsStarPointAndPersists() {
         let suiteName = "ServeSelectionPreferenceStoreTests.deuceFormat.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         let store = UserDefaultsServeSelectionPreferenceStore(defaults: defaults)
 
+        XCTAssertEqual(store.deuceFormat, .starPoint)
+        store.setDeuceFormat(.goldenPoint)
         XCTAssertEqual(store.deuceFormat, .goldenPoint)
         store.setDeuceFormat(.silverPoint)
         XCTAssertEqual(store.deuceFormat, .silverPoint)
@@ -273,20 +275,20 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
             .advantage
         )
 
-        // Everyone else lands on the new default.
+        // Everyone else lands on the product default.
         let onDefaults = UserDefaults(suiteName: suiteName + ".on")!
         onDefaults.set(true, forKey: "goldenPointEnabled")
         XCTAssertEqual(
             UserDefaultsServeSelectionPreferenceStore(defaults: onDefaults).deuceFormat,
-            .goldenPoint
+            .starPoint
         )
 
-        // An explicit choice always beats the legacy key.
+        // An explicit choice always beats the legacy key — including a stored golden.
         let bothDefaults = UserDefaults(suiteName: suiteName + ".both")!
         bothDefaults.set(false, forKey: "goldenPointEnabled")
         let store = UserDefaultsServeSelectionPreferenceStore(defaults: bothDefaults)
-        store.setDeuceFormat(.silverPoint)
-        XCTAssertEqual(store.deuceFormat, .silverPoint)
+        store.setDeuceFormat(.goldenPoint)
+        XCTAssertEqual(store.deuceFormat, .goldenPoint)
     }
 
     func testArchivedMatchesKeepSilverPointBehaviour() throws {
@@ -305,9 +307,18 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
         XCTAssertEqual(offSettings.deuceFormat, .advantage)
     }
 
-    func testDefaultSettingsUseGoldenPoint() {
-        XCTAssertEqual(MatchSettings.default.deuceFormat, .goldenPoint)
-        XCTAssertEqual(MatchSettings().deuceFormat, .goldenPoint)
+    func testDefaultSettingsUseStarPoint() {
+        XCTAssertEqual(MatchSettings.default.deuceFormat, .starPoint)
+        XCTAssertEqual(MatchSettings().deuceFormat, .starPoint)
+    }
+
+    func testGameScoreDecodesWithoutBrokenAdvantageCount() throws {
+        let legacy = """
+        {"leftPoints":3,"rightPoints":3,"isGoldenPointActive":false,"isTieBreak":false,"isComplete":false}
+        """
+        let score = try JSONDecoder().decode(GameScore.self, from: Data(legacy.utf8))
+        XCTAssertEqual(score.brokenAdvantageCount, 0)
+        XCTAssertEqual(score.leftPoints, 3)
     }
 
     func testDeuceFormatRoundTripsThroughCoding() throws {

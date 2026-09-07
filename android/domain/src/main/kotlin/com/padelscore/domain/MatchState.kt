@@ -19,7 +19,12 @@ data class GameScore(
     var leftPoints: Int = 0,
     var rightPoints: Int = 0,
     var advantageSide: Side? = null,
+    /** True while a single decisive rally is in progress under any capped deuce
+     * format. Historical name kept for archive compatibility. */
     var isGoldenPointActive: Boolean = false,
+    /** How many times advantage has been broken in this game. Reconstructed by
+     * replay; used by capped formats to know when the next rally decides. */
+    var brokenAdvantageCount: Int = 0,
     var isTieBreak: Boolean = false,
     var isComplete: Boolean = false,
     var winner: Side? = null,
@@ -59,8 +64,16 @@ data class GameScore(
     fun statusLine(deuceFormat: DeuceFormat): String? = when {
         isTieBreak -> "Tie-break"
         isGoldenPointActive -> deuceFormat.decidingPointLabel
-        advantageSide != null -> "Advantage"
-        leftPoints >= 3 && rightPoints >= 3 -> "Deuce"
+        advantageSide != null -> if (deuceFormat.numbersDeuceCycles) {
+            "Advantage ${brokenAdvantageCount + 1}"
+        } else {
+            "Advantage"
+        }
+        leftPoints >= 3 && rightPoints >= 3 -> if (deuceFormat.numbersDeuceCycles) {
+            "Deuce ${brokenAdvantageCount + 1}"
+        } else {
+            "Deuce"
+        }
         else -> null
     }
 

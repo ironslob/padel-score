@@ -58,7 +58,7 @@ class SharedPreferencesStore(
             if (prefs.contains(LEGACY_GOLDEN) && !prefs.getBoolean(LEGACY_GOLDEN, true)) {
                 return DeuceFormat.Advantage
             }
-            return DeuceFormat.GoldenPoint
+            return MatchSettings().deuceFormat
         }
         set(value) { prefs.edit().putString(DEUCE, serialName(value)).apply() }
 
@@ -89,6 +89,7 @@ class SharedPreferencesStore(
 
         private fun serialName(format: DeuceFormat): String = when (format) {
             DeuceFormat.Advantage -> "advantage"
+            DeuceFormat.StarPoint -> "starPoint"
             DeuceFormat.SilverPoint -> "silverPoint"
             DeuceFormat.GoldenPoint -> "goldenPoint"
         }

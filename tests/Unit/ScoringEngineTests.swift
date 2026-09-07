@@ -220,6 +220,117 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.currentSet.leftGames, 1)
     }
 
+    // MARK: Star point
+
+    func testStarPointPlaysTwoAdvantageCyclesThenDecides() throws {
+        var s = try reachDeuce(start(settings: settings(.starPoint)))
+        XCTAssertEqual(s.gameStatusLine, "Deuce 1")
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+
+        s = try point(.left, s) // Advantage 1
+        XCTAssertEqual(s.gameStatusLine, "Advantage 1")
+        s = try point(.right, s) // broken → Deuce 2
+        XCTAssertEqual(s.currentGame.brokenAdvantageCount, 1)
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.gameStatusLine, "Deuce 2")
+
+        s = try point(.right, s) // Advantage 2
+        XCTAssertEqual(s.gameStatusLine, "Advantage 2")
+        s = try point(.left, s) // broken → Star Point
+        XCTAssertEqual(s.currentGame.brokenAdvantageCount, 2)
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.gameStatusLine, "Star Point")
+        XCTAssertEqual(s.gameDisplayPair.left, "ST")
+        XCTAssertEqual(s.gameDisplayPair.right, "ST")
+
+        s = try point(.left, s)
+        XCTAssertEqual(s.currentSet.leftGames, 1)
+        XCTAssertEqual(s.currentGame.brokenAdvantageCount, 0)
+    }
+
+    func testStarPointAdvantageConvertedOnCycleOneWins() throws {
+        var s = try reachDeuce(start(settings: settings(.starPoint)))
+        s = try point(.left, s)
+        s = try point(.left, s)
+        XCTAssertEqual(s.currentSet.leftGames, 1)
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+    }
+
+    func testStarPointAdvantageConvertedOnCycleTwoWins() throws {
+        var s = try reachDeuce(start(settings: settings(.starPoint)))
+        s = try point(.left, s)
+        s = try point(.right, s) // Deuce 2
+        s = try point(.right, s) // Advantage 2
+        s = try point(.right, s) // converts
+        XCTAssertEqual(s.currentSet.rightGames, 1)
+    }
+
+    func testStarPointDecidingPointWinnableByEitherSide() throws {
+        var s = try reachDeuce(start(settings: settings(.starPoint)))
+        s = try point(.left, s)
+        s = try point(.right, s)
+        s = try point(.right, s)
+        s = try point(.left, s) // Star Point
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
+        s = try point(.right, s)
+        XCTAssertEqual(s.currentSet.rightGames, 1)
+    }
+
+    func testStarPointOneBrokenAdvantageIsNotDecisive() throws {
+        // Star ≠ silver: after one broken advantage the next point is still an advantage.
+        var s = try reachDeuce(start(settings: settings(.starPoint)))
+        s = try point(.left, s)
+        s = try point(.right, s)
+        XCTAssertEqual(s.currentGame.brokenAdvantageCount, 1)
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.gameStatusLine, "Deuce 2")
+    }
+
+    func testBrokenAdvantageCountResetsBetweenGames() throws {
+        var s = try reachDeuce(start(settings: settings(.starPoint)))
+        s = try point(.left, s)
+        s = try point(.right, s)
+        s = try point(.right, s)
+        s = try point(.left, s)
+        s = try point(.left, s) // game
+        XCTAssertEqual(s.currentSet.leftGames, 1)
+        XCTAssertEqual(s.currentGame.brokenAdvantageCount, 0)
+    }
+
+    func testUndoFromStarPointRestoresAdvantageTwo() throws {
+        var s = try reachDeuce(start(settings: settings(.starPoint)))
+        s = try point(.left, s)
+        s = try point(.right, s)
+        s = try point(.right, s)
+        s = try point(.left, s) // Star Point
+        XCTAssertEqual(s.gameStatusLine, "Star Point")
+
+        s = try engine.apply(.undo, to: s)
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.currentGame.advantageSide, .right)
+        XCTAssertEqual(s.currentGame.brokenAdvantageCount, 1)
+        XCTAssertEqual(s.gameStatusLine, "Advantage 2")
+    }
+
+    func testRegularAndSilverStatusLinesStayUnnumbered() throws {
+        var regular = try reachDeuce(start(settings: settings(.advantage)))
+        XCTAssertEqual(regular.gameStatusLine, "Deuce")
+        regular = try point(.left, regular)
+        XCTAssertEqual(regular.gameStatusLine, "Advantage")
+
+        var silver = try reachDeuce(start(settings: settings(.silverPoint)))
+        XCTAssertEqual(silver.gameStatusLine, "Deuce")
+        silver = try point(.left, silver)
+        XCTAssertEqual(silver.gameStatusLine, "Advantage")
+    }
+
+    func testDeuceFormatOrderingIsMostAdvantagesToFewest() {
+        XCTAssertEqual(
+            DeuceFormat.allCases,
+            [.advantage, .starPoint, .silverPoint, .goldenPoint]
+        )
+    }
+
     // MARK: Changing the deuce format mid-match
 
     private func changeFormat(_ format: DeuceFormat, _ state: MatchState) throws -> MatchState {
@@ -277,6 +388,70 @@ final class ScoringEngineTests: XCTestCase {
         s = try point(.right, s)
         XCTAssertTrue(s.currentGame.isGoldenPointActive)
         XCTAssertEqual(s.gameStatusLine, "Silver Point")
+    }
+
+    func testChangingToStarPointFromDeuceLeavesTwoAdvantages() throws {
+        var s = try reachDeuce(start(settings: settings(.goldenPoint)))
+        s = try changeFormat(.starPoint, s)
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.gameStatusLine, "Deuce 1")
+
+        s = try point(.left, s)
+        s = try point(.right, s)
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.gameStatusLine, "Deuce 2")
+    }
+
+    func testChangingToStarPointFromSilverDeciderLeavesOneAdvantage() throws {
+        var s = try reachDeuce(start(settings: settings(.silverPoint)))
+        s = try point(.left, s)
+        s = try point(.right, s) // silver decider
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
+
+        s = try changeFormat(.starPoint, s)
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.currentGame.brokenAdvantageCount, 1)
+        XCTAssertEqual(s.gameStatusLine, "Deuce 2")
+    }
+
+    func testChangingToSilverAfterOneBrokenAdvantageUnderRegularArms() throws {
+        var s = try reachDeuce(start(settings: settings(.advantage)))
+        s = try point(.left, s)
+        s = try point(.right, s) // one break
+        XCTAssertEqual(s.currentGame.brokenAdvantageCount, 1)
+
+        s = try changeFormat(.silverPoint, s)
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
+        XCTAssertNil(s.currentGame.advantageSide)
+    }
+
+    func testChangingToStarAfterTwoBreaksWithHeldAdvantageArmsAndSurrenders() throws {
+        var s = try reachDeuce(start(settings: settings(.advantage)))
+        s = try point(.left, s)
+        s = try point(.right, s)
+        s = try point(.right, s)
+        s = try point(.left, s)
+        s = try point(.left, s) // Advantage after two breaks
+        XCTAssertEqual(s.currentGame.brokenAdvantageCount, 2)
+        XCTAssertEqual(s.currentGame.advantageSide, .left)
+
+        s = try changeFormat(.starPoint, s)
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
+        XCTAssertNil(s.currentGame.advantageSide)
+        XCTAssertEqual(s.gameStatusLine, "Star Point")
+    }
+
+    func testChangingFromStarDeciderToRegularDisarms() throws {
+        var s = try reachDeuce(start(settings: settings(.starPoint)))
+        s = try point(.left, s)
+        s = try point(.right, s)
+        s = try point(.right, s)
+        s = try point(.left, s)
+        XCTAssertTrue(s.currentGame.isGoldenPointActive)
+
+        s = try changeFormat(.advantage, s)
+        XCTAssertFalse(s.currentGame.isGoldenPointActive)
+        XCTAssertEqual(s.gameStatusLine, "Deuce")
     }
 
     func testGamesAlreadyPlayedKeepTheirResultAfterAFormatChange() throws {

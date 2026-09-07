@@ -53,12 +53,20 @@ enum class MatchSetFormat {
     }
 }
 
-/** How a game is resolved once both sides reach 40. */
+/** How a game is resolved once both sides reach 40.
+ *
+ * Declaration order is the picker/cycler order: most advantages to fewest
+ * (Regular → Star → Silver → Golden).
+ */
 @Serializable
 enum class DeuceFormat {
     /** Traditional scoring: advantage repeats until one side wins by two points. */
     @SerialName("advantage")
     Advantage,
+
+    /** Two advantage cycles are played. If the second is broken, the next point decides. */
+    @SerialName("starPoint")
+    StarPoint,
 
     /** One advantage is played. If it is broken, the next point decides the game. */
     @SerialName("silverPoint")
@@ -72,6 +80,7 @@ enum class DeuceFormat {
     val label: String
         get() = when (this) {
             Advantage -> "Regular"
+            StarPoint -> "Star point"
             SilverPoint -> "Silver point"
             GoldenPoint -> "Golden point"
         }
@@ -79,6 +88,7 @@ enum class DeuceFormat {
     val decidingPointLabel: String
         get() = when (this) {
             Advantage -> "Deuce"
+            StarPoint -> "Star Point"
             SilverPoint -> "Silver Point"
             GoldenPoint -> "Golden Point"
         }
@@ -86,9 +96,28 @@ enum class DeuceFormat {
     val decidingPointShortLabel: String
         get() = when (this) {
             Advantage -> "40"
+            StarPoint -> "ST"
             SilverPoint -> "SP"
             GoldenPoint -> "GP"
         }
+
+    /** How many converted-or-broken advantage cycles are allowed before the
+     * next point becomes decisive. `null` means unlimited (regular scoring). */
+    val advantagesBeforeDecidingPoint: Int?
+        get() = when (this) {
+            Advantage -> null
+            StarPoint -> 2
+            SilverPoint -> 1
+            GoldenPoint -> 0
+        }
+
+    fun decidesGame(afterBrokenAdvantages: Int): Boolean {
+        val cap = advantagesBeforeDecidingPoint ?: return false
+        return afterBrokenAdvantages >= cap
+    }
+
+    val numbersDeuceCycles: Boolean
+        get() = (advantagesBeforeDecidingPoint ?: 0) > 1
 }
 
 /** V1 defaults from product.md. `deuceFormat` is a persisted preference on Watch. */
@@ -98,7 +127,7 @@ data class MatchSettings(
     val continuousPlay: Boolean = false,
     val gamesToWinSet: Int = 6,
     val mustWinByTwoGames: Boolean = true,
-    val deuceFormat: DeuceFormat = DeuceFormat.GoldenPoint,
+    val deuceFormat: DeuceFormat = DeuceFormat.StarPoint,
     val askServeAtSetStart: Boolean = false,
     val fixedServerPositions: Boolean = true,
     val usThemLabels: Boolean = true,
@@ -154,13 +183,12 @@ object MatchSettingsSerializer : KSerializer<MatchSettings> {
                 put("continuousPlay", value.continuousPlay)
                 put("gamesToWinSet", value.gamesToWinSet)
                 put("mustWinByTwoGames", value.mustWinByTwoGames)
-                put("deuceFormat", value.deuceFormat.name.replaceFirstChar { it.lowercase() }.let {
-                    when (value.deuceFormat) {
+                put("deuceFormat", when (value.deuceFormat) {
                         DeuceFormat.Advantage -> "advantage"
+                        DeuceFormat.StarPoint -> "starPoint"
                         DeuceFormat.SilverPoint -> "silverPoint"
                         DeuceFormat.GoldenPoint -> "goldenPoint"
-                    }
-                })
+                    })
                 put("goldenPointEnabled", value.deuceFormat != DeuceFormat.Advantage)
                 put("askServeAtSetStart", value.askServeAtSetStart)
                 put("fixedServerPositions", value.fixedServerPositions)
@@ -182,6 +210,7 @@ object MatchSettingsSerializer : KSerializer<MatchSettings> {
 
         val deuceFormat = when (string("deuceFormat")) {
             "advantage" -> DeuceFormat.Advantage
+            "starPoint" -> DeuceFormat.StarPoint
             "silverPoint" -> DeuceFormat.SilverPoint
             "goldenPoint" -> DeuceFormat.GoldenPoint
             else -> {

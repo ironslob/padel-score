@@ -239,12 +239,11 @@ class ScoringEngine {
             || state.currentGame.leftPoints < 3 || state.currentGame.rightPoints < 3) {
             return;
         }
-        if (format == DEUCE_GOLDEN_POINT) {
+        var decisive = deuceFormatDecidesGame(format, state.currentGame.brokenAdvantageCount);
+        if (decisive) {
             state.currentGame.advantageSide = null;
-            state.currentGame.isGoldenPointActive = true;
-        } else {
-            state.currentGame.isGoldenPointActive = false;
         }
+        state.currentGame.isGoldenPointActive = decisive;
     }
 
     private function awardPoint(side as Side, state as MatchState, deuceFormat as DeuceFormat) as Void {
@@ -264,19 +263,20 @@ class ScoringEngine {
         var myPoints = state.currentGame.pointsFor(side);
         var theirPoints = state.currentGame.pointsFor(oppositeSide(side));
 
-        // Deuce territory (both at 40+). Golden point never reaches here — it makes
-        // the point decisive the moment the game arrives at 40-40, below.
+        // Deuce territory (both at 40+). Cap-0 formats (golden) never reach here —
+        // they arm the decider the moment the game arrives at 40-40, below.
         if (myPoints >= 3 && theirPoints >= 3) {
             if (state.currentGame.advantageSide == null) {
                 state.currentGame.advantageSide = side;
             } else if (state.currentGame.advantageSide == side) {
                 completeGame(side, state);
             } else {
-                // Advantage broken → back to deuce. Silver point allows exactly one
-                // advantage, so the next point decides; regular scoring keeps cycling.
+                // Advantage broken → back to deuce. Arm the named decisive rally
+                // once the format's advantage cap is spent.
                 state.currentGame.advantageSide = null;
+                state.currentGame.brokenAdvantageCount += 1;
                 state.currentGame.isGoldenPointActive =
-                    deuceFormat == DEUCE_SILVER_POINT;
+                    deuceFormatDecidesGame(deuceFormat, state.currentGame.brokenAdvantageCount);
             }
             return;
         }
@@ -288,9 +288,8 @@ class ScoringEngine {
 
         state.currentGame.setPoints(myPoints + 1, side);
 
-        // Golden point: no advantage phase at all, so reaching 40-40 makes the very
-        // next rally decisive.
-        if (deuceFormat == DEUCE_GOLDEN_POINT
+        // Cap 0 (golden): reaching 40-40 makes the very next rally decisive.
+        if (deuceFormatDecidesGame(deuceFormat, state.currentGame.brokenAdvantageCount)
             && state.currentGame.leftPoints >= 3
             && state.currentGame.rightPoints >= 3) {
             state.currentGame.isGoldenPointActive = true;
@@ -338,6 +337,7 @@ class ScoringEngine {
         state.currentGame.winner = winner;
         state.currentGame.advantageSide = null;
         state.currentGame.isGoldenPointActive = false;
+        state.currentGame.brokenAdvantageCount = 0;
 
         var games = state.currentSet.gamesFor(winner) + 1;
         state.currentSet.setGames(games, winner);

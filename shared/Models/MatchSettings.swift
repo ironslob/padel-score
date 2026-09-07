@@ -35,9 +35,14 @@ public enum MatchSetFormat: String, CaseIterable, Codable, Sendable, Identifiabl
 }
 
 /// How a game is resolved once both sides reach 40.
+///
+/// Declaration order is the picker/cycler order: most advantages to fewest
+/// (Regular → Star → Silver → Golden).
 public enum DeuceFormat: String, CaseIterable, Codable, Sendable, Identifiable {
     /// Traditional scoring: advantage repeats until one side wins by two points.
     case advantage
+    /// Two advantage cycles are played. If the second is broken, the next point decides.
+    case starPoint
     /// One advantage is played. If it is broken, the next point decides the game.
     case silverPoint
     /// No advantage at all — the first point at 40-40 decides the game.
@@ -48,6 +53,7 @@ public enum DeuceFormat: String, CaseIterable, Codable, Sendable, Identifiable {
     public var label: String {
         switch self {
         case .advantage: return "Regular"
+        case .starPoint: return "Star point"
         case .silverPoint: return "Silver point"
         case .goldenPoint: return "Golden point"
         }
@@ -57,6 +63,7 @@ public enum DeuceFormat: String, CaseIterable, Codable, Sendable, Identifiable {
     public var decidingPointLabel: String {
         switch self {
         case .advantage: return "Deuce"
+        case .starPoint: return "Star Point"
         case .silverPoint: return "Silver Point"
         case .goldenPoint: return "Golden Point"
         }
@@ -66,9 +73,33 @@ public enum DeuceFormat: String, CaseIterable, Codable, Sendable, Identifiable {
     public var decidingPointShortLabel: String {
         switch self {
         case .advantage: return "40"
+        case .starPoint: return "ST"
         case .silverPoint: return "SP"
         case .goldenPoint: return "GP"
         }
+    }
+
+    /// How many converted-or-broken advantage cycles are allowed before the
+    /// next point becomes decisive. `nil` means unlimited (regular scoring).
+    public var advantagesBeforeDecidingPoint: Int? {
+        switch self {
+        case .advantage: return nil
+        case .starPoint: return 2
+        case .silverPoint: return 1
+        case .goldenPoint: return 0
+        }
+    }
+
+    /// Whether the game should be on a named decisive rally after this many
+    /// advantages have been broken (or immediately at 40-40 when the cap is 0).
+    public func decidesGame(afterBrokenAdvantages count: Int) -> Bool {
+        guard let cap = advantagesBeforeDecidingPoint else { return false }
+        return count >= cap
+    }
+
+    /// Whether Deuce / Advantage status should be numbered (Deuce 1, Advantage 2, …).
+    public var numbersDeuceCycles: Bool {
+        (advantagesBeforeDecidingPoint ?? 0) > 1
     }
 }
 
@@ -125,7 +156,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         continuousPlay: Bool = false,
         gamesToWinSet: Int = 6,
         mustWinByTwoGames: Bool = true,
-        deuceFormat: DeuceFormat = .goldenPoint,
+        deuceFormat: DeuceFormat = .starPoint,
         askServeAtSetStart: Bool = false,
         fixedServerPositions: Bool = true,
         usThemLabels: Bool = true,

@@ -45,12 +45,9 @@ struct ScoreScreen: View {
                 if match.currentGame.isTieBreak {
                     tieBreakHeader
                 } else if match.currentGame.isGoldenPointActive {
-                    goldenPointLabel
+                    decidingPointHeader
                 } else {
-                    Text("\(games.left) – \(games.right)")
-                        .font(setScoreFont)
-                        .foregroundStyle(.primary)
-                        .accessibilityLabel("Games \(games.left) to \(games.right)")
+                    gamesHeader
                 }
 
                 HStack(spacing: 8) {
@@ -163,7 +160,32 @@ struct ScoreScreen: View {
     }
 
     @ViewBuilder
-    private var goldenPointLabel: some View {
+    private var gamesHeader: some View {
+        let status = match.settings.deuceFormat.numbersDeuceCycles ? match.gameStatusLine : nil
+        let gamesLabel = "Games \(games.left) to \(games.right)"
+        if isLuminanceReduced || status == nil {
+            Text("\(games.left) – \(games.right)")
+                .font(setScoreFont)
+                .foregroundStyle(.primary)
+                .accessibilityLabel(
+                    status.map { "\(gamesLabel), \($0)" } ?? gamesLabel
+                )
+        } else {
+            VStack(spacing: 2) {
+                Text("\(games.left) – \(games.right)")
+                    .font(setScoreFont)
+                    .foregroundStyle(.primary)
+                Text(status!)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("\(gamesLabel), \(status!)")
+        }
+    }
+
+    @ViewBuilder
+    private var decidingPointHeader: some View {
         let format = match.settings.deuceFormat
         let accessibility = "\(format.decidingPointLabel), next point wins"
         if isLuminanceReduced {

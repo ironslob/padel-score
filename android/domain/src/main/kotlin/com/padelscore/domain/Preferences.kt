@@ -40,7 +40,7 @@ class InMemoryPreferenceStore : ServeSelectionPreferenceStoring {
     override var alwaysAskServeAtSetStart: Boolean = false
     override var fixedServerPositions: Boolean = true
     override var usThemLabels: Boolean = true
-    override var deuceFormat: DeuceFormat = DeuceFormat.GoldenPoint
+    override var deuceFormat: DeuceFormat = DeuceFormat.StarPoint
     override var matchSetFormat: MatchSetFormat = MatchSetFormat.BestOfThree
     override var warmUpEnabled: Boolean = true
     override var warmUpMinutes: Int = MatchSettings.DEFAULT_WARM_UP_MINUTES
@@ -49,6 +49,7 @@ class InMemoryPreferenceStore : ServeSelectionPreferenceStoring {
 object SettingsCopy {
     const val deuceFormat =
         "How a game is decided at 40-40. Regular plays advantage until someone wins by two. " +
+            "Star point plays two advantages, then the next point wins. " +
             "Silver point plays one advantage, then the next point wins. " +
             "Golden point skips advantage entirely — the next point wins. " +
             "Can be changed during a match; games already played keep their result."
