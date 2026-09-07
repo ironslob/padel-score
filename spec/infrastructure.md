@@ -69,6 +69,28 @@ Development Environment
 
 No third-party UI frameworks should be introduced without a compelling reason.
 
+## Wear OS Application
+
+Language
+
+- Kotlin
+
+Frameworks
+
+- Jetpack Compose for Wear OS
+- kotlinx.serialization
+- Health Services (exercise session)
+
+Platforms
+
+- Wear OS 4+ (API 30)
+
+Development Environment
+
+- Android Studio / Gradle
+
+The scoring engine is a JVM module (`android/domain`) so unit tests run without the Android SDK.
+
 ---
 
 # 4. Local Persistence

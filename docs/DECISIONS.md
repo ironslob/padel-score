@@ -82,3 +82,9 @@ The HealthKit workout still starts once in `startMatch` and ends once when the m
 
 **Why:** HealthKit has no API to detect another session in advance, and owning the workout is what makes wrist-raise return to Padel Score. Asking every time added a control most starts do not need. Garmin has no equivalent; it cannot start a HealthKit session.
 
+## Wear OS watch app
+
+**Choice:** A standalone Wear OS app in `android/`, with a JVM Kotlin port of the scoring engine (`android/domain`) and Jetpack Compose UI (`android/wear`) that follows the Apple Watch screens rather than Garmin’s on-watch history. Health Services tries to start one tennis exercise session per match (including warm-up), matching HealthKit’s role. Tiles, Data Layer phone sync, and an Android companion are deferred.
+
+**Why:** Wear OS is the Android equivalent of the Watch app. Extracting Kotlin Multiplatform would churn the Swift and Monkey C trees; a third engine port matches the existing Garmin pattern, with Swift remaining the source of truth. History stays off the watch, as on Apple Watch. Health Services is the closest wrist-raise analog; if another exercise owns the session, the same continue-without-workout / cancel prompt is shown.
+
