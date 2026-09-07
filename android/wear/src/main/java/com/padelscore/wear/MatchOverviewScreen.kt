@@ -34,7 +34,13 @@ fun MatchOverviewScreen(match: MatchState) {
     )
     ScalingLazyColumn(modifier = Modifier.fillMaxSize()) {
         item { Labeled("Scoring", match.settings.deuceFormat.label) }
-        item { Labeled("Current Set", "${match.currentSet.leftGames} – ${match.currentSet.rightGames}") }
+        if (match.isMatchTieBreak) {
+            item {
+                Labeled("Super TB", "${match.currentGame.leftPoints} – ${match.currentGame.rightPoints}")
+            }
+        } else {
+            item { Labeled("Current Set", "${match.currentSet.leftGames} – ${match.currentSet.rightGames}") }
+        }
         item { Labeled("Current Match", "${match.leftSetsWon} – ${match.rightSetsWon}") }
         item { Labeled("Elapsed", elapsed) }
         if (match.currentGame.isGoldenPointActive) {

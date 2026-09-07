@@ -103,6 +103,7 @@ class MatchStore {
             "continuousPlay" => settings.continuousPlay,
             "gamesToWinSet" => settings.gamesToWinSet,
             "mustWinByTwoGames" => settings.mustWinByTwoGames,
+            "decidingSetIsMatchTieBreak" => settings.decidingSetIsMatchTieBreak,
             "deuceFormat" => deuceFormatToString(settings.deuceFormat),
             // Pre-silver-point key, still written so an older build reading this
             // store keeps scoring these matches the same way.
@@ -168,6 +169,11 @@ class MatchStore {
         if (data.hasKey("continuousPlay")) { settings.continuousPlay = data.get("continuousPlay") as Boolean; }
         if (data.hasKey("gamesToWinSet")) { settings.gamesToWinSet = data.get("gamesToWinSet") as Number; }
         if (data.hasKey("mustWinByTwoGames")) { settings.mustWinByTwoGames = data.get("mustWinByTwoGames") as Boolean; }
+        if (data.hasKey("decidingSetIsMatchTieBreak")) {
+            settings.decidingSetIsMatchTieBreak = data.get("decidingSetIsMatchTieBreak") as Boolean;
+        } else {
+            settings.decidingSetIsMatchTieBreak = false;
+        }
         var format = null;
         if (data.hasKey("deuceFormat")) {
             var rawFormat = data.get("deuceFormat");

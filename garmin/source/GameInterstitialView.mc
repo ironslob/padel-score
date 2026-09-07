@@ -44,8 +44,16 @@ class GameInterstitialView extends WatchUi.View {
         }
         var sets = match.matchSetsDisplay();
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
-        dc.drawText(width / 2, 44, Graphics.FONT_SMALL, "Games " + games[0] + " – " + games[1], Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(width / 2, 66, Graphics.FONT_XTINY, "Sets " + sets[0] + " – " + sets[1], Graphics.TEXT_JUSTIFY_CENTER);
+        if (match.isMatchTieBreak()) {
+            dc.drawText(width / 2, 44, Graphics.FONT_SMALL, "Games " + games[0] + " – " + games[1], Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, 66, Graphics.FONT_XTINY, "First to 10, win by 2", Graphics.TEXT_JUSTIFY_CENTER);
+        } else if (isTieBreak) {
+            dc.drawText(width / 2, 44, Graphics.FONT_SMALL, "Games " + games[0] + " – " + games[1], Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, 66, Graphics.FONT_XTINY, "First to 7, win by 2", Graphics.TEXT_JUSTIFY_CENTER);
+        } else {
+            dc.drawText(width / 2, 44, Graphics.FONT_SMALL, "Games " + games[0] + " – " + games[1], Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, 66, Graphics.FONT_XTINY, "Sets " + sets[0] + " – " + sets[1], Graphics.TEXT_JUSTIFY_CENTER);
+        }
 
         if (completedSet) {
             drawSetActions(dc, match, width, height);

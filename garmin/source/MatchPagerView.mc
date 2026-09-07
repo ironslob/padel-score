@@ -53,7 +53,10 @@ class MatchPagerView extends WatchUi.View {
         var roles = match.servingRoleLabels();
         var sides = match.scoreScreenSides();
 
-        if (match.currentGame.isTieBreak) {
+        if (match.isMatchTieBreak()) {
+            dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
+            dc.drawText(width / 2, 16, Graphics.FONT_XTINY, "Super TB", Graphics.TEXT_JUSTIFY_CENTER);
+        } else if (match.currentGame.isTieBreak) {
             dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
             dc.drawText(width / 2, 16, Graphics.FONT_XTINY, "Tie-break", Graphics.TEXT_JUSTIFY_CENTER);
         } else if (match.currentGame.isGoldenPointActive) {

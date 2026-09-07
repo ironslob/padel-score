@@ -1025,6 +1025,145 @@ final class ScoringEngineTests: XCTestCase {
         XCTAssertEqual(s.rightSetsWon, 2)
     }
 
+    // MARK: - Match / super tie-break (2 sets + TB)
+
+    private var matchTieBreakSettings: MatchSettings {
+        var settings = rotatingSettings
+        MatchSetFormat.bestOfThreeMatchTieBreak.apply(to: &settings)
+        return settings
+    }
+
+    private func reachOneOne(settings: MatchSettings) throws -> MatchState {
+        var s = start(settings: settings)
+        for _ in 0..<6 { s = try winGame(for: .left, from: s) }
+        for _ in 0..<6 { s = try winGame(for: .right, from: s) }
+        return s
+    }
+
+    func testMatchTieBreakStartsAtOneOne() throws {
+        let s = try reachOneOne(settings: matchTieBreakSettings)
+        XCTAssertTrue(s.isMatchTieBreak)
+        XCTAssertTrue(s.currentGame.isTieBreak)
+        XCTAssertEqual(s.currentSet.leftGames, 0)
+        XCTAssertEqual(s.currentSet.rightGames, 0)
+        XCTAssertEqual(s.leftSetsWon, 1)
+        XCTAssertEqual(s.rightSetsWon, 1)
+        XCTAssertTrue(s.isAtSetStart)
+        XCTAssertEqual(s.gameStatusLine, "Super TB")
+        XCTAssertEqual(s.setScoreLines, ["6-0", "0-6", "0-0"])
+    }
+
+    func testMatchTieBreakFirstToTenWinsMatch() throws {
+        var s = try reachOneOne(settings: matchTieBreakSettings)
+        s = try winTieBreak(for: .left, points: 10, from: s)
+        XCTAssertEqual(s.status, .completed)
+        XCTAssertEqual(s.winner, .left)
+        XCTAssertEqual(s.leftSetsWon, 2)
+        XCTAssertEqual(s.rightSetsWon, 1)
+        XCTAssertEqual(s.completedSets.count, 3)
+        XCTAssertEqual(s.completedSets[2].leftGames, 10)
+        XCTAssertEqual(s.completedSets[2].rightGames, 0)
+        XCTAssertEqual(s.finalScoreSummary, "6-0, 0-6, 10-0")
+    }
+
+    func testMatchTieBreakRequiresTwoPointLead() throws {
+        var s = try reachOneOne(settings: matchTieBreakSettings)
+        s = try winTieBreak(for: .left, points: 9, from: s)
+        s = try winTieBreak(for: .right, points: 9, from: s)
+        XCTAssertEqual(s.status, .inProgress)
+        XCTAssertTrue(s.isMatchTieBreak)
+        s = try point(.left, s) // 10-9 — not enough
+        XCTAssertEqual(s.status, .inProgress)
+        s = try point(.right, s) // 10-10
+        s = try point(.left, s) // 11-10
+        XCTAssertEqual(s.status, .inProgress)
+        s = try point(.left, s) // 12-10
+        XCTAssertEqual(s.status, .completed)
+        XCTAssertEqual(s.completedSets[2].leftGames, 12)
+        XCTAssertEqual(s.completedSets[2].rightGames, 10)
+    }
+
+    func testMatchTieBreakSkippedOnTwoNil() throws {
+        var s = start(settings: matchTieBreakSettings)
+        for _ in 0..<12 {
+            s = try winGame(for: .left, from: s)
+        }
+        XCTAssertEqual(s.status, .completed)
+        XCTAssertEqual(s.leftSetsWon, 2)
+        XCTAssertEqual(s.completedSets.count, 2)
+        XCTAssertFalse(s.isMatchTieBreak)
+    }
+
+    func testBestOfThreeWithoutFlagPlaysFullThirdSet() throws {
+        var s = try reachOneOne(settings: rotatingSettings)
+        XCTAssertFalse(s.isMatchTieBreak)
+        XCTAssertFalse(s.currentGame.isTieBreak)
+        XCTAssertEqual(s.currentSet.leftGames, 0)
+        s = try winGame(for: .left, from: s)
+        XCTAssertEqual(s.currentSet.leftGames, 1)
+    }
+
+    func testMatchTieBreakFlagIgnoredOnBestOfOne() throws {
+        var settings = rotatingSettings
+        settings.setsToWin = 1
+        settings.decidingSetIsMatchTieBreak = true
+        var s = start(settings: settings)
+        for _ in 0..<6 {
+            s = try winGame(for: .left, from: s)
+        }
+        XCTAssertEqual(s.status, .completed)
+        XCTAssertEqual(s.completedSets.count, 1)
+        XCTAssertFalse(s.isMatchTieBreak)
+    }
+
+    func testSetTwoTieBreakFlowsIntoMatchTieBreak() throws {
+        var s = start(settings: matchTieBreakSettings)
+        for _ in 0..<6 { s = try winGame(for: .left, from: s) }
+        s = try reachSixSix(from: s)
+        XCTAssertTrue(s.currentGame.isTieBreak)
+        XCTAssertFalse(s.isMatchTieBreak)
+        s = try winTieBreak(for: .right, points: 7, from: s)
+        XCTAssertTrue(s.isMatchTieBreak)
+        XCTAssertEqual(s.leftSetsWon, 1)
+        XCTAssertEqual(s.rightSetsWon, 1)
+        s = try winTieBreak(for: .left, points: 10, from: s)
+        XCTAssertEqual(s.status, .completed)
+        XCTAssertEqual(s.completedSets[1].leftGames, 6)
+        XCTAssertEqual(s.completedSets[1].rightGames, 7)
+        XCTAssertEqual(s.completedSets[2].leftGames, 10)
+    }
+
+    func testUndoFromMatchTieBreakRestoresSetTwo() throws {
+        var s = try reachOneOne(settings: matchTieBreakSettings)
+        XCTAssertTrue(s.isMatchTieBreak)
+        s = try engine.apply(.undo, to: s)
+        XCTAssertFalse(s.isMatchTieBreak)
+        XCTAssertEqual(s.leftSetsWon, 1)
+        XCTAssertEqual(s.rightSetsWon, 0)
+        XCTAssertEqual(s.completedSets.count, 1)
+    }
+
+    func testMatchTieBreakEarlyFinishSummaryUsesPoints() throws {
+        var s = try reachOneOne(settings: matchTieBreakSettings)
+        s = try winTieBreak(for: .left, points: 6, from: s)
+        s = try winTieBreak(for: .right, points: 4, from: s)
+        XCTAssertEqual(s.setScoreLines, ["6-0", "0-6", "6-4"])
+        s = try engine.apply(.endEarly, to: s)
+        XCTAssertEqual(s.finalScoreSummary, "6-0, 0-6, 6-4")
+    }
+
+    func testMatchSetFormatApplyRoundTripsMatchTieBreak() {
+        var settings = MatchSettings.default
+        MatchSetFormat.bestOfThreeMatchTieBreak.apply(to: &settings)
+        XCTAssertTrue(settings.decidingSetIsMatchTieBreak)
+        XCTAssertEqual(settings.matchSetFormat, .bestOfThreeMatchTieBreak)
+        MatchSetFormat.bestOfThree.apply(to: &settings)
+        XCTAssertFalse(settings.decidingSetIsMatchTieBreak)
+        XCTAssertEqual(settings.matchSetFormat, .bestOfThree)
+        MatchSetFormat.continuous.apply(to: &settings)
+        XCTAssertFalse(settings.decidingSetIsMatchTieBreak)
+    }
+
     // MARK: - Tie-break
 
     func testSixSixStartsTieBreak() throws {

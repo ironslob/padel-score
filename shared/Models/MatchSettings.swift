@@ -3,6 +3,8 @@ import Foundation
 public enum MatchSetFormat: String, CaseIterable, Codable, Sendable, Identifiable {
     case bestOfOne
     case bestOfThree
+    /// Best of 3 where the deciding set is a 10-point match tie-break.
+    case bestOfThreeMatchTieBreak
     case bestOfFive
     case continuous
 
@@ -12,6 +14,7 @@ public enum MatchSetFormat: String, CaseIterable, Codable, Sendable, Identifiabl
         switch self {
         case .bestOfOne: return "1 set"
         case .bestOfThree: return "Best of 3"
+        case .bestOfThreeMatchTieBreak: return "2 sets + TB"
         case .bestOfFive: return "Best of 5"
         case .continuous: return "Continuous"
         }
@@ -22,14 +25,22 @@ public enum MatchSetFormat: String, CaseIterable, Codable, Sendable, Identifiabl
         case .bestOfOne:
             settings.setsToWin = 1
             settings.continuousPlay = false
+            settings.decidingSetIsMatchTieBreak = false
         case .bestOfThree:
             settings.setsToWin = 2
             settings.continuousPlay = false
+            settings.decidingSetIsMatchTieBreak = false
+        case .bestOfThreeMatchTieBreak:
+            settings.setsToWin = 2
+            settings.continuousPlay = false
+            settings.decidingSetIsMatchTieBreak = true
         case .bestOfFive:
             settings.setsToWin = 3
             settings.continuousPlay = false
+            settings.decidingSetIsMatchTieBreak = false
         case .continuous:
             settings.continuousPlay = true
+            settings.decidingSetIsMatchTieBreak = false
         }
     }
 }
@@ -137,6 +148,8 @@ public struct MatchSettings: Codable, Sendable, Equatable {
     public var continuousPlay: Bool
     public var gamesToWinSet: Int
     public var mustWinByTwoGames: Bool
+    /// When true, the deciding set (both sides at `setsToWin - 1`) is a 10-point match tie-break.
+    public var decidingSetIsMatchTieBreak: Bool
     /// How a game is decided once both sides reach 40.
     public var deuceFormat: DeuceFormat
     /// When true, the player must choose who is serving at the start of each new set.
@@ -156,6 +169,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         continuousPlay: Bool = false,
         gamesToWinSet: Int = 6,
         mustWinByTwoGames: Bool = true,
+        decidingSetIsMatchTieBreak: Bool = false,
         deuceFormat: DeuceFormat = .starPoint,
         askServeAtSetStart: Bool = false,
         fixedServerPositions: Bool = true,
@@ -167,6 +181,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         self.continuousPlay = continuousPlay
         self.gamesToWinSet = gamesToWinSet
         self.mustWinByTwoGames = mustWinByTwoGames
+        self.decidingSetIsMatchTieBreak = decidingSetIsMatchTieBreak
         self.deuceFormat = deuceFormat
         self.askServeAtSetStart = askServeAtSetStart
         self.fixedServerPositions = fixedServerPositions
@@ -182,7 +197,8 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         switch setsToWin {
         case 1: return .bestOfOne
         case 3: return .bestOfFive
-        default: return .bestOfThree
+        default:
+            return decidingSetIsMatchTieBreak ? .bestOfThreeMatchTieBreak : .bestOfThree
         }
     }
 
@@ -203,6 +219,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         case continuousPlay
         case gamesToWinSet
         case mustWinByTwoGames
+        case decidingSetIsMatchTieBreak
         case deuceFormat
         /// Pre-silver-point key. Read for migration, still written so older builds
         /// sharing the archive keep scoring these matches the same way.
@@ -221,6 +238,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         continuousPlay = try container.decodeIfPresent(Bool.self, forKey: .continuousPlay) ?? false
         gamesToWinSet = try container.decode(Int.self, forKey: .gamesToWinSet)
         mustWinByTwoGames = try container.decode(Bool.self, forKey: .mustWinByTwoGames)
+        decidingSetIsMatchTieBreak = try container.decodeIfPresent(Bool.self, forKey: .decidingSetIsMatchTieBreak) ?? false
         if let format = try container.decodeIfPresent(DeuceFormat.self, forKey: .deuceFormat) {
             deuceFormat = format
         } else {
@@ -248,6 +266,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         try container.encode(continuousPlay, forKey: .continuousPlay)
         try container.encode(gamesToWinSet, forKey: .gamesToWinSet)
         try container.encode(mustWinByTwoGames, forKey: .mustWinByTwoGames)
+        try container.encode(decidingSetIsMatchTieBreak, forKey: .decidingSetIsMatchTieBreak)
         try container.encode(deuceFormat, forKey: .deuceFormat)
         try container.encode(deuceFormat != .advantage, forKey: .goldenPointEnabled)
         try container.encode(askServeAtSetStart, forKey: .askServeAtSetStart)

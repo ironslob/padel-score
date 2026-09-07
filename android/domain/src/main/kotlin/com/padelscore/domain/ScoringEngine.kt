@@ -285,15 +285,24 @@ class ScoringEngine {
         }
 
         val theirPoints = state.currentGame.points(side.opposite)
-        if (myPoints + 1 >= 7 && (myPoints + 1) - theirPoints >= 2) {
+        val target = tieBreakPointsToWin(state)
+        if (myPoints + 1 >= target && (myPoints + 1) - theirPoints >= 2) {
             completeTieBreak(side, state)
         }
     }
 
+    private fun tieBreakPointsToWin(state: MatchState): Int =
+        if (state.isMatchTieBreak) 10 else 7
+
     private fun completeTieBreak(winner: Side, state: MatchState) {
         state.currentGame.isComplete = true
         state.currentGame.winner = winner
-        state.currentSet.setGames(7, winner)
+        if (state.isMatchTieBreak) {
+            state.currentSet.setGames(state.currentGame.leftPoints, Side.Left)
+            state.currentSet.setGames(state.currentGame.rightPoints, Side.Right)
+        } else {
+            state.currentSet.setGames(7, winner)
+        }
         val nextSetServer = tieBreakOpeningServer(state)?.opposite
         completeSet(winner, state, nextSetServer)
     }
@@ -363,9 +372,20 @@ class ScoringEngine {
             state.currentGame = GameScore()
         } else {
             state.currentSet = SetScore()
-            state.currentGame = GameScore()
+            state.currentGame = if (shouldStartMatchTieBreak(state)) {
+                GameScore(isTieBreak = true)
+            } else {
+                GameScore()
+            }
             beginNextSetServe(nextSetServer, state)
         }
+    }
+
+    private fun shouldStartMatchTieBreak(state: MatchState): Boolean {
+        if (!state.settings.decidingSetIsMatchTieBreak) return false
+        if (state.settings.setsToWin < 2) return false
+        val threshold = state.settings.setsToWin - 1
+        return state.leftSetsWon == threshold && state.rightSetsWon == threshold
     }
 
     private fun restoreServerSelectionPrompt(from: MatchState, onto: MatchState): MatchState {

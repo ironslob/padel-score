@@ -65,7 +65,7 @@ object SettingsCopy {
             "summary still offers New serve when you want to change it."
 
     const val matchSetFormat =
-        "How many sets decide the match. Continuous keeps scoring until you finish."
+        "How many sets decide the match. 2 sets + TB replaces the third set with a 10-point tie-break. Continuous keeps scoring until you finish."
 
     const val warmUp =
         "A timer before you pick who serves. Only at match start. Tap Play when ready."

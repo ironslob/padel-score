@@ -133,15 +133,27 @@ private fun didPointEndGame(previous: MatchState?, updated: MatchState?): Boolea
 
 @Composable
 private fun TieBreakHeader(match: MatchState, games: Pair<String, String>) {
+    val isMatchTB = match.isMatchTieBreak
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Tie-break", color = UndoOrange, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
-        Text("${games.first} – ${games.second}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            if (isMatchTB) "Super TB" else "Tie-break",
+            color = UndoOrange,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.labelSmall,
+        )
+        if (!isMatchTB) {
+            Text(
+                "${games.first} – ${games.second}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         val notice = match.activeTieBreakNotice
         Text(
             when (notice) {
                 TieBreakNotice.ChangeServe -> "Change serve"
                 TieBreakNotice.ChangeSides -> "Change sides"
-                null -> "First to 7"
+                null -> if (isMatchTB) "First to 10" else "First to 7"
             },
             style = MaterialTheme.typography.labelSmall,
             color = if (notice != null) UndoOrange else MaterialTheme.colorScheme.onSurfaceVariant,

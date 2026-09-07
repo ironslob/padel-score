@@ -615,13 +615,14 @@ The architecture should make future additions straightforward.
 Examples include:
 
 - configurable scoring rules
-- tie-break variants
 - player names
 - tournaments
 - leagues
 - doubles partnerships
 - wearable complications
 - Apple Health integration
+
+Match-length variants such as a deciding-set match tie-break (2 sets + TB) are implemented as settings on the shared scoring engines rather than deferred extension points.
 
 These should be additive rather than requiring architectural changes.
 

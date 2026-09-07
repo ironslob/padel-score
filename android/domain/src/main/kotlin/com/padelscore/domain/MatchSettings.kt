@@ -21,6 +21,8 @@ import kotlinx.serialization.json.put
 enum class MatchSetFormat {
     BestOfOne,
     BestOfThree,
+    /** Best of 3 where the deciding set is a 10-point match tie-break. */
+    BestOfThreeMatchTieBreak,
     BestOfFive,
     Continuous,
     ;
@@ -29,21 +31,43 @@ enum class MatchSetFormat {
         get() = when (this) {
             BestOfOne -> "1 set"
             BestOfThree -> "Best of 3"
+            BestOfThreeMatchTieBreak -> "2 sets + TB"
             BestOfFive -> "Best of 5"
             Continuous -> "Continuous"
         }
 
     fun apply(settings: MatchSettings): MatchSettings = when (this) {
-        BestOfOne -> settings.copy(setsToWin = 1, continuousPlay = false)
-        BestOfThree -> settings.copy(setsToWin = 2, continuousPlay = false)
-        BestOfFive -> settings.copy(setsToWin = 3, continuousPlay = false)
-        Continuous -> settings.copy(continuousPlay = true)
+        BestOfOne -> settings.copy(
+            setsToWin = 1,
+            continuousPlay = false,
+            decidingSetIsMatchTieBreak = false,
+        )
+        BestOfThree -> settings.copy(
+            setsToWin = 2,
+            continuousPlay = false,
+            decidingSetIsMatchTieBreak = false,
+        )
+        BestOfThreeMatchTieBreak -> settings.copy(
+            setsToWin = 2,
+            continuousPlay = false,
+            decidingSetIsMatchTieBreak = true,
+        )
+        BestOfFive -> settings.copy(
+            setsToWin = 3,
+            continuousPlay = false,
+            decidingSetIsMatchTieBreak = false,
+        )
+        Continuous -> settings.copy(
+            continuousPlay = true,
+            decidingSetIsMatchTieBreak = false,
+        )
     }
 
     val rawValue: String
         get() = when (this) {
             BestOfOne -> "bestOfOne"
             BestOfThree -> "bestOfThree"
+            BestOfThreeMatchTieBreak -> "bestOfThreeMatchTieBreak"
             BestOfFive -> "bestOfFive"
             Continuous -> "continuous"
         }
@@ -127,6 +151,7 @@ data class MatchSettings(
     val continuousPlay: Boolean = false,
     val gamesToWinSet: Int = 6,
     val mustWinByTwoGames: Boolean = true,
+    val decidingSetIsMatchTieBreak: Boolean = false,
     val deuceFormat: DeuceFormat = DeuceFormat.StarPoint,
     val askServeAtSetStart: Boolean = false,
     val fixedServerPositions: Boolean = true,
@@ -139,6 +164,7 @@ data class MatchSettings(
             continuousPlay -> MatchSetFormat.Continuous
             setsToWin == 1 -> MatchSetFormat.BestOfOne
             setsToWin == 3 -> MatchSetFormat.BestOfFive
+            decidingSetIsMatchTieBreak -> MatchSetFormat.BestOfThreeMatchTieBreak
             else -> MatchSetFormat.BestOfThree
         }
 
@@ -183,6 +209,7 @@ object MatchSettingsSerializer : KSerializer<MatchSettings> {
                 put("continuousPlay", value.continuousPlay)
                 put("gamesToWinSet", value.gamesToWinSet)
                 put("mustWinByTwoGames", value.mustWinByTwoGames)
+                put("decidingSetIsMatchTieBreak", value.decidingSetIsMatchTieBreak)
                 put("deuceFormat", when (value.deuceFormat) {
                         DeuceFormat.Advantage -> "advantage"
                         DeuceFormat.StarPoint -> "starPoint"
@@ -223,6 +250,7 @@ object MatchSettingsSerializer : KSerializer<MatchSettings> {
             continuousPlay = bool("continuousPlay", false),
             gamesToWinSet = int("gamesToWinSet", 6),
             mustWinByTwoGames = obj["mustWinByTwoGames"]?.jsonPrimitive?.boolean ?: true,
+            decidingSetIsMatchTieBreak = bool("decidingSetIsMatchTieBreak", false),
             deuceFormat = deuceFormat,
             askServeAtSetStart = bool("askServeAtSetStart", false),
             fixedServerPositions = bool("fixedServerPositions", true),

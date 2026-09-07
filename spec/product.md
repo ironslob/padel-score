@@ -274,6 +274,14 @@ Default settings:
 - Standard scoring
 - Warm-up before the first serve (on, no time limit)
 
+Match length is a Settings preference (pre-match only):
+
+- 1 set
+- Best of 3 (default) — full third set when needed
+- 2 sets + TB — best of 3 where the deciding set is a 10-point match tie-break (first to 10, win by 2), with the same serve rotation and change-sides rules as a set tie-break. The third set is recorded as the tie-break point totals (for example `10-8`).
+- Best of 5
+- Continuous
+
 Starting a match should remain fast and require no nested configuration.
 
 When warm-up is on, starting a match starts the Health workout when possible and shows a timer. The player taps Play when ready. An optional time limit can auto-advance. Warm-up happens only before the match, never between sets. Warm-up time is included in the Health workout and in match elapsed time.

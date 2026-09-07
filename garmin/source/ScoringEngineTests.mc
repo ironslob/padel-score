@@ -709,3 +709,93 @@ function testRehydratePreservesWarmUp(logger as Logger) as Boolean {
     Test.assert(restored.needsServerSelection);
     return true;
 }
+
+function startMatchTieBreakAtOneOne(engine as ScoringEngine, id as String) as MatchState {
+    var settings = new MatchSettings();
+    settings.fixedServerPositions = false;
+    applyMatchSetFormat(settings, SET_FORMAT_BEST_OF_THREE_MATCH_TB);
+    var state = engine.startMatch(settings, id, 0);
+    state = engine.applySelectServer(state, LEFT, 1);
+    var t = 2;
+    state = winGames(engine, state, LEFT, 6, t);
+    t += 24;
+    state = winGames(engine, state, RIGHT, 6, t);
+    return state;
+}
+
+(:test)
+function testMatchTieBreakStartsAtOneOne(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var state = startMatchTieBreakAtOneOne(engine, "test-mtb-1");
+    Test.assert(state.isMatchTieBreak());
+    Test.assert(state.currentGame.isTieBreak);
+    Test.assertEqual(0, state.currentSet.leftGames);
+    Test.assertEqual(0, state.currentSet.rightGames);
+    Test.assertEqual(1, state.leftSetsWon);
+    Test.assertEqual(1, state.rightSetsWon);
+    Test.assert(state.isAtSetStart());
+    Test.assertEqual("Super TB", state.gameStatusLine());
+    return true;
+}
+
+(:test)
+function testMatchTieBreakFirstToTenWinsMatch(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var state = startMatchTieBreakAtOneOne(engine, "test-mtb-2");
+    var t = 100;
+    for (var i = 0; i < 10; i += 1) {
+        state = engine.applyPointWon(state, LEFT, t);
+        t += 1;
+    }
+    Test.assertEqual(COMPLETED, state.status);
+    Test.assertEqual(LEFT, state.winner);
+    Test.assertEqual(2, state.leftSetsWon);
+    Test.assertEqual(1, state.rightSetsWon);
+    Test.assertEqual(3, state.completedSets.size());
+    Test.assertEqual(10, state.completedSets[2].leftGames);
+    Test.assertEqual(0, state.completedSets[2].rightGames);
+    return true;
+}
+
+(:test)
+function testMatchTieBreakRequiresTwoPointLead(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var state = startMatchTieBreakAtOneOne(engine, "test-mtb-3");
+    var t = 100;
+    var i;
+    for (i = 0; i < 9; i += 1) {
+        state = engine.applyPointWon(state, LEFT, t);
+        t += 1;
+    }
+    for (i = 0; i < 9; i += 1) {
+        state = engine.applyPointWon(state, RIGHT, t);
+        t += 1;
+    }
+    state = engine.applyPointWon(state, LEFT, t); // 10-9
+    t += 1;
+    Test.assertEqual(IN_PROGRESS, state.status);
+    state = engine.applyPointWon(state, RIGHT, t); // 10-10
+    t += 1;
+    state = engine.applyPointWon(state, LEFT, t); // 11-10
+    t += 1;
+    Test.assertEqual(IN_PROGRESS, state.status);
+    state = engine.applyPointWon(state, LEFT, t); // 12-10
+    Test.assertEqual(COMPLETED, state.status);
+    Test.assertEqual(12, state.completedSets[2].leftGames);
+    Test.assertEqual(10, state.completedSets[2].rightGames);
+    return true;
+}
+
+(:test)
+function testMatchSetFormatLabelAndCycleIncludesMatchTB(logger as Logger) as Boolean {
+    Test.assertEqual("2 sets + TB", matchSetFormatLabel(SET_FORMAT_BEST_OF_THREE_MATCH_TB));
+    Test.assertEqual(SET_FORMAT_BEST_OF_THREE_MATCH_TB, nextMatchSetFormat(SET_FORMAT_BEST_OF_THREE));
+    Test.assertEqual(SET_FORMAT_BEST_OF_FIVE, nextMatchSetFormat(SET_FORMAT_BEST_OF_THREE_MATCH_TB));
+    var settings = new MatchSettings();
+    applyMatchSetFormat(settings, SET_FORMAT_BEST_OF_THREE_MATCH_TB);
+    Test.assert(settings.decidingSetIsMatchTieBreak);
+    Test.assertEqual(SET_FORMAT_BEST_OF_THREE_MATCH_TB, matchSetFormatFromSettings(settings));
+    applyMatchSetFormat(settings, SET_FORMAT_BEST_OF_THREE);
+    Test.assert(!settings.decidingSetIsMatchTieBreak);
+    return true;
+}

@@ -271,7 +271,11 @@ private struct GameInterstitialView: View {
                 .frame(maxWidth: .infinity)
 
             VStack(spacing: 4) {
-                if isTieBreak {
+                if match.isMatchTieBreak {
+                    Text("First to 10, win by 2")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else if isTieBreak {
                     Text("First to 7, win by 2")
                         .font(.caption)
                         .foregroundStyle(.secondary)

@@ -1125,6 +1125,161 @@ class ScoringEngineTests {
         assertEquals(2, s.rightSetsWon)
     }
 
+    // Match / super tie-break (2 sets + TB)
+
+    private fun matchTieBreakSettings(): MatchSettings =
+        MatchSetFormat.BestOfThreeMatchTieBreak.apply(rotatingSettings)
+
+    private fun reachOneOne(settings: MatchSettings): MatchState {
+        var s = start(settings)
+        repeat(6) { s = winGame(Side.Left, s) }
+        repeat(6) { s = winGame(Side.Right, s) }
+        return s
+    }
+
+    @Test
+    fun testMatchTieBreakStartsAtOneOne() {
+        val s = reachOneOne(matchTieBreakSettings())
+        assertTrue(s.isMatchTieBreak)
+        assertTrue(s.currentGame.isTieBreak)
+        assertEquals(0, s.currentSet.leftGames)
+        assertEquals(0, s.currentSet.rightGames)
+        assertEquals(1, s.leftSetsWon)
+        assertEquals(1, s.rightSetsWon)
+        assertTrue(s.isAtSetStart)
+        assertEquals("Super TB", s.gameStatusLine)
+        assertEquals(listOf("6-0", "0-6", "0-0"), s.setScoreLines)
+    }
+
+    @Test
+    fun testMatchTieBreakFirstToTenWinsMatch() {
+        var s = reachOneOne(matchTieBreakSettings())
+        s = winTieBreak(Side.Left, 10, s)
+        assertEquals(MatchStatus.Completed, s.status)
+        assertEquals(Side.Left, s.winner)
+        assertEquals(2, s.leftSetsWon)
+        assertEquals(1, s.rightSetsWon)
+        assertEquals(3, s.completedSets.size)
+        assertEquals(10, s.completedSets[2].leftGames)
+        assertEquals(0, s.completedSets[2].rightGames)
+        assertEquals("6-0, 0-6, 10-0", s.finalScoreSummary)
+    }
+
+    @Test
+    fun testMatchTieBreakRequiresTwoPointLead() {
+        var s = reachOneOne(matchTieBreakSettings())
+        s = winTieBreak(Side.Left, 9, s)
+        s = winTieBreak(Side.Right, 9, s)
+        assertEquals(MatchStatus.InProgress, s.status)
+        assertTrue(s.isMatchTieBreak)
+        s = point(Side.Left, s) // 10-9
+        assertEquals(MatchStatus.InProgress, s.status)
+        s = point(Side.Right, s) // 10-10
+        s = point(Side.Left, s) // 11-10
+        assertEquals(MatchStatus.InProgress, s.status)
+        s = point(Side.Left, s) // 12-10
+        assertEquals(MatchStatus.Completed, s.status)
+        assertEquals(12, s.completedSets[2].leftGames)
+        assertEquals(10, s.completedSets[2].rightGames)
+    }
+
+    @Test
+    fun testMatchTieBreakSkippedOnTwoNil() {
+        var s = start(matchTieBreakSettings())
+        repeat(12) { s = winGame(Side.Left, s) }
+        assertEquals(MatchStatus.Completed, s.status)
+        assertEquals(2, s.leftSetsWon)
+        assertEquals(2, s.completedSets.size)
+        assertFalse(s.isMatchTieBreak)
+    }
+
+    @Test
+    fun testBestOfThreeWithoutFlagPlaysFullThirdSet() {
+        var s = reachOneOne(rotatingSettings)
+        assertFalse(s.isMatchTieBreak)
+        assertFalse(s.currentGame.isTieBreak)
+        assertEquals(0, s.currentSet.leftGames)
+        s = winGame(Side.Left, s)
+        assertEquals(1, s.currentSet.leftGames)
+    }
+
+    @Test
+    fun testMatchTieBreakFlagIgnoredOnBestOfOne() {
+        val settings = rotatingSettings.copy(setsToWin = 1, decidingSetIsMatchTieBreak = true)
+        var s = start(settings)
+        repeat(6) { s = winGame(Side.Left, s) }
+        assertEquals(MatchStatus.Completed, s.status)
+        assertEquals(1, s.completedSets.size)
+        assertFalse(s.isMatchTieBreak)
+    }
+
+    @Test
+    fun testSetTwoTieBreakFlowsIntoMatchTieBreak() {
+        var s = start(matchTieBreakSettings())
+        repeat(6) { s = winGame(Side.Left, s) }
+        s = reachSixSix(s)
+        assertTrue(s.currentGame.isTieBreak)
+        assertFalse(s.isMatchTieBreak)
+        s = winTieBreak(Side.Right, 7, s)
+        assertTrue(s.isMatchTieBreak)
+        assertEquals(1, s.leftSetsWon)
+        assertEquals(1, s.rightSetsWon)
+        s = winTieBreak(Side.Left, 10, s)
+        assertEquals(MatchStatus.Completed, s.status)
+        assertEquals(6, s.completedSets[1].leftGames)
+        assertEquals(7, s.completedSets[1].rightGames)
+        assertEquals(10, s.completedSets[2].leftGames)
+    }
+
+    @Test
+    fun testUndoFromMatchTieBreakRestoresSetTwo() {
+        var s = reachOneOne(matchTieBreakSettings())
+        assertTrue(s.isMatchTieBreak)
+        s = engine.apply(MatchAction.Undo, s)
+        assertFalse(s.isMatchTieBreak)
+        assertEquals(1, s.leftSetsWon)
+        assertEquals(0, s.rightSetsWon)
+        assertEquals(1, s.completedSets.size)
+    }
+
+    @Test
+    fun testMatchTieBreakEarlyFinishSummaryUsesPoints() {
+        var s = reachOneOne(matchTieBreakSettings())
+        s = winTieBreak(Side.Left, 6, s)
+        s = winTieBreak(Side.Right, 4, s)
+        assertEquals(listOf("6-0", "0-6", "6-4"), s.setScoreLines)
+        s = engine.apply(MatchAction.EndEarly, s)
+        assertEquals("6-0, 0-6, 6-4", s.finalScoreSummary)
+    }
+
+    @Test
+    fun testMatchSetFormatApplyRoundTripsMatchTieBreak() {
+        var settings = MatchSettings()
+        settings = MatchSetFormat.BestOfThreeMatchTieBreak.apply(settings)
+        assertTrue(settings.decidingSetIsMatchTieBreak)
+        assertEquals(MatchSetFormat.BestOfThreeMatchTieBreak, settings.matchSetFormat)
+        settings = MatchSetFormat.BestOfThree.apply(settings)
+        assertFalse(settings.decidingSetIsMatchTieBreak)
+        assertEquals(MatchSetFormat.BestOfThree, settings.matchSetFormat)
+        settings = MatchSetFormat.Continuous.apply(settings)
+        assertFalse(settings.decidingSetIsMatchTieBreak)
+    }
+
+    @Test
+    fun testMatchSettingsJsonDefaultsMatchTieBreakFlagOff() {
+        val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+        val legacy = """{"setsToWin":2,"gamesToWinSet":6,"mustWinByTwoGames":true,"deuceFormat":"starPoint"}"""
+        val settings = json.decodeFromString(MatchSettings.serializer(), legacy)
+        assertFalse(settings.decidingSetIsMatchTieBreak)
+        assertEquals(MatchSetFormat.BestOfThree, settings.matchSetFormat)
+
+        val withFlag = MatchSetFormat.BestOfThreeMatchTieBreak.apply(MatchSettings())
+        val encoded = json.encodeToString(MatchSettings.serializer(), withFlag)
+        val decoded = json.decodeFromString(MatchSettings.serializer(), encoded)
+        assertTrue(decoded.decidingSetIsMatchTieBreak)
+        assertEquals(MatchSetFormat.BestOfThreeMatchTieBreak, decoded.matchSetFormat)
+    }
+
     // MARK: - Tie-break
 
     @Test

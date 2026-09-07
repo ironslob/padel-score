@@ -255,7 +255,11 @@ fun GameInterstitialScreen(
         }
         item {
             Text(
-                if (isTieBreak) "First to 7, win by 2" else "Sets ${sets.first} – ${sets.second}",
+                when {
+                    match.isMatchTieBreak -> "First to 10, win by 2"
+                    isTieBreak -> "First to 7, win by 2"
+                    else -> "Sets ${sets.first} – ${sets.second}"
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

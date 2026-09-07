@@ -307,6 +307,34 @@ final class ServeSelectionPreferenceStoreTests: XCTestCase {
         XCTAssertEqual(offSettings.deuceFormat, .advantage)
     }
 
+    func testArchivedMatchesDefaultMatchTieBreakFlagOff() throws {
+        let legacy = """
+        {"setsToWin":2,"gamesToWinSet":6,"mustWinByTwoGames":true,"deuceFormat":"starPoint"}
+        """
+        let settings = try JSONDecoder().decode(MatchSettings.self, from: Data(legacy.utf8))
+        XCTAssertFalse(settings.decidingSetIsMatchTieBreak)
+        XCTAssertEqual(settings.matchSetFormat, .bestOfThree)
+    }
+
+    func testMatchTieBreakSettingsRoundTrip() throws {
+        var settings = MatchSettings.default
+        MatchSetFormat.bestOfThreeMatchTieBreak.apply(to: &settings)
+        let data = try JSONEncoder().encode(settings)
+        let decoded = try JSONDecoder().decode(MatchSettings.self, from: data)
+        XCTAssertTrue(decoded.decidingSetIsMatchTieBreak)
+        XCTAssertEqual(decoded.matchSetFormat, .bestOfThreeMatchTieBreak)
+    }
+
+    func testMatchSetFormatPreferencePersistsMatchTieBreak() {
+        let suiteName = "ServeSelectionPreferenceStoreTests.matchTieBreak.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        let store = UserDefaultsServeSelectionPreferenceStore(defaults: defaults)
+        store.setMatchSetFormat(.bestOfThreeMatchTieBreak)
+        XCTAssertEqual(store.matchSetFormat, .bestOfThreeMatchTieBreak)
+        store.setMatchSetFormat(.bestOfFive)
+        XCTAssertEqual(store.matchSetFormat, .bestOfFive)
+    }
+
     func testDefaultSettingsUseStarPoint() {
         XCTAssertEqual(MatchSettings.default.deuceFormat, .starPoint)
         XCTAssertEqual(MatchSettings().deuceFormat, .starPoint)

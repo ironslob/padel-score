@@ -88,3 +88,9 @@ The HealthKit workout still starts once in `startMatch` and ends once when the m
 
 **Why:** Wear OS is the Android equivalent of the Watch app. Extracting Kotlin Multiplatform would churn the Swift and Monkey C trees; a third engine port matches the existing Garmin pattern, with Swift remaining the source of truth. History stays off the watch, as on Apple Watch. Health Services is the closest wrist-raise analog; if another exercise owns the session, the same continue-without-workout / cancel prompt is shown.
 
+## Match / super tie-break (2 sets + TB)
+
+**Choice:** A match-length option on all three watches: best of 3 where the deciding set is a 10-point tie-break (win by 2). Implemented as `decidingSetIsMatchTieBreak` on `MatchSettings` plus `MatchSetFormat.bestOfThreeMatchTieBreak` ("2 sets + TB"). The third set is stored as the TB point totals on `SetScore` (for example `10-8`); set TBs at 6–6 stay `7-6`. Match TB vs set TB is detected as `isTieBreak` at games `0–0`.
+
+**Why:** Club and box-league play often use this format. It is still match scoring, not a new product surface — one more Match length choice keeps start flow fast. Shipped on Apple, Garmin, and Wear together for scoring parity.
+
