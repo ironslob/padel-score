@@ -269,7 +269,7 @@ Default settings:
 - Win by two games
 - Tie-break at 6–6 (first to 7 points, win by 2)
 - Tie-break serve rotates every 2 points after the opening point; change sides every 6 points
-- Golden point at deuce
+- Star point at deuce
 - Standard scoring
 - Warm-up before the first serve (on, no time limit)
 
@@ -366,7 +366,10 @@ The application performs all score progression automatically.
 
 # 14. Scoring at Deuce
 
-The way a game is resolved at 40-40 is a user setting with three options.
+The way a game is resolved at 40-40 is a user setting with four options,
+listed from most to fewest advantages. Each option caps how many advantages
+may be broken before a single point decides the game; regular scoring has no
+cap.
 
 **Regular** — traditional advantage scoring. Advantage repeats until one side
 wins two points in a row.
@@ -375,15 +378,28 @@ wins two points in a row.
 40-40 → Advantage → Back to Deuce → Advantage → … → Game
 ```
 
+**Star point** (default) — two advantages are played. If the second is
+broken, the next point decides the game. This is the FIP format (2026) used
+by Premier Padel and the CUPRA FIP Tour.
+
+```
+40-40 → Advantage 1 → Deuce 2 → Advantage 2 → Star Point → Next Point Wins
+```
+
+Under star point the deuce and advantage status lines are numbered
+("Deuce 2", "Advantage 2") so players can see how close the decisive point
+is. Point labels are unchanged (40 / Ad).
+
 **Silver point** — one advantage is played. If it is broken, the next point
-decides the game.
+decides the game. A house rule, not an FIP format.
 
 ```
 40-40 → Advantage → Back to Deuce → Silver Point → Next Point Wins
 ```
 
-**Golden point** (default) — no advantage phase at all. The first point at
-40-40 decides the game. This is the format used by the FIP and Premier Padel.
+**Golden point** — no advantage phase at all. The first point at 40-40
+decides the game. Formerly the professional format; now a house rule and a
+common club format.
 
 ```
 40-40 → Golden Point → Next Point Wins
@@ -395,15 +411,27 @@ format in play.
 Example:
 
 ```
-Golden Point
+Star Point
 
 Next point wins
 ```
 
+FIP rules give the receiving pair the choice of which player receives the
+decisive point. The application only tracks the score; that choice is left
+to the players, under every format.
+
+Changing the format during a game in progress re-reads that game under the
+new cap: advantages already broken count against it. A game that has used up
+the advantages the new format allows goes straight to its decisive point,
+giving up any advantage held; otherwise a pending decisive point is disarmed
+and the remaining advantages are still to be played. Games already played
+keep their result.
+
 Note: versions before this setting existed shipped a single "Golden point"
 toggle whose behaviour was in fact silver point. Matches archived under that
 toggle decode as silver point so their scorelines stay faithful to how they
-were played.
+were played. A deuce format a player has explicitly chosen is never changed
+when the default moves; only fresh installs pick up a new default.
 
 ---
 
@@ -469,7 +497,8 @@ Elapsed
 48 min
 ```
 
-If golden point is active this should also be displayed.
+If a decisive point is active (golden, silver, or star point, per §14) this
+should also be displayed, named for the format in play.
 
 No editing is possible on this screen.
 
@@ -661,7 +690,7 @@ Deliver:
 - Game scoring
 - Set scoring
 - Match scoring
-- Deuce format (regular / silver / golden point)
+- Deuce format (regular / star / silver / golden point)
 - Undo
 - Finish match
 - End early
@@ -705,7 +734,7 @@ Deliver:
 
 - Win percentage
 - Match trends
-- Golden point record
+- Decisive-point record (golden / silver / star)
 - Average duration
 - Streaks
 - Insights

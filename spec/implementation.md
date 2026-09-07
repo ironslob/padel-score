@@ -400,7 +400,7 @@ Avoid hard-coded values where future configuration is likely.
 
 Examples:
 
-Deuce format (regular / silver / golden point)
+Deuce format (regular / star / silver / golden point)
 
 Best of three
 

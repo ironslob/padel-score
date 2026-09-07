@@ -56,7 +56,7 @@ xcodebuild -target PadelScoreWatch -sdk watchos -configuration Debug CODE_SIGNIN
 
 ## Run tests
 
-Unit tests cover the scoring engine (including golden point and undo) and persistence/restore.
+Unit tests cover the scoring engine (including every deuce format and undo) and persistence/restore.
 
 Prefer the **PadelScoreTests** scheme — it runs hostless and does not require the Watch app/runtime.
 
@@ -140,10 +140,10 @@ PadelScore.xcodeproj
 ## V1 features
 
 - Start / score / finish / end early / discard match on Watch
-- Game, set, and match scoring with the house golden-point rule
+- Game, set, and match scoring with FIP star point by default
 - 3-second undo on the score screen; undo also on Actions
 - Local persistence and restore after restart
 - iPhone match history, notes, and deletion
-- Deuce format: regular / silver point / golden point
+- Deuce format: regular / star point / silver point / golden point
 
 See [docs/DECISIONS.md](docs/DECISIONS.md) for engineering choices and [spec/](spec/) for authoritative requirements.

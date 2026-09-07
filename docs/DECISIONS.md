@@ -38,11 +38,17 @@ Documented decisions that were not fully prescribed by `/spec`.
 
 **Why:** Players swap ends between sets and often rearrange who serves, which the existing `askServeAtSetStart` preference only covers by asking every single time. Social and continuous matches also often stop after a set, so End match belongs on that screen rather than only behind a swipe to Actions. The three-second quick-undo window is far too short to survive a changeover, so auto-advancing would have hidden the choices before anyone reached their wrist. Shrinking buttons to keep every action above the fold made them harder to hit; scrolling the less likely ones is the better trade. Storing the New serve request as an event would need a new `MatchEventKind`, which an older build sharing the archive could not decode; the choice that follows is the fact worth keeping, and the set boundary it belongs to is already derivable from the stream. Anywhere other than a set start the stored choice is ignored on replay, so undoing the set-winning point drops a server picked for a set that is no longer over rather than applying it mid-game.
 
-## Golden point house rule
+## Deuce formats and the star point default
 
-**Choice:** Three deuce formats. **Golden point** (default, FIP): 40-40 is immediately decisive — no advantage. **Silver point:** one advantage is played; if it is broken, the next point wins. **Regular:** advantage repeats until one side wins by two. Versions before this setting existed shipped a "Golden point" toggle that actually played silver point; archived matches decode as silver so their scorelines stay faithful.
+**Choice:** Four deuce formats, modelled as a cap on how many advantages may be broken before a single point decides the game. **Regular:** no cap. **Star point** (default, FIP 2026 — Premier Padel and the CUPRA FIP Tour): two. **Silver point:** one. **Golden point:** zero — 40-40 is immediately decisive. The engine keeps one `brokenAdvantageCount` per game and one rule, `format.decidesGame(afterBrokenAdvantages:)`, for arming the decisive point, arriving at 40-40, and re-reading a game when the format is changed mid-match. `isGoldenPointActive` keeps its historical name and means "a decisive rally is live" under any format. Star point numbers its deuce and advantage status lines ("Deuce 2", "Advantage 2"); silver and regular do not.
 
-**Why:** Exactly as specified in `spec/product.md` §14.
+The default moved from golden to star point for fresh installs only. A `deuceFormat` preference or archived match already stored is never rewritten. Versions before the setting existed shipped a "Golden point" toggle that actually played silver point; archived matches decode as silver so their scorelines stay faithful, and an explicit "off" on that toggle still means regular. Picker and Garmin cycler list the formats from most to fewest advantages: Regular → Star → Silver → Golden.
+
+FIP rules also let the receiving pair choose who receives the decisive point. Not modelled on either platform — the app tracks the score, the players make that call — the same as it always was for golden point.
+
+**Why:** `spec/product.md` §14. Golden point stopped being the professional format when the FIP adopted star point; "golden is what the tour uses" is no longer true and club players will ask for star point by name. A cap generalises the three existing rules instead of adding a fourth special case, so both engines gain the format with the same small diff.
+
+**Cross-version note:** an Apple build older than this one cannot decode a synced match whose `deuceFormat` is `starPoint` (Swift rejects unknown raw values). Garmin's store falls back to the legacy flag and reads it as silver. Both watch and phone must be updated together, which is how the App Store ships them anyway.
 
 ## Finish Match vs End Early
 
