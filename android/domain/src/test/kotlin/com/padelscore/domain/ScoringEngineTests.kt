@@ -240,6 +240,135 @@ class ScoringEngineTests {
         assertEquals(1, s.currentSet.leftGames)
     }
 
+    // MARK: Star point
+
+    @Test
+    fun testStarPointPlaysTwoAdvantageCyclesThenDecides() {
+        var s = reachDeuce(start(settings(DeuceFormat.StarPoint)))
+        assertEquals("Deuce 1", s.gameStatusLine)
+        assertFalse(s.currentGame.isGoldenPointActive)
+
+        s = point(Side.Left, s)
+        assertEquals("Advantage 1", s.gameStatusLine)
+        s = point(Side.Right, s)
+        assertEquals(1, s.currentGame.brokenAdvantageCount)
+        assertFalse(s.currentGame.isGoldenPointActive)
+        assertEquals("Deuce 2", s.gameStatusLine)
+
+        s = point(Side.Right, s)
+        assertEquals("Advantage 2", s.gameStatusLine)
+        s = point(Side.Left, s)
+        assertEquals(2, s.currentGame.brokenAdvantageCount)
+        assertTrue(s.currentGame.isGoldenPointActive)
+        assertEquals("Star Point", s.gameStatusLine)
+        assertEquals("ST", s.gameDisplayPair.first)
+        assertEquals("ST", s.gameDisplayPair.second)
+
+        s = point(Side.Left, s)
+        assertEquals(1, s.currentSet.leftGames)
+        assertEquals(0, s.currentGame.brokenAdvantageCount)
+    }
+
+    @Test
+    fun testStarPointAdvantageConvertedOnCycleOneWins() {
+        var s = reachDeuce(start(settings(DeuceFormat.StarPoint)))
+        s = point(Side.Left, s)
+        s = point(Side.Left, s)
+        assertEquals(1, s.currentSet.leftGames)
+        assertFalse(s.currentGame.isGoldenPointActive)
+    }
+
+    @Test
+    fun testStarPointAdvantageConvertedOnCycleTwoWins() {
+        var s = reachDeuce(start(settings(DeuceFormat.StarPoint)))
+        s = point(Side.Left, s)
+        s = point(Side.Right, s)
+        s = point(Side.Right, s)
+        s = point(Side.Right, s)
+        assertEquals(1, s.currentSet.rightGames)
+    }
+
+    @Test
+    fun testStarPointDecidingPointWinnableByEitherSide() {
+        var s = reachDeuce(start(settings(DeuceFormat.StarPoint)))
+        s = point(Side.Left, s)
+        s = point(Side.Right, s)
+        s = point(Side.Right, s)
+        s = point(Side.Left, s)
+        assertTrue(s.currentGame.isGoldenPointActive)
+        s = point(Side.Right, s)
+        assertEquals(1, s.currentSet.rightGames)
+    }
+
+    @Test
+    fun testStarPointOneBrokenAdvantageIsNotDecisive() {
+        var s = reachDeuce(start(settings(DeuceFormat.StarPoint)))
+        s = point(Side.Left, s)
+        s = point(Side.Right, s)
+        assertEquals(1, s.currentGame.brokenAdvantageCount)
+        assertFalse(s.currentGame.isGoldenPointActive)
+        assertEquals("Deuce 2", s.gameStatusLine)
+    }
+
+    @Test
+    fun testBrokenAdvantageCountResetsBetweenGames() {
+        var s = reachDeuce(start(settings(DeuceFormat.StarPoint)))
+        s = point(Side.Left, s)
+        s = point(Side.Right, s)
+        s = point(Side.Right, s)
+        s = point(Side.Left, s)
+        s = point(Side.Left, s)
+        assertEquals(1, s.currentSet.leftGames)
+        assertEquals(0, s.currentGame.brokenAdvantageCount)
+    }
+
+    @Test
+    fun testUndoFromStarPointRestoresAdvantageTwo() {
+        var s = reachDeuce(start(settings(DeuceFormat.StarPoint)))
+        s = point(Side.Left, s)
+        s = point(Side.Right, s)
+        s = point(Side.Right, s)
+        s = point(Side.Left, s)
+        assertEquals("Star Point", s.gameStatusLine)
+
+        s = engine.apply(MatchAction.Undo, s)
+        assertFalse(s.currentGame.isGoldenPointActive)
+        assertEquals(Side.Right, s.currentGame.advantageSide)
+        assertEquals(1, s.currentGame.brokenAdvantageCount)
+        assertEquals("Advantage 2", s.gameStatusLine)
+    }
+
+    @Test
+    fun testRegularAndSilverStatusLinesStayUnnumbered() {
+        var regular = reachDeuce(start(settings(DeuceFormat.Advantage)))
+        assertEquals("Deuce", regular.gameStatusLine)
+        regular = point(Side.Left, regular)
+        assertEquals("Advantage", regular.gameStatusLine)
+
+        var silver = reachDeuce(start(settings(DeuceFormat.SilverPoint)))
+        assertEquals("Deuce", silver.gameStatusLine)
+        silver = point(Side.Left, silver)
+        assertEquals("Advantage", silver.gameStatusLine)
+    }
+
+    @Test
+    fun testDeuceFormatOrderingIsMostAdvantagesToFewest() {
+        assertEquals(
+            listOf(
+                DeuceFormat.Advantage,
+                DeuceFormat.StarPoint,
+                DeuceFormat.SilverPoint,
+                DeuceFormat.GoldenPoint,
+            ),
+            DeuceFormat.entries,
+        )
+    }
+
+    @Test
+    fun testDefaultSettingsUseStarPoint() {
+        assertEquals(DeuceFormat.StarPoint, MatchSettings().deuceFormat)
+    }
+
     // MARK: Changing the deuce format mid-match
 
     private fun changeFormat(format: DeuceFormat, state: MatchState): MatchState {
@@ -301,6 +430,75 @@ class ScoringEngineTests {
         s = point(Side.Right, s)
         assertTrue(s.currentGame.isGoldenPointActive)
         assertEquals("Silver Point", s.gameStatusLine)
+    }
+
+    @Test
+    fun testChangingToStarPointFromDeuceLeavesTwoAdvantages() {
+        var s = reachDeuce(start(settings(DeuceFormat.GoldenPoint)))
+        s = changeFormat(DeuceFormat.StarPoint, s)
+        assertFalse(s.currentGame.isGoldenPointActive)
+        assertEquals("Deuce 1", s.gameStatusLine)
+
+        s = point(Side.Left, s)
+        s = point(Side.Right, s)
+        assertFalse(s.currentGame.isGoldenPointActive)
+        assertEquals("Deuce 2", s.gameStatusLine)
+    }
+
+    @Test
+    fun testChangingToStarPointFromSilverDeciderLeavesOneAdvantage() {
+        var s = reachDeuce(start(settings(DeuceFormat.SilverPoint)))
+        s = point(Side.Left, s)
+        s = point(Side.Right, s)
+        assertTrue(s.currentGame.isGoldenPointActive)
+
+        s = changeFormat(DeuceFormat.StarPoint, s)
+        assertFalse(s.currentGame.isGoldenPointActive)
+        assertEquals(1, s.currentGame.brokenAdvantageCount)
+        assertEquals("Deuce 2", s.gameStatusLine)
+    }
+
+    @Test
+    fun testChangingToSilverAfterOneBrokenAdvantageUnderRegularArms() {
+        var s = reachDeuce(start(settings(DeuceFormat.Advantage)))
+        s = point(Side.Left, s)
+        s = point(Side.Right, s)
+        assertEquals(1, s.currentGame.brokenAdvantageCount)
+
+        s = changeFormat(DeuceFormat.SilverPoint, s)
+        assertTrue(s.currentGame.isGoldenPointActive)
+        assertNull(s.currentGame.advantageSide)
+    }
+
+    @Test
+    fun testChangingToStarAfterTwoBreaksWithHeldAdvantageArmsAndSurrenders() {
+        var s = reachDeuce(start(settings(DeuceFormat.Advantage)))
+        s = point(Side.Left, s)
+        s = point(Side.Right, s)
+        s = point(Side.Right, s)
+        s = point(Side.Left, s)
+        s = point(Side.Left, s)
+        assertEquals(2, s.currentGame.brokenAdvantageCount)
+        assertEquals(Side.Left, s.currentGame.advantageSide)
+
+        s = changeFormat(DeuceFormat.StarPoint, s)
+        assertTrue(s.currentGame.isGoldenPointActive)
+        assertNull(s.currentGame.advantageSide)
+        assertEquals("Star Point", s.gameStatusLine)
+    }
+
+    @Test
+    fun testChangingFromStarDeciderToRegularDisarms() {
+        var s = reachDeuce(start(settings(DeuceFormat.StarPoint)))
+        s = point(Side.Left, s)
+        s = point(Side.Right, s)
+        s = point(Side.Right, s)
+        s = point(Side.Left, s)
+        assertTrue(s.currentGame.isGoldenPointActive)
+
+        s = changeFormat(DeuceFormat.Advantage, s)
+        assertFalse(s.currentGame.isGoldenPointActive)
+        assertEquals("Deuce", s.gameStatusLine)
     }
 
     @Test

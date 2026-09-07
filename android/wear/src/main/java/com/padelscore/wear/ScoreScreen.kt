@@ -70,12 +70,8 @@ fun ScoreScreen(service: MatchService, match: MatchState) {
     ) {
         when {
             match.currentGame.isTieBreak -> TieBreakHeader(match, games)
-            match.currentGame.isGoldenPointActive -> GoldenPointHeader(match)
-            else -> Text(
-                "${games.first} – ${games.second}",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
+            match.currentGame.isGoldenPointActive -> DecidingPointHeader(match)
+            else -> GamesHeader(match, games)
         }
         Row(
             modifier = Modifier.fillMaxWidth().weight(1f),
@@ -154,7 +150,26 @@ private fun TieBreakHeader(match: MatchState, games: Pair<String, String>) {
 }
 
 @Composable
-private fun GoldenPointHeader(match: MatchState) {
+private fun GamesHeader(match: MatchState, games: Pair<String, String>) {
+    val status = if (match.settings.deuceFormat.numbersDeuceCycles) match.gameStatusLine else null
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            "${games.first} – ${games.second}",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+        if (status != null) {
+            Text(
+                status,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun DecidingPointHeader(match: MatchState) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(match.settings.deuceFormat.decidingPointLabel, color = Color(0xFFFFD60A), fontWeight = FontWeight.Bold)
         Text("Next point wins", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

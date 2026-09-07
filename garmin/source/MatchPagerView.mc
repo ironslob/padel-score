@@ -63,6 +63,11 @@ class MatchPagerView extends WatchUi.View {
         } else {
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
             dc.drawText(width / 2, 16, Graphics.FONT_SMALL, games[0] + " – " + games[1], Graphics.TEXT_JUSTIFY_CENTER);
+            var status = match.gameStatusLine();
+            if (status != null && deuceFormatNumbersDeuceCycles(match.settings.deuceFormat)) {
+                dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+                dc.drawText(width / 2, 34, Graphics.FONT_XTINY, status, Graphics.TEXT_JUSTIFY_CENTER);
+            }
         }
 
         var notice = match.currentGame.tieBreakNotice();

@@ -232,7 +232,7 @@ Responsibilities:
 - game scoring
 - set scoring
 - match scoring
-- golden point logic
+- deuce / deciding-point logic
 - undo
 - validation
 
@@ -343,7 +343,7 @@ Derived information includes:
 - current game
 - current set
 - current match
-- golden point status
+- deciding-point status
 - elapsed duration
 
 The application may cache derived state for performance.

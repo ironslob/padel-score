@@ -220,15 +220,11 @@ class ScoringEngine {
         if (state.currentGame.isTieBreak) return
         if (state.currentGame.leftPoints < 3 || state.currentGame.rightPoints < 3) return
 
-        when (format) {
-            DeuceFormat.GoldenPoint -> {
-                state.currentGame.advantageSide = null
-                state.currentGame.isGoldenPointActive = true
-            }
-            DeuceFormat.SilverPoint, DeuceFormat.Advantage -> {
-                state.currentGame.isGoldenPointActive = false
-            }
+        val decisive = format.decidesGame(state.currentGame.brokenAdvantageCount)
+        if (decisive) {
+            state.currentGame.advantageSide = null
         }
+        state.currentGame.isGoldenPointActive = decisive
     }
 
     private fun awardPoint(side: Side, state: MatchState, deuceFormat: DeuceFormat) {
@@ -257,7 +253,9 @@ class ScoringEngine {
                 }
                 else -> {
                     state.currentGame.advantageSide = null
-                    state.currentGame.isGoldenPointActive = deuceFormat == DeuceFormat.SilverPoint
+                    state.currentGame.brokenAdvantageCount += 1
+                    state.currentGame.isGoldenPointActive =
+                        deuceFormat.decidesGame(state.currentGame.brokenAdvantageCount)
                 }
             }
             return
@@ -270,7 +268,7 @@ class ScoringEngine {
 
         state.currentGame.setPoints(myPoints + 1, side)
 
-        if (deuceFormat == DeuceFormat.GoldenPoint &&
+        if (deuceFormat.decidesGame(state.currentGame.brokenAdvantageCount) &&
             state.currentGame.leftPoints >= 3 &&
             state.currentGame.rightPoints >= 3
         ) {
@@ -311,6 +309,7 @@ class ScoringEngine {
         state.currentGame.winner = winner
         state.currentGame.advantageSide = null
         state.currentGame.isGoldenPointActive = false
+        state.currentGame.brokenAdvantageCount = 0
 
         val games = state.currentSet.games(winner) + 1
         state.currentSet.setGames(games, winner)

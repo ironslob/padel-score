@@ -230,17 +230,13 @@ public struct ScoringEngine: Sendable {
               state.currentGame.rightPoints >= 3
         else { return }
 
-        switch format {
-        case .goldenPoint:
-            // Golden point has no advantage phase, so an advantage already held is
-            // given up and the next rally decides the game.
-            state.currentGame.advantageSide = nil
-            state.currentGame.isGoldenPointActive = true
-        case .silverPoint, .advantage:
-            // A pending decisive rally stops being decisive; under silver point the
-            // single advantage it allows is still to be played.
-            state.currentGame.isGoldenPointActive = false
-        }
+        let decisive = format.decidesGame(
+            afterBrokenAdvantages: state.currentGame.brokenAdvantageCount
+        )
+        // Cap already spent: arm the decider and give up any held advantage
+        // (golden always; silver/star once their advantages are gone).
+        if decisive { state.currentGame.advantageSide = nil }
+        state.currentGame.isGoldenPointActive = decisive
     }
 
     // MARK: - Point / game / set / match progression
@@ -262,18 +258,21 @@ public struct ScoringEngine: Sendable {
         let myPoints = state.currentGame.points(for: side)
         let theirPoints = state.currentGame.points(for: side.opposite)
 
-        // Deuce territory (both at 40+). Golden point never reaches here — it makes
-        // the point decisive the moment the game arrives at 40-40, below.
+        // Deuce territory (both at 40+). Formats with cap 0 (golden) never reach
+        // here — they arm the decider the moment the game arrives at 40-40, below.
         if myPoints >= 3 && theirPoints >= 3 {
             if state.currentGame.advantageSide == nil {
                 state.currentGame.advantageSide = side
             } else if state.currentGame.advantageSide == side {
                 completeGame(winner: side, in: &state)
             } else {
-                // Advantage broken → back to deuce. Silver point allows exactly one
-                // advantage, so the next point decides; regular scoring keeps cycling.
+                // Advantage broken → back to deuce. Arm the named decisive rally
+                // once the format's advantage cap is spent.
                 state.currentGame.advantageSide = nil
-                state.currentGame.isGoldenPointActive = deuceFormat == .silverPoint
+                state.currentGame.brokenAdvantageCount += 1
+                state.currentGame.isGoldenPointActive = deuceFormat.decidesGame(
+                    afterBrokenAdvantages: state.currentGame.brokenAdvantageCount
+                )
             }
             return
         }
@@ -286,9 +285,8 @@ public struct ScoringEngine: Sendable {
 
         state.currentGame.setPoints(myPoints + 1, for: side)
 
-        // Golden point: no advantage phase at all, so reaching 40-40 makes the very
-        // next rally decisive.
-        if deuceFormat == .goldenPoint,
+        // Cap 0 (golden): reaching 40-40 makes the very next rally decisive.
+        if deuceFormat.decidesGame(afterBrokenAdvantages: state.currentGame.brokenAdvantageCount),
            state.currentGame.leftPoints >= 3,
            state.currentGame.rightPoints >= 3 {
             state.currentGame.isGoldenPointActive = true
@@ -333,6 +331,7 @@ public struct ScoringEngine: Sendable {
         state.currentGame.winner = winner
         state.currentGame.advantageSide = nil
         state.currentGame.isGoldenPointActive = false
+        state.currentGame.brokenAdvantageCount = 0
 
         let games = state.currentSet.games(for: winner) + 1
         state.currentSet.setGames(games, for: winner)

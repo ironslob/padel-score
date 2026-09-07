@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <properties>
-    <property id="deuceFormat" type="string">goldenPoint</property>
+    <property id="deuceFormat" type="string">starPoint</property>
     <property id="rotateServeEnabled" type="boolean">false</property>
     <property id="usThemLabels" type="boolean">true</property>
     <property id="askServeAtSetStart" type="boolean">false</property>

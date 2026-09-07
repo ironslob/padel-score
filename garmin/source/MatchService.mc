@@ -218,15 +218,9 @@ class MatchService {
         }
     }
 
-    // Advances the setting through Regular → Silver → Golden → Regular.
+    // Advances the setting through Regular → Star → Silver → Golden → Regular.
     function cycleDeuceFormat() as DeuceFormat {
-        var current = getDeuceFormat();
-        var next = DEUCE_ADVANTAGE;
-        if (current == DEUCE_ADVANTAGE) {
-            next = DEUCE_SILVER_POINT;
-        } else if (current == DEUCE_SILVER_POINT) {
-            next = DEUCE_GOLDEN_POINT;
-        }
+        var next = deuceFormatAfter(getDeuceFormat());
         setDeuceFormat(next);
         return next;
     }

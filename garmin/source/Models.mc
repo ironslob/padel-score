@@ -35,10 +35,14 @@ enum ScoringError {
 // DEUCE_ADVANTAGE: traditional advantage until two clear.
 // DEUCE_SILVER_POINT: one advantage, then decisive point if broken.
 // DEUCE_GOLDEN_POINT: first point at 40-40 wins.
+// DEUCE_STAR_POINT: two advantages, then decisive point if the second is broken.
+// Appended at the end so existing integer values stay stable; UI order is via
+// deuceFormatOrder() (Regular → Star → Silver → Golden).
 enum DeuceFormat {
     DEUCE_ADVANTAGE,
     DEUCE_SILVER_POINT,
-    DEUCE_GOLDEN_POINT
+    DEUCE_GOLDEN_POINT,
+    DEUCE_STAR_POINT
 }
 
 enum MatchSetFormat {
@@ -82,7 +86,7 @@ class MatchSettings {
         continuousPlay = false;
         gamesToWinSet = 6;
         mustWinByTwoGames = true;
-        deuceFormat = DEUCE_GOLDEN_POINT;
+        deuceFormat = DEUCE_STAR_POINT;
         askServeAtSetStart = false;
         fixedServerPositions = true;
         usThemLabels = true;
@@ -114,9 +118,13 @@ class GameScore {
     var leftPoints as Number;
     var rightPoints as Number;
     var advantageSide as Side or Null;
-    // True while a single decisive rally is in progress: immediately at 40-40 under
-    // golden point, or after an advantage is broken under silver point.
+    // True while a single decisive rally is in progress under any capped deuce
+    // format (golden at 40-40, silver after one broken advantage, star after two).
+    // Historical name kept for archive compatibility.
     var isGoldenPointActive as Boolean;
+    // How many times advantage has been broken in this game. Reconstructed by
+    // replay; used by capped formats to know when the next rally decides.
+    var brokenAdvantageCount as Number;
     var isTieBreak as Boolean;
     var isComplete as Boolean;
     var winner as Side or Null;
@@ -126,6 +134,7 @@ class GameScore {
         rightPoints = 0;
         advantageSide = null;
         isGoldenPointActive = false;
+        brokenAdvantageCount = 0;
         isTieBreak = false;
         isComplete = false;
         winner = null;
@@ -178,9 +187,15 @@ class GameScore {
             return deuceFormatDecidingPointLabel(deuceFormat);
         }
         if (advantageSide != null) {
+            if (deuceFormatNumbersDeuceCycles(deuceFormat)) {
+                return "Advantage " + (brokenAdvantageCount + 1).toString();
+            }
             return "Advantage";
         }
         if (leftPoints >= 3 && rightPoints >= 3) {
+            if (deuceFormatNumbersDeuceCycles(deuceFormat)) {
+                return "Deuce " + (brokenAdvantageCount + 1).toString();
+            }
             return "Deuce";
         }
         return null;
@@ -308,6 +323,7 @@ class MatchState {
         return currentSet.leftGames == 0 && currentSet.rightGames == 0
             && currentGame.leftPoints == 0 && currentGame.rightPoints == 0
             && currentGame.advantageSide == null && !currentGame.isGoldenPointActive
+            && currentGame.brokenAdvantageCount == 0
             && !currentGame.isTieBreak && !currentGame.isComplete;
     }
 
@@ -513,6 +529,10 @@ function deuceFormatToString(format as DeuceFormat) as String {
         return "advantage";
     } else if (format == DEUCE_SILVER_POINT) {
         return "silverPoint";
+    } else if (format == DEUCE_STAR_POINT) {
+        return "starPoint";
+    } else if (format == DEUCE_GOLDEN_POINT) {
+        return "goldenPoint";
     }
     return "goldenPoint";
 }
@@ -527,6 +547,8 @@ function deuceFormatFromString(raw as String or Null) as DeuceFormat or Null {
         return DEUCE_SILVER_POINT;
     } else if (raw.equals("goldenPoint")) {
         return DEUCE_GOLDEN_POINT;
+    } else if (raw.equals("starPoint")) {
+        return DEUCE_STAR_POINT;
     }
     return null;
 }
@@ -539,12 +561,14 @@ function deuceFormatFromLegacyPreference(goldenPointEnabled as Boolean or Null) 
     if (goldenPointEnabled != null && !goldenPointEnabled) {
         return DEUCE_ADVANTAGE;
     }
-    return DEUCE_GOLDEN_POINT;
+    return DEUCE_STAR_POINT;
 }
 
 function deuceFormatLabel(format as DeuceFormat) as String {
     if (format == DEUCE_ADVANTAGE) {
         return "Regular";
+    } else if (format == DEUCE_STAR_POINT) {
+        return "Star";
     } else if (format == DEUCE_SILVER_POINT) {
         return "Silver";
     }
@@ -554,6 +578,8 @@ function deuceFormatLabel(format as DeuceFormat) as String {
 function deuceFormatDecidingPointLabel(format as DeuceFormat) as String {
     if (format == DEUCE_ADVANTAGE) {
         return "Deuce";
+    } else if (format == DEUCE_STAR_POINT) {
+        return "Star Point";
     } else if (format == DEUCE_SILVER_POINT) {
         return "Silver Point";
     }
@@ -563,10 +589,57 @@ function deuceFormatDecidingPointLabel(format as DeuceFormat) as String {
 function deuceFormatDecidingPointShortLabel(format as DeuceFormat) as String {
     if (format == DEUCE_ADVANTAGE) {
         return "40";
+    } else if (format == DEUCE_STAR_POINT) {
+        return "ST";
     } else if (format == DEUCE_SILVER_POINT) {
         return "SP";
     }
     return "GP";
+}
+
+// Cap: null/negative means unlimited (regular). 0 = golden, 1 = silver, 2 = star.
+function deuceFormatAdvantagesBeforeDecidingPoint(format as DeuceFormat) as Number or Null {
+    if (format == DEUCE_STAR_POINT) {
+        return 2;
+    } else if (format == DEUCE_SILVER_POINT) {
+        return 1;
+    } else if (format == DEUCE_GOLDEN_POINT) {
+        return 0;
+    }
+    return null;
+}
+
+function deuceFormatDecidesGame(format as DeuceFormat, brokenAdvantages as Number) as Boolean {
+    var cap = deuceFormatAdvantagesBeforeDecidingPoint(format);
+    if (cap == null) {
+        return false;
+    }
+    return brokenAdvantages >= (cap as Number);
+}
+
+function deuceFormatNumbersDeuceCycles(format as DeuceFormat) as Boolean {
+    var cap = deuceFormatAdvantagesBeforeDecidingPoint(format);
+    return cap != null && (cap as Number) > 1;
+}
+
+// Picker order: Regular → Star → Silver → Golden (most advantages to fewest).
+function deuceFormatOrder() as Array<DeuceFormat> {
+    return [
+        DEUCE_ADVANTAGE,
+        DEUCE_STAR_POINT,
+        DEUCE_SILVER_POINT,
+        DEUCE_GOLDEN_POINT
+    ] as Array<DeuceFormat>;
+}
+
+function deuceFormatAfter(current as DeuceFormat) as DeuceFormat {
+    var order = deuceFormatOrder();
+    for (var i = 0; i < order.size(); i += 1) {
+        if (order[i] == current) {
+            return order[(i + 1) % order.size()];
+        }
+    }
+    return order[0];
 }
 
 function matchSetFormatFromSettings(settings as MatchSettings) as MatchSetFormat {
