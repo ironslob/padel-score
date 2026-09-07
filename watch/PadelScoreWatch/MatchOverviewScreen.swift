@@ -10,7 +10,11 @@ struct MatchOverviewScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
                 labeled("Scoring", match.settings.deuceFormat.label)
-                labeled("Current Set", "\(match.currentSet.leftGames) – \(match.currentSet.rightGames)")
+                if match.isMatchTieBreak {
+                    labeled("Super TB", "\(match.currentGame.leftPoints) – \(match.currentGame.rightPoints)")
+                } else {
+                    labeled("Current Set", "\(match.currentSet.leftGames) – \(match.currentSet.rightGames)")
+                }
                 labeled("Current Match", "\(match.leftSetsWon) – \(match.rightSetsWon)")
                 labeled("Elapsed", DurationFormatter.elapsed(now.timeIntervalSince(match.startedAt)))
 

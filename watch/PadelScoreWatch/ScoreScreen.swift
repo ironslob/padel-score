@@ -99,9 +99,10 @@ struct ScoreScreen: View {
 
     @ViewBuilder
     private var tieBreakHeader: some View {
+        let isMatchTB = match.isMatchTieBreak
         if isLuminanceReduced {
             VStack(spacing: 2) {
-                Text("TB")
+                Text(isMatchTB ? "Super TB" : "TB")
                     .font(setScoreFont)
                     .foregroundStyle(.primary)
                 if let notice = match.activeTieBreakNotice {
@@ -115,18 +116,20 @@ struct ScoreScreen: View {
             .accessibilityLabel(tieBreakAccessibilityLabel)
         } else {
             VStack(spacing: 2) {
-                Text("Tie-break")
+                Text(isMatchTB ? "Super TB" : "Tie-break")
                     .font(.caption.weight(.bold))
                     .foregroundStyle(.orange)
-                Text("\(games.left) – \(games.right)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                if !isMatchTB {
+                    Text("\(games.left) – \(games.right)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
                 if let notice = match.activeTieBreakNotice {
                     Text(tieBreakNoticeLabel(notice))
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.orange)
                 } else {
-                    Text("First to 7")
+                    Text(isMatchTB ? "First to 10" : "First to 7")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
@@ -138,7 +141,7 @@ struct ScoreScreen: View {
     }
 
     private var tieBreakAccessibilityLabel: String {
-        var parts = ["Tie-break, 6 games all"]
+        var parts = [match.isMatchTieBreak ? "Super tie-break" : "Tie-break, 6 games all"]
         if let notice = match.activeTieBreakNotice {
             parts.append(tieBreakNoticeLabel(notice))
         }

@@ -49,7 +49,9 @@ enum MatchSetFormat {
     SET_FORMAT_BEST_OF_ONE,
     SET_FORMAT_BEST_OF_THREE,
     SET_FORMAT_BEST_OF_FIVE,
-    SET_FORMAT_CONTINUOUS
+    SET_FORMAT_CONTINUOUS,
+    // Appended so existing integer preference values 0–3 stay stable.
+    SET_FORMAT_BEST_OF_THREE_MATCH_TB
 }
 
 class DeuceFormatChange {
@@ -67,6 +69,8 @@ class MatchSettings {
     var continuousPlay as Boolean;
     var gamesToWinSet as Number;
     var mustWinByTwoGames as Boolean;
+    // When true, the deciding set is a 10-point match tie-break.
+    var decidingSetIsMatchTieBreak as Boolean;
     // How a game is decided once both sides reach 40.
     var deuceFormat as DeuceFormat;
     var askServeAtSetStart as Boolean;
@@ -86,6 +90,7 @@ class MatchSettings {
         continuousPlay = false;
         gamesToWinSet = 6;
         mustWinByTwoGames = true;
+        decidingSetIsMatchTieBreak = false;
         deuceFormat = DEUCE_STAR_POINT;
         askServeAtSetStart = false;
         fixedServerPositions = true;
@@ -100,6 +105,7 @@ class MatchSettings {
         s.continuousPlay = continuousPlay;
         s.gamesToWinSet = gamesToWinSet;
         s.mustWinByTwoGames = mustWinByTwoGames;
+        s.decidingSetIsMatchTieBreak = decidingSetIsMatchTieBreak;
         s.deuceFormat = deuceFormat;
         s.askServeAtSetStart = askServeAtSetStart;
         s.fixedServerPositions = fixedServerPositions;
@@ -324,7 +330,12 @@ class MatchState {
             && currentGame.leftPoints == 0 && currentGame.rightPoints == 0
             && currentGame.advantageSide == null && !currentGame.isGoldenPointActive
             && currentGame.brokenAdvantageCount == 0
-            && !currentGame.isTieBreak && !currentGame.isComplete;
+            && !currentGame.isComplete;
+    }
+
+    // A 10-point match/super tie-break used as the deciding set (game TB at 0–0).
+    function isMatchTieBreak() as Boolean {
+        return currentGame.isTieBreak && currentSet.leftGames == 0 && currentSet.rightGames == 0;
     }
 
     function canChooseNewServer() as Boolean {
@@ -397,6 +408,9 @@ class MatchState {
 
     // Status line for the current game ("Deuce", "Golden Point", …), or null.
     function gameStatusLine() as String or Null {
+        if (isMatchTieBreak()) {
+            return "Super TB";
+        }
         return currentGame.statusLine(settings.deuceFormat);
     }
 
@@ -405,6 +419,9 @@ class MatchState {
     }
 
     function scoreScreenSetDisplay() as Array<String> {
+        if (isMatchTieBreak()) {
+            return remapForScoreScreen(matchSetsDisplay());
+        }
         return remapForScoreScreen(currentSet.displayPair());
     }
 
@@ -450,7 +467,11 @@ class MatchState {
         }
         if (status == IN_PROGRESS || status == ENDED_EARLY || status == COMPLETED) {
             if (!currentSet.isComplete) {
-                lines.add(currentSet.leftGames.toString() + "-" + currentSet.rightGames.toString());
+                if (isMatchTieBreak()) {
+                    lines.add(currentGame.leftPoints.toString() + "-" + currentGame.rightPoints.toString());
+                } else {
+                    lines.add(currentSet.leftGames.toString() + "-" + currentSet.rightGames.toString());
+                }
             }
         }
         return lines;
@@ -488,6 +509,9 @@ class MatchState {
         }
         if (currentSet.leftGames == 0 && currentSet.rightGames == 0 && !hasInProgressGameScore()) {
             return null;
+        }
+        if (isMatchTieBreak()) {
+            return currentGame.leftPoints.toString() + "-" + currentGame.rightPoints.toString();
         }
         var line = currentSet.leftGames.toString() + "-" + currentSet.rightGames.toString();
         var gameLabel = inProgressGameScoreLabel();
@@ -652,6 +676,9 @@ function matchSetFormatFromSettings(settings as MatchSettings) as MatchSetFormat
     if (settings.setsToWin == 3) {
         return SET_FORMAT_BEST_OF_FIVE;
     }
+    if (settings.decidingSetIsMatchTieBreak) {
+        return SET_FORMAT_BEST_OF_THREE_MATCH_TB;
+    }
     return SET_FORMAT_BEST_OF_THREE;
 }
 
@@ -659,20 +686,30 @@ function applyMatchSetFormat(settings as MatchSettings, format as MatchSetFormat
     if (format == SET_FORMAT_BEST_OF_ONE) {
         settings.setsToWin = 1;
         settings.continuousPlay = false;
+        settings.decidingSetIsMatchTieBreak = false;
+    } else if (format == SET_FORMAT_BEST_OF_THREE_MATCH_TB) {
+        settings.setsToWin = 2;
+        settings.continuousPlay = false;
+        settings.decidingSetIsMatchTieBreak = true;
     } else if (format == SET_FORMAT_BEST_OF_FIVE) {
         settings.setsToWin = 3;
         settings.continuousPlay = false;
+        settings.decidingSetIsMatchTieBreak = false;
     } else if (format == SET_FORMAT_CONTINUOUS) {
         settings.continuousPlay = true;
+        settings.decidingSetIsMatchTieBreak = false;
     } else {
         settings.setsToWin = 2;
         settings.continuousPlay = false;
+        settings.decidingSetIsMatchTieBreak = false;
     }
 }
 
 function matchSetFormatLabel(format as MatchSetFormat) as String {
     if (format == SET_FORMAT_BEST_OF_ONE) {
         return "1 set";
+    } else if (format == SET_FORMAT_BEST_OF_THREE_MATCH_TB) {
+        return "2 sets + TB";
     } else if (format == SET_FORMAT_BEST_OF_FIVE) {
         return "Best of 5";
     } else if (format == SET_FORMAT_CONTINUOUS) {
@@ -685,6 +722,8 @@ function nextMatchSetFormat(format as MatchSetFormat) as MatchSetFormat {
     if (format == SET_FORMAT_BEST_OF_ONE) {
         return SET_FORMAT_BEST_OF_THREE;
     } else if (format == SET_FORMAT_BEST_OF_THREE) {
+        return SET_FORMAT_BEST_OF_THREE_MATCH_TB;
+    } else if (format == SET_FORMAT_BEST_OF_THREE_MATCH_TB) {
         return SET_FORMAT_BEST_OF_FIVE;
     } else if (format == SET_FORMAT_BEST_OF_FIVE) {
         return SET_FORMAT_CONTINUOUS;

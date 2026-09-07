@@ -307,15 +307,25 @@ class ScoringEngine {
         }
 
         var theirPoints = state.currentGame.pointsFor(oppositeSide(side));
-        if (myPoints + 1 >= 7 && (myPoints + 1) - theirPoints >= 2) {
+        var target = tieBreakPointsToWin(state);
+        if (myPoints + 1 >= target && (myPoints + 1) - theirPoints >= 2) {
             completeTieBreak(side, state);
         }
+    }
+
+    private function tieBreakPointsToWin(state as MatchState) as Number {
+        return state.isMatchTieBreak() ? 10 : 7;
     }
 
     private function completeTieBreak(winner as Side, state as MatchState) as Void {
         state.currentGame.isComplete = true;
         state.currentGame.winner = winner;
-        state.currentSet.setGames(7, winner);
+        if (state.isMatchTieBreak()) {
+            state.currentSet.setGames(state.currentGame.leftPoints, LEFT);
+            state.currentSet.setGames(state.currentGame.rightPoints, RIGHT);
+        } else {
+            state.currentSet.setGames(7, winner);
+        }
         var nextSetServer = null;
         var opener = tieBreakOpeningServer(state);
         if (opener != null) {
@@ -402,9 +412,26 @@ class ScoringEngine {
             state.currentGame = new GameScore();
         } else {
             state.currentSet = new SetScore();
-            state.currentGame = new GameScore();
+            if (shouldStartMatchTieBreak(state)) {
+                var matchTb = new GameScore();
+                matchTb.isTieBreak = true;
+                state.currentGame = matchTb;
+            } else {
+                state.currentGame = new GameScore();
+            }
             beginNextSetServe(nextSetServer, state);
         }
+    }
+
+    private function shouldStartMatchTieBreak(state as MatchState) as Boolean {
+        if (!state.settings.decidingSetIsMatchTieBreak) {
+            return false;
+        }
+        if (state.settings.setsToWin < 2) {
+            return false;
+        }
+        var threshold = state.settings.setsToWin - 1;
+        return state.leftSetsWon == threshold && state.rightSetsWon == threshold;
     }
 
     private function beginNextSetServe(nextSetServer as Side or Null, state as MatchState) as Void {

@@ -155,7 +155,17 @@ data class MatchState(
         get() = events.any { it.kind == MatchEventKind.PointWon }
 
     val isAtSetStart: Boolean
-        get() = currentSet.leftGames == 0 && currentSet.rightGames == 0 && currentGame == GameScore()
+        get() = currentSet.leftGames == 0 &&
+            currentSet.rightGames == 0 &&
+            currentGame.leftPoints == 0 &&
+            currentGame.rightPoints == 0 &&
+            currentGame.advantageSide == null &&
+            !currentGame.isGoldenPointActive &&
+            !currentGame.isComplete
+
+    /** A 10-point match/super tie-break used as the deciding set (game TB at 0–0). */
+    val isMatchTieBreak: Boolean
+        get() = currentGame.isTieBreak && currentSet.leftGames == 0 && currentSet.rightGames == 0
 
     val canChooseNewServer: Boolean
         get() = status == MatchStatus.InProgress &&
@@ -208,13 +218,17 @@ data class MatchState(
         get() = currentGame.displayPair(settings.deuceFormat)
 
     val gameStatusLine: String?
-        get() = currentGame.statusLine(settings.deuceFormat)
+        get() = if (isMatchTieBreak) "Super TB" else currentGame.statusLine(settings.deuceFormat)
 
     val scoreScreenGameDisplay: Pair<String, String>
         get() = remapForScoreScreen(gameDisplayPair)
 
     val scoreScreenSetDisplay: Pair<String, String>
-        get() = remapForScoreScreen(currentSet.displayPair)
+        get() = if (isMatchTieBreak) {
+            remapForScoreScreen(matchSetsDisplay)
+        } else {
+            remapForScoreScreen(currentSet.displayPair)
+        }
 
     val servingRoleLabels: Pair<String, String>
         get() {
@@ -257,7 +271,11 @@ data class MatchState(
                 status == MatchStatus.Completed
             ) {
                 if (!currentSet.isComplete) {
-                    lines.add("${currentSet.leftGames}-${currentSet.rightGames}")
+                    if (isMatchTieBreak) {
+                        lines.add("${currentGame.leftPoints}-${currentGame.rightPoints}")
+                    } else {
+                        lines.add("${currentSet.leftGames}-${currentSet.rightGames}")
+                    }
                 }
             }
             return lines
@@ -287,6 +305,9 @@ data class MatchState(
             if (currentSet.isComplete) return null
             if (currentSet.leftGames == 0 && currentSet.rightGames == 0 && !hasInProgressGameScore) {
                 return null
+            }
+            if (isMatchTieBreak) {
+                return "${currentGame.leftPoints}-${currentGame.rightPoints}"
             }
             var line = "${currentSet.leftGames}-${currentSet.rightGames}"
             inProgressGameScoreLabel?.let { line += " ($it)" }

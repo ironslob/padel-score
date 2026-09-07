@@ -292,6 +292,7 @@ class MatchService {
             var value = raw as Number;
             if (value == SET_FORMAT_BEST_OF_ONE
                 || value == SET_FORMAT_BEST_OF_THREE
+                || value == SET_FORMAT_BEST_OF_THREE_MATCH_TB
                 || value == SET_FORMAT_BEST_OF_FIVE
                 || value == SET_FORMAT_CONTINUOUS) {
                 return value as MatchSetFormat;

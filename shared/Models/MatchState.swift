@@ -317,9 +317,20 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
     }
 
     /// True while the set in progress has not been played into: no games won and no
-    /// points on the board. Serve can still be handed to either side here.
+    /// points on the board. A virgin match tie-break (`isTieBreak` at 0–0) still
+    /// counts so New serve / ask-serve work at that boundary.
     public var isAtSetStart: Bool {
-        currentSet.leftGames == 0 && currentSet.rightGames == 0 && currentGame == .zero
+        guard currentSet.leftGames == 0 && currentSet.rightGames == 0 else { return false }
+        guard currentGame.leftPoints == 0 && currentGame.rightPoints == 0 else { return false }
+        guard currentGame.advantageSide == nil else { return false }
+        guard !currentGame.isGoldenPointActive else { return false }
+        guard !currentGame.isComplete else { return false }
+        return true
+    }
+
+    /// A 10-point match/super tie-break used as the deciding set (games TB at 0–0).
+    public var isMatchTieBreak: Bool {
+        currentGame.isTieBreak && currentSet.leftGames == 0 && currentSet.rightGames == 0
     }
 
     /// Whether the player may pick a new server right now, rather than carrying the
@@ -382,7 +393,8 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
 
     /// Status line for the current game ("Deuce", "Golden Point", …), or nil.
     public var gameStatusLine: String? {
-        currentGame.statusLine(deuceFormat: settings.deuceFormat)
+        if isMatchTieBreak { return "Super TB" }
+        return currentGame.statusLine(deuceFormat: settings.deuceFormat)
     }
 
     /// Game point labels oriented for the score screen.
@@ -391,8 +403,12 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
     }
 
     /// Set games labels oriented for the score screen.
+    /// During a match TB the set is 0–0; complications/Live Activity use match sets won instead.
     public var scoreScreenSetDisplay: (left: String, right: String) {
-        remapForScoreScreen(currentSet.displayPair)
+        if isMatchTieBreak {
+            return remapForScoreScreen(matchSetsDisplay)
+        }
+        return remapForScoreScreen(currentSet.displayPair)
     }
 
     /// Role labels for the score screen (visual left / right).
@@ -441,7 +457,11 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
         var lines = completedSets.map { "\($0.leftGames)-\($0.rightGames)" }
         if status == .inProgress || status == .endedEarly || status == .completed {
             if !currentSet.isComplete {
-                lines.append("\(currentSet.leftGames)-\(currentSet.rightGames)")
+                if isMatchTieBreak {
+                    lines.append("\(currentGame.leftPoints)-\(currentGame.rightPoints)")
+                } else {
+                    lines.append("\(currentSet.leftGames)-\(currentSet.rightGames)")
+                }
             }
         }
         return lines
@@ -469,10 +489,14 @@ public struct MatchState: Codable, Sendable, Equatable, Identifiable {
     }
 
     /// Games in the incomplete set when a match finishes mid-set, including the in-progress game if any.
+    /// During a match TB, the TB points themselves are the set score (not `0-0 (6-4)`).
     private var partialSetLineForIncompleteTerminal: String? {
         guard status == .endedEarly || status == .completed, !currentSet.isComplete else { return nil }
         guard currentSet.leftGames > 0 || currentSet.rightGames > 0 || hasInProgressGameScore else {
             return nil
+        }
+        if isMatchTieBreak {
+            return "\(currentGame.leftPoints)-\(currentGame.rightPoints)"
         }
         var line = "\(currentSet.leftGames)-\(currentSet.rightGames)"
         if let gameScore = inProgressGameScoreLabel {

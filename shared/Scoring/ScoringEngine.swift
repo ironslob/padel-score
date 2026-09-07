@@ -302,15 +302,25 @@ public struct ScoringEngine: Sendable {
         }
 
         let theirPoints = state.currentGame.points(for: side.opposite)
-        if myPoints + 1 >= 7 && (myPoints + 1) - theirPoints >= 2 {
+        let target = tieBreakPointsToWin(in: state)
+        if myPoints + 1 >= target && (myPoints + 1) - theirPoints >= 2 {
             completeTieBreak(winner: side, in: &state)
         }
+    }
+
+    private func tieBreakPointsToWin(in state: MatchState) -> Int {
+        state.isMatchTieBreak ? 10 : 7
     }
 
     private func completeTieBreak(winner: Side, in state: inout MatchState) {
         state.currentGame.isComplete = true
         state.currentGame.winner = winner
-        state.currentSet.setGames(7, for: winner)
+        if state.isMatchTieBreak {
+            state.currentSet.setGames(state.currentGame.leftPoints, for: .left)
+            state.currentSet.setGames(state.currentGame.rightPoints, for: .right)
+        } else {
+            state.currentSet.setGames(7, for: winner)
+        }
         // The side that opened the tie-break receives first in the next set, so
         // serve keeps rotating as if the tie-break were a single game.
         let nextSetServer = tieBreakOpeningServer(in: state)?.opposite
@@ -390,9 +400,20 @@ public struct ScoringEngine: Sendable {
             state.currentGame = .zero
         } else {
             state.currentSet = .zero
-            state.currentGame = .zero
+            let startsMatchTieBreak = shouldStartMatchTieBreak(in: state)
+            state.currentGame = startsMatchTieBreak ? GameScore(isTieBreak: true) : .zero
             beginNextSetServe(nextSetServer, in: &state)
         }
+    }
+
+    /// Deciding set opens as a 10-point match tie-break when both sides sit one
+    /// set from winning and the format flag is on. Requires `setsToWin >= 2` so a
+    /// hand-edited 1-set match never treats match start as a deciding set.
+    private func shouldStartMatchTieBreak(in state: MatchState) -> Bool {
+        guard state.settings.decidingSetIsMatchTieBreak else { return false }
+        guard state.settings.setsToWin >= 2 else { return false }
+        let threshold = state.settings.setsToWin - 1
+        return state.leftSetsWon == threshold && state.rightSetsWon == threshold
     }
 
     /// `requestServerSelection` records no event, so replay restores the rotated
