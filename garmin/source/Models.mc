@@ -323,6 +323,7 @@ class MatchState {
         return currentSet.leftGames == 0 && currentSet.rightGames == 0
             && currentGame.leftPoints == 0 && currentGame.rightPoints == 0
             && currentGame.advantageSide == null && !currentGame.isGoldenPointActive
+            && currentGame.brokenAdvantageCount == 0
             && !currentGame.isTieBreak && !currentGame.isComplete;
     }
 
