@@ -113,12 +113,13 @@ public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenc
             return format
         }
         // Upgrading from the two-way toggle: someone who turned it off wanted
-        // full advantage scoring, so honour that. Everyone else gets the new
-        // default, which is what the old "Golden point" label promised.
+        // full advantage scoring, so honour that. Everyone else — including fresh
+        // installs — gets the product default. A format saved under the newer key
+        // is never rewritten when the default moves.
         if defaults.object(forKey: legacyGoldenPointKey) as? Bool == false {
             return .advantage
         }
-        return .goldenPoint
+        return MatchSettings.default.deuceFormat
     }
 
     public func setDeuceFormat(_ value: DeuceFormat) {
@@ -157,6 +158,7 @@ public struct UserDefaultsServeSelectionPreferenceStore: ServeSelectionPreferenc
 public enum SettingsCopy {
     public static let deuceFormat =
         "How a game is decided at 40-40. Regular plays advantage until someone wins by two. " +
+        "Star point (FIP, Premier Padel) plays two advantages, then the next point wins. " +
         "Silver point plays one advantage, then the next point wins. " +
         "Golden point skips advantage entirely — the next point wins. " +
         "Can be changed during a match; games already played keep their result."

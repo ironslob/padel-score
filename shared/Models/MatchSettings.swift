@@ -35,9 +35,14 @@ public enum MatchSetFormat: String, CaseIterable, Codable, Sendable, Identifiabl
 }
 
 /// How a game is resolved once both sides reach 40.
+///
+/// Declared from most to fewest advantages, which is also the order the picker shows.
 public enum DeuceFormat: String, CaseIterable, Codable, Sendable, Identifiable {
     /// Traditional scoring: advantage repeats until one side wins by two points.
     case advantage
+    /// Two advantages are played. If the second is broken, the next point decides the
+    /// game. The FIP rule for Premier Padel and the CUPRA FIP Tour.
+    case starPoint
     /// One advantage is played. If it is broken, the next point decides the game.
     case silverPoint
     /// No advantage at all — the first point at 40-40 decides the game.
@@ -48,6 +53,7 @@ public enum DeuceFormat: String, CaseIterable, Codable, Sendable, Identifiable {
     public var label: String {
         switch self {
         case .advantage: return "Regular"
+        case .starPoint: return "Star point"
         case .silverPoint: return "Silver point"
         case .goldenPoint: return "Golden point"
         }
@@ -57,6 +63,7 @@ public enum DeuceFormat: String, CaseIterable, Codable, Sendable, Identifiable {
     public var decidingPointLabel: String {
         switch self {
         case .advantage: return "Deuce"
+        case .starPoint: return "Star Point"
         case .silverPoint: return "Silver Point"
         case .goldenPoint: return "Golden Point"
         }
@@ -66,9 +73,35 @@ public enum DeuceFormat: String, CaseIterable, Codable, Sendable, Identifiable {
     public var decidingPointShortLabel: String {
         switch self {
         case .advantage: return "40"
+        case .starPoint: return "ST"
         case .silverPoint: return "SP"
         case .goldenPoint: return "GP"
         }
+    }
+
+    /// How many advantages may be broken before a single point decides the game.
+    /// `nil` means there is no cap: regular scoring keeps cycling until someone wins by two.
+    public var advantagesBeforeDecidingPoint: Int? {
+        switch self {
+        case .advantage: return nil
+        case .starPoint: return 2
+        case .silverPoint: return 1
+        case .goldenPoint: return 0
+        }
+    }
+
+    /// Whether the next point decides the game once `count` advantages have been broken
+    /// in the current game. Zero covers arriving at 40-40 with no advantage played yet.
+    public func decidesGame(afterBrokenAdvantages count: Int) -> Bool {
+        guard let cap = advantagesBeforeDecidingPoint else { return false }
+        return count >= cap
+    }
+
+    /// Formats that allow more than one advantage number the deuce and advantage
+    /// status lines ("Deuce 2", "Advantage 2") so players can see how close the
+    /// decisive point is. A single advantage needs no counting.
+    public var numbersDeuceCycles: Bool {
+        (advantagesBeforeDecidingPoint ?? 0) > 1
     }
 }
 
@@ -125,7 +158,7 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         continuousPlay: Bool = false,
         gamesToWinSet: Int = 6,
         mustWinByTwoGames: Bool = true,
-        deuceFormat: DeuceFormat = .goldenPoint,
+        deuceFormat: DeuceFormat = .starPoint,
         askServeAtSetStart: Bool = false,
         fixedServerPositions: Bool = true,
         usThemLabels: Bool = true,
@@ -218,6 +251,8 @@ public struct MatchSettings: Codable, Sendable, Equatable {
         try container.encode(gamesToWinSet, forKey: .gamesToWinSet)
         try container.encode(mustWinByTwoGames, forKey: .mustWinByTwoGames)
         try container.encode(deuceFormat, forKey: .deuceFormat)
+        // Older builds only know "some deciding point" vs none, so every capped format
+        // maps to true there.
         try container.encode(deuceFormat != .advantage, forKey: .goldenPointEnabled)
         try container.encode(askServeAtSetStart, forKey: .askServeAtSetStart)
         try container.encode(fixedServerPositions, forKey: .fixedServerPositions)

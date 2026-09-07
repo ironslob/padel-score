@@ -45,7 +45,7 @@ struct ScoreScreen: View {
                 if match.currentGame.isTieBreak {
                     tieBreakHeader
                 } else if match.currentGame.isGoldenPointActive {
-                    goldenPointLabel
+                    decidingPointHeader
                 } else {
                     Text("\(games.left) – \(games.right)")
                         .font(setScoreFont)
@@ -162,8 +162,9 @@ struct ScoreScreen: View {
         }
     }
 
+    /// Names the decisive rally for the format in play: Golden, Silver, or Star Point.
     @ViewBuilder
-    private var goldenPointLabel: some View {
+    private var decidingPointHeader: some View {
         let format = match.settings.deuceFormat
         let accessibility = "\(format.decidingPointLabel), next point wins"
         if isLuminanceReduced {

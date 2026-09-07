@@ -35,8 +35,13 @@ public struct GameScore: Codable, Sendable, Equatable {
     public var leftPoints: Int
     public var rightPoints: Int
     public var advantageSide: Side?
-    /// True while a single decisive rally is in progress: immediately at 40-40 under
-    /// golden point, or after an advantage is broken under silver point.
+    /// Advantages that have been played and broken in this game. Formats with a cap
+    /// (`DeuceFormat.advantagesBeforeDecidingPoint`) arm the decisive point once the cap
+    /// is reached; regular scoring only counts it for display.
+    public var brokenAdvantageCount: Int
+    /// True while a single decisive rally is in progress — the golden, silver, or star
+    /// point named by the format in play. The name is historical: it predates the
+    /// other formats.
     public var isGoldenPointActive: Bool
     public var isTieBreak: Bool
     public var isComplete: Bool
@@ -46,6 +51,7 @@ public struct GameScore: Codable, Sendable, Equatable {
         leftPoints: Int = 0,
         rightPoints: Int = 0,
         advantageSide: Side? = nil,
+        brokenAdvantageCount: Int = 0,
         isGoldenPointActive: Bool = false,
         isTieBreak: Bool = false,
         isComplete: Bool = false,
@@ -54,10 +60,36 @@ public struct GameScore: Codable, Sendable, Equatable {
         self.leftPoints = leftPoints
         self.rightPoints = rightPoints
         self.advantageSide = advantageSide
+        self.brokenAdvantageCount = brokenAdvantageCount
         self.isGoldenPointActive = isGoldenPointActive
         self.isTieBreak = isTieBreak
         self.isComplete = isComplete
         self.winner = winner
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case leftPoints
+        case rightPoints
+        case advantageSide
+        case brokenAdvantageCount
+        case isGoldenPointActive
+        case isTieBreak
+        case isComplete
+        case winner
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        leftPoints = try container.decode(Int.self, forKey: .leftPoints)
+        rightPoints = try container.decode(Int.self, forKey: .rightPoints)
+        advantageSide = try container.decodeIfPresent(Side.self, forKey: .advantageSide)
+        // Absent in snapshots written before star point. The cached game is rebuilt from
+        // the event stream on load anyway, so zero is only a placeholder.
+        brokenAdvantageCount = try container.decodeIfPresent(Int.self, forKey: .brokenAdvantageCount) ?? 0
+        isGoldenPointActive = try container.decode(Bool.self, forKey: .isGoldenPointActive)
+        isTieBreak = try container.decode(Bool.self, forKey: .isTieBreak)
+        isComplete = try container.decode(Bool.self, forKey: .isComplete)
+        winner = try container.decodeIfPresent(Side.self, forKey: .winner)
     }
 
     public static let zero = GameScore()
@@ -122,12 +154,19 @@ public struct GameScore: Codable, Sendable, Equatable {
             return deuceFormat.decidingPointLabel
         }
         if advantageSide != nil {
-            return "Advantage"
+            return numbered("Advantage", deuceFormat: deuceFormat)
         }
         if leftPoints >= 3 && rightPoints >= 3 {
-            return "Deuce"
+            return numbered("Deuce", deuceFormat: deuceFormat)
         }
         return nil
+    }
+
+    /// "Deuce 2" / "Advantage 2" under formats that play more than one advantage, so
+    /// players can see how far the decisive point is; plain "Deuce" otherwise.
+    private func numbered(_ phase: String, deuceFormat: DeuceFormat) -> String {
+        guard deuceFormat.numbersDeuceCycles else { return phase }
+        return "\(phase) \(brokenAdvantageCount + 1)"
     }
 
     private static func label(for points: Int) -> String {
