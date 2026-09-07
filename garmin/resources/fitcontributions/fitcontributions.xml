@@ -1,17 +1,19 @@
-<fitContributions>
-    <fitField id="0"
-        displayInActivitySummary="true"
-        sortOrder="0"
-        dataLabel="@Strings.fitMatchScoreLabel"
-        unitLabel="@Strings.fitMatchScoreUnits"/>
-    <fitField id="1"
-        displayInActivitySummary="true"
-        sortOrder="1"
-        dataLabel="@Strings.fitSetsUsLabel"
-        unitLabel="@Strings.fitSetsUnits"/>
-    <fitField id="2"
-        displayInActivitySummary="true"
-        sortOrder="2"
-        dataLabel="@Strings.fitSetsThemLabel"
-        unitLabel="@Strings.fitSetsUnits"/>
-</fitContributions>
+<resources>
+    <fitContributions>
+        <fitField id="0"
+            displayInActivitySummary="true"
+            sortOrder="0"
+            dataLabel="@Strings.fitMatchScoreLabel"
+            unitLabel="@Strings.fitMatchScoreUnits"/>
+        <fitField id="1"
+            displayInActivitySummary="true"
+            sortOrder="1"
+            dataLabel="@Strings.fitSetsUsLabel"
+            unitLabel="@Strings.fitSetsUnits"/>
+        <fitField id="2"
+            displayInActivitySummary="true"
+            sortOrder="2"
+            dataLabel="@Strings.fitSetsThemLabel"
+            unitLabel="@Strings.fitSetsUnits"/>
+    </fitContributions>
+</resources>
