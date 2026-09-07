@@ -35,10 +35,14 @@ enum ScoringError {
 // DEUCE_ADVANTAGE: traditional advantage until two clear.
 // DEUCE_SILVER_POINT: one advantage, then decisive point if broken.
 // DEUCE_GOLDEN_POINT: first point at 40-40 wins.
+// DEUCE_STAR_POINT: two advantages, then decisive point if the second is broken (FIP).
+// New values go at the end; the settings cycler order lives in deuceFormatOrder(),
+// not in the enum.
 enum DeuceFormat {
     DEUCE_ADVANTAGE,
     DEUCE_SILVER_POINT,
-    DEUCE_GOLDEN_POINT
+    DEUCE_GOLDEN_POINT,
+    DEUCE_STAR_POINT
 }
 
 enum MatchSetFormat {
@@ -82,7 +86,7 @@ class MatchSettings {
         continuousPlay = false;
         gamesToWinSet = 6;
         mustWinByTwoGames = true;
-        deuceFormat = DEUCE_GOLDEN_POINT;
+        deuceFormat = DEUCE_STAR_POINT;
         askServeAtSetStart = false;
         fixedServerPositions = true;
         usThemLabels = true;
@@ -114,8 +118,11 @@ class GameScore {
     var leftPoints as Number;
     var rightPoints as Number;
     var advantageSide as Side or Null;
-    // True while a single decisive rally is in progress: immediately at 40-40 under
-    // golden point, or after an advantage is broken under silver point.
+    // Advantages played and broken in this game. Capped formats arm the decisive
+    // point once deuceFormatAdvantagesBeforeDecidingPoint is reached.
+    var brokenAdvantageCount as Number;
+    // True while a single decisive rally is in progress — the golden, silver, or
+    // star point named by the format in play. The name predates the other formats.
     var isGoldenPointActive as Boolean;
     var isTieBreak as Boolean;
     var isComplete as Boolean;
@@ -125,6 +132,7 @@ class GameScore {
         leftPoints = 0;
         rightPoints = 0;
         advantageSide = null;
+        brokenAdvantageCount = 0;
         isGoldenPointActive = false;
         isTieBreak = false;
         isComplete = false;
@@ -178,12 +186,21 @@ class GameScore {
             return deuceFormatDecidingPointLabel(deuceFormat);
         }
         if (advantageSide != null) {
-            return "Advantage";
+            return numberedPhase("Advantage", deuceFormat);
         }
         if (leftPoints >= 3 && rightPoints >= 3) {
-            return "Deuce";
+            return numberedPhase("Deuce", deuceFormat);
         }
         return null;
+    }
+
+    // "Deuce 2" / "Advantage 2" under formats that play more than one advantage, so
+    // players can see how far the decisive point is; plain "Deuce" otherwise.
+    private function numberedPhase(phase as String, deuceFormat as DeuceFormat) as String {
+        if (!deuceFormatNumbersDeuceCycles(deuceFormat)) {
+            return phase;
+        }
+        return phase + " " + (brokenAdvantageCount + 1).toString();
     }
 
     function tieBreakNotice() as String or Null {
@@ -508,9 +525,12 @@ class MatchState {
 }
 
 // Module-level helpers live after enums and classes (Monkey C compile order).
+// Raw values match the Swift enum so a synced or migrated store reads the same on both.
 function deuceFormatToString(format as DeuceFormat) as String {
     if (format == DEUCE_ADVANTAGE) {
         return "advantage";
+    } else if (format == DEUCE_STAR_POINT) {
+        return "starPoint";
     } else if (format == DEUCE_SILVER_POINT) {
         return "silverPoint";
     }
@@ -523,6 +543,8 @@ function deuceFormatFromString(raw as String or Null) as DeuceFormat or Null {
     }
     if (raw.equals("advantage")) {
         return DEUCE_ADVANTAGE;
+    } else if (raw.equals("starPoint")) {
+        return DEUCE_STAR_POINT;
     } else if (raw.equals("silverPoint")) {
         return DEUCE_SILVER_POINT;
     } else if (raw.equals("goldenPoint")) {
@@ -535,16 +557,72 @@ function deuceFormatFromLegacyArchivedFlag(goldenPointEnabled as Boolean) as Deu
     return goldenPointEnabled ? DEUCE_SILVER_POINT : DEUCE_ADVANTAGE;
 }
 
+// Only an explicit "off" carries over; everything else — including a fresh
+// install — lands on the product default. A format saved under the newer
+// "deuceFormat" key is never rewritten when the default moves.
 function deuceFormatFromLegacyPreference(goldenPointEnabled as Boolean or Null) as DeuceFormat {
     if (goldenPointEnabled != null && !goldenPointEnabled) {
         return DEUCE_ADVANTAGE;
     }
-    return DEUCE_GOLDEN_POINT;
+    return new MatchSettings().deuceFormat;
+}
+
+// Most to fewest advantages — the same order the Apple picker lists them.
+function deuceFormatOrder() as Array<DeuceFormat> {
+    return [
+        DEUCE_ADVANTAGE,
+        DEUCE_STAR_POINT,
+        DEUCE_SILVER_POINT,
+        DEUCE_GOLDEN_POINT
+    ] as Array<DeuceFormat>;
+}
+
+// The format after `current` in deuceFormatOrder(), wrapping round.
+function deuceFormatAfter(current as DeuceFormat) as DeuceFormat {
+    var order = deuceFormatOrder();
+    for (var i = 0; i < order.size(); i += 1) {
+        if (order[i] == current) {
+            return order[(i + 1) % order.size()];
+        }
+    }
+    return order[0];
+}
+
+// How many advantages may be broken before a single point decides the game.
+// null means no cap: regular scoring keeps cycling until someone wins by two.
+function deuceFormatAdvantagesBeforeDecidingPoint(format as DeuceFormat) as Number or Null {
+    if (format == DEUCE_ADVANTAGE) {
+        return null;
+    } else if (format == DEUCE_STAR_POINT) {
+        return 2;
+    } else if (format == DEUCE_SILVER_POINT) {
+        return 1;
+    }
+    return 0;
+}
+
+// Whether the next point decides the game once `brokenAdvantages` advantages
+// have been broken in the current game. Zero covers arriving at 40-40.
+function deuceFormatDecidesGame(format as DeuceFormat, brokenAdvantages as Number) as Boolean {
+    var cap = deuceFormatAdvantagesBeforeDecidingPoint(format);
+    if (cap == null) {
+        return false;
+    }
+    return brokenAdvantages >= cap;
+}
+
+// Formats that allow more than one advantage number the Deuce / Advantage status
+// lines so players can see how close the decisive point is.
+function deuceFormatNumbersDeuceCycles(format as DeuceFormat) as Boolean {
+    var cap = deuceFormatAdvantagesBeforeDecidingPoint(format);
+    return cap != null && cap > 1;
 }
 
 function deuceFormatLabel(format as DeuceFormat) as String {
     if (format == DEUCE_ADVANTAGE) {
         return "Regular";
+    } else if (format == DEUCE_STAR_POINT) {
+        return "Star";
     } else if (format == DEUCE_SILVER_POINT) {
         return "Silver";
     }
@@ -554,6 +632,8 @@ function deuceFormatLabel(format as DeuceFormat) as String {
 function deuceFormatDecidingPointLabel(format as DeuceFormat) as String {
     if (format == DEUCE_ADVANTAGE) {
         return "Deuce";
+    } else if (format == DEUCE_STAR_POINT) {
+        return "Star Point";
     } else if (format == DEUCE_SILVER_POINT) {
         return "Silver Point";
     }
@@ -563,6 +643,8 @@ function deuceFormatDecidingPointLabel(format as DeuceFormat) as String {
 function deuceFormatDecidingPointShortLabel(format as DeuceFormat) as String {
     if (format == DEUCE_ADVANTAGE) {
         return "40";
+    } else if (format == DEUCE_STAR_POINT) {
+        return "ST";
     } else if (format == DEUCE_SILVER_POINT) {
         return "SP";
     }

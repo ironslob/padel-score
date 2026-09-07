@@ -63,7 +63,7 @@ base64 -i developer_key.der | pbcopy
 - Start match, select server
 - Large left/right score buttons with quick-undo (tap same side twice within 3s; yellow bar on the button)
 - Swipe pager: Overview → Score → Actions
-- Golden / silver / regular deuce, tie-break, serve rotation at set boundaries (parity with Apple Watch)
+- Regular / star / silver / golden deuce, tie-break, serve rotation at set boundaries (parity with Apple Watch)
 - New serve and End match at changeover; deuce format can be changed mid-match
 - Finish / end early / discard (with confirmation)
 - Match history, match length, ask-serve, and Us/Them settings

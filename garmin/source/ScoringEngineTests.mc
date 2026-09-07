@@ -173,6 +173,234 @@ function testSilverPointDecidingPointWinnableByEitherSide(logger as Logger) as B
 }
 
 (:test)
+function testSilverPointStatusLinesAreNotNumbered(logger as Logger) as Boolean {
+    // One advantage needs no counting, so silver keeps the plain labels.
+    var engine = new ScoringEngine();
+    var state = startAtDeuce(engine, DEUCE_SILVER_POINT, "test-sp-5");
+    Test.assertEqual("Deuce", state.gameStatusLine());
+    state = engine.applyPointWon(state, LEFT, 30);
+    Test.assertEqual("Advantage", state.gameStatusLine());
+    return true;
+}
+
+(:test)
+function testStarPointPlaysTwoAdvantagesThenDecides(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var state = startAtDeuce(engine, DEUCE_STAR_POINT, "test-st-1");
+    Test.assert(!state.currentGame.isGoldenPointActive);
+    Test.assertEqual("Deuce 1", state.gameStatusLine());
+    Test.assertEqual("40", state.gameDisplayPair()[0]);
+
+    state = engine.applyPointWon(state, LEFT, 30); // Ad left
+    Test.assertEqual(LEFT, state.currentGame.advantageSide);
+    Test.assert(!state.currentGame.isGoldenPointActive);
+    Test.assertEqual("Advantage 1", state.gameStatusLine());
+    Test.assertEqual("Ad", state.gameDisplayPair()[0]);
+
+    state = engine.applyPointWon(state, RIGHT, 31); // first advantage broken → not decisive yet
+    Test.assert(state.currentGame.advantageSide == null);
+    Test.assert(!state.currentGame.isGoldenPointActive);
+    Test.assertEqual(1, state.currentGame.brokenAdvantageCount);
+    Test.assertEqual("Deuce 2", state.gameStatusLine());
+    Test.assertEqual("40", state.gameDisplayPair()[0]);
+
+    state = engine.applyPointWon(state, RIGHT, 32); // Ad right
+    Test.assertEqual(RIGHT, state.currentGame.advantageSide);
+    Test.assertEqual("Advantage 2", state.gameStatusLine());
+
+    state = engine.applyPointWon(state, LEFT, 33); // second advantage broken → star point
+    Test.assert(state.currentGame.isGoldenPointActive);
+    Test.assert(state.currentGame.advantageSide == null);
+    Test.assertEqual(2, state.currentGame.brokenAdvantageCount);
+    Test.assertEqual("Star Point", state.gameStatusLine());
+    var pair = state.gameDisplayPair();
+    Test.assertEqual("ST", pair[0]);
+    Test.assertEqual("ST", pair[1]);
+
+    state = engine.applyPointWon(state, RIGHT, 34);
+    Test.assertEqual(1, state.currentSet.rightGames);
+    Test.assertEqual(0, state.currentSet.leftGames);
+    Test.assert(!state.currentGame.isGoldenPointActive);
+    Test.assertEqual(0, state.currentGame.brokenAdvantageCount);
+    return true;
+}
+
+(:test)
+function testStarPointAdvantageHolderWinsOnEitherCycle(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    // First advantage converted: no second cycle, no star point.
+    var state = startAtDeuce(engine, DEUCE_STAR_POINT, "test-st-2");
+    state = engine.applyPointWon(state, LEFT, 30);
+    state = engine.applyPointWon(state, LEFT, 31);
+    Test.assertEqual(1, state.currentSet.leftGames);
+
+    // Second advantage converted.
+    var t = 32;
+    for (var i = 0; i < 3; i += 1) {
+        state = engine.applyPointWon(state, LEFT, t);
+        t += 1;
+        state = engine.applyPointWon(state, RIGHT, t);
+        t += 1;
+    }
+    state = engine.applyPointWon(state, LEFT, t); // Ad left
+    t += 1;
+    state = engine.applyPointWon(state, RIGHT, t); // broken
+    t += 1;
+    state = engine.applyPointWon(state, RIGHT, t); // Ad right
+    t += 1;
+    state = engine.applyPointWon(state, RIGHT, t); // converts
+    Test.assertEqual(1, state.currentSet.rightGames);
+    Test.assert(!state.currentGame.isGoldenPointActive);
+    return true;
+}
+
+(:test)
+function testStarPointDecidingPointWinnableByEitherSide(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var state = startAtDeuce(engine, DEUCE_STAR_POINT, "test-st-3");
+    state = engine.applyPointWon(state, LEFT, 30);
+    state = engine.applyPointWon(state, RIGHT, 31);
+    state = engine.applyPointWon(state, RIGHT, 32);
+    state = engine.applyPointWon(state, LEFT, 33); // second break → star point
+    Test.assert(state.currentGame.isGoldenPointActive);
+    // The side that just lost its advantage can still take the game.
+    state = engine.applyPointWon(state, RIGHT, 34);
+    Test.assertEqual(1, state.currentSet.rightGames);
+    return true;
+}
+
+(:test)
+function testStarPointIsNotSilverPoint(logger as Logger) as Boolean {
+    // One broken advantage under star point must not arm the deciding point.
+    var engine = new ScoringEngine();
+    var state = startAtDeuce(engine, DEUCE_STAR_POINT, "test-st-4");
+    state = engine.applyPointWon(state, LEFT, 30);
+    state = engine.applyPointWon(state, RIGHT, 31);
+    Test.assert(!state.currentGame.isGoldenPointActive);
+    state = engine.applyPointWon(state, LEFT, 32);
+    // Second advantage is a real advantage: converting it wins the game.
+    state = engine.applyPointWon(state, LEFT, 33);
+    Test.assertEqual(1, state.currentSet.leftGames);
+    return true;
+}
+
+(:test)
+function testUndoStarPointReturnsToSecondAdvantage(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var state = startAtDeuce(engine, DEUCE_STAR_POINT, "test-st-5");
+    state = engine.applyPointWon(state, LEFT, 30);
+    state = engine.applyPointWon(state, RIGHT, 31);
+    state = engine.applyPointWon(state, RIGHT, 32);
+    state = engine.applyPointWon(state, LEFT, 33);
+    Test.assert(state.currentGame.isGoldenPointActive);
+
+    state = engine.applyUndo(state);
+    Test.assert(!state.currentGame.isGoldenPointActive);
+    Test.assertEqual(RIGHT, state.currentGame.advantageSide);
+    Test.assertEqual(1, state.currentGame.brokenAdvantageCount);
+    Test.assertEqual("Advantage 2", state.gameStatusLine());
+    return true;
+}
+
+(:test)
+function testChangingToStarPointAtDeuceLeavesTwoAdvantagesToPlay(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var state = startAtDeuce(engine, DEUCE_GOLDEN_POINT, "test-st-change-1");
+    Test.assert(state.currentGame.isGoldenPointActive);
+
+    state = engine.applySetDeuceFormat(state, DEUCE_STAR_POINT, 30);
+    Test.assert(!state.currentGame.isGoldenPointActive);
+    Test.assertEqual("Deuce 1", state.gameStatusLine());
+
+    state = engine.applyPointWon(state, LEFT, 31);
+    state = engine.applyPointWon(state, RIGHT, 32);
+    Test.assert(!state.currentGame.isGoldenPointActive);
+    state = engine.applyPointWon(state, LEFT, 33);
+    state = engine.applyPointWon(state, RIGHT, 34);
+    Test.assert(state.currentGame.isGoldenPointActive);
+    Test.assertEqual("Star Point", state.gameStatusLine());
+    return true;
+}
+
+(:test)
+function testChangingFromSilverPointDeciderToStarPointLeavesOneAdvantageToPlay(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var state = startAtDeuce(engine, DEUCE_SILVER_POINT, "test-st-change-2");
+    state = engine.applyPointWon(state, LEFT, 30);
+    state = engine.applyPointWon(state, RIGHT, 31); // silver point armed after one break
+    Test.assert(state.currentGame.isGoldenPointActive);
+
+    // Star point allows two; one has been used, so one advantage remains.
+    state = engine.applySetDeuceFormat(state, DEUCE_STAR_POINT, 32);
+    Test.assert(!state.currentGame.isGoldenPointActive);
+    Test.assertEqual("Deuce 2", state.gameStatusLine());
+
+    state = engine.applyPointWon(state, LEFT, 33);
+    Test.assertEqual("Advantage 2", state.gameStatusLine());
+    state = engine.applyPointWon(state, RIGHT, 34);
+    Test.assert(state.currentGame.isGoldenPointActive);
+    Test.assertEqual("Star Point", state.gameStatusLine());
+    return true;
+}
+
+(:test)
+function testChangingToACappedFormatAfterItsAdvantagesWereUsedArmsTheDecider(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    // Regular scoring: two advantages broken, a third one held.
+    var state = startAtDeuce(engine, DEUCE_ADVANTAGE, "test-st-change-3");
+    state = engine.applyPointWon(state, LEFT, 30);
+    state = engine.applyPointWon(state, RIGHT, 31);
+    state = engine.applyPointWon(state, LEFT, 32);
+    state = engine.applyPointWon(state, RIGHT, 33);
+    state = engine.applyPointWon(state, LEFT, 34);
+    Test.assertEqual(LEFT, state.currentGame.advantageSide);
+
+    // Star point allows only two and both are spent, so — like switching to golden —
+    // the advantage held is given up and the next rally decides.
+    state = engine.applySetDeuceFormat(state, DEUCE_STAR_POINT, 35);
+    Test.assert(state.currentGame.isGoldenPointActive);
+    Test.assert(state.currentGame.advantageSide == null);
+    Test.assertEqual("Star Point", state.gameStatusLine());
+
+    state = engine.applyPointWon(state, RIGHT, 36);
+    Test.assertEqual(1, state.currentSet.rightGames);
+    return true;
+}
+
+(:test)
+function testChangingToSilverPointAfterOneBrokenAdvantageArmsTheDecider(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var state = startAtDeuce(engine, DEUCE_ADVANTAGE, "test-sp-change-1");
+    state = engine.applyPointWon(state, LEFT, 30);
+    state = engine.applyPointWon(state, RIGHT, 31); // silver's single advantage already played
+    Test.assert(!state.currentGame.isGoldenPointActive);
+
+    state = engine.applySetDeuceFormat(state, DEUCE_SILVER_POINT, 32);
+    Test.assert(state.currentGame.isGoldenPointActive);
+    Test.assertEqual("Silver Point", state.gameStatusLine());
+    return true;
+}
+
+(:test)
+function testChangingFromStarPointDeciderToRegularDisarmsIt(logger as Logger) as Boolean {
+    var engine = new ScoringEngine();
+    var state = startAtDeuce(engine, DEUCE_STAR_POINT, "test-st-change-4");
+    state = engine.applyPointWon(state, LEFT, 30);
+    state = engine.applyPointWon(state, RIGHT, 31);
+    state = engine.applyPointWon(state, LEFT, 32);
+    state = engine.applyPointWon(state, RIGHT, 33);
+    Test.assert(state.currentGame.isGoldenPointActive);
+
+    state = engine.applySetDeuceFormat(state, DEUCE_ADVANTAGE, 34);
+    Test.assert(!state.currentGame.isGoldenPointActive);
+    Test.assertEqual("Deuce", state.gameStatusLine());
+    state = engine.applyPointWon(state, LEFT, 35);
+    Test.assertEqual(LEFT, state.currentGame.advantageSide);
+    Test.assertEqual(0, state.currentSet.leftGames);
+    return true;
+}
+
+(:test)
 function testUndoSilverPointReturnsToAdvantage(logger as Logger) as Boolean {
     var engine = new ScoringEngine();
     var state = startAtDeuce(engine, DEUCE_SILVER_POINT, "test-sp-3");
@@ -218,15 +446,32 @@ function testDeuceFormatStringRoundTrip(logger as Logger) as Boolean {
     var formats = [
         DEUCE_ADVANTAGE,
         DEUCE_SILVER_POINT,
-        DEUCE_GOLDEN_POINT
+        DEUCE_GOLDEN_POINT,
+        DEUCE_STAR_POINT
     ] as Array<DeuceFormat>;
     for (var i = 0; i < formats.size(); i += 1) {
         var raw = deuceFormatToString(formats[i]);
         Test.assertEqual(formats[i], deuceFormatFromString(raw));
     }
+    // Raw values are shared with the Swift enum.
+    Test.assertEqual("starPoint", deuceFormatToString(DEUCE_STAR_POINT));
     // Unknown and absent values fall through so callers can apply migration.
     Test.assert(deuceFormatFromString(null) == null);
     Test.assert(deuceFormatFromString("nonsense") == null);
+    return true;
+}
+
+(:test)
+function testDeuceFormatsCycleFromMostToFewestAdvantages(logger as Logger) as Boolean {
+    Test.assertEqual(DEUCE_STAR_POINT, deuceFormatAfter(DEUCE_ADVANTAGE));
+    Test.assertEqual(DEUCE_SILVER_POINT, deuceFormatAfter(DEUCE_STAR_POINT));
+    Test.assertEqual(DEUCE_GOLDEN_POINT, deuceFormatAfter(DEUCE_SILVER_POINT));
+    Test.assertEqual(DEUCE_ADVANTAGE, deuceFormatAfter(DEUCE_GOLDEN_POINT));
+
+    Test.assert(deuceFormatAdvantagesBeforeDecidingPoint(DEUCE_ADVANTAGE) == null);
+    Test.assertEqual(2, deuceFormatAdvantagesBeforeDecidingPoint(DEUCE_STAR_POINT));
+    Test.assertEqual(1, deuceFormatAdvantagesBeforeDecidingPoint(DEUCE_SILVER_POINT));
+    Test.assertEqual(0, deuceFormatAdvantagesBeforeDecidingPoint(DEUCE_GOLDEN_POINT));
     return true;
 }
 
@@ -242,18 +487,18 @@ function testArchivedMatchesKeepSilverPointBehaviour(logger as Logger) as Boolea
 (:test)
 function testPreferenceMigratesFromLegacyGoldenPointToggle(logger as Logger) as Boolean {
     // Deliberately different from the archived-match rule: only an explicit
-    // "off" carries over, everything else lands on the new default.
+    // "off" carries over, everything else lands on the product default.
     Test.assertEqual(DEUCE_ADVANTAGE, deuceFormatFromLegacyPreference(false));
-    Test.assertEqual(DEUCE_GOLDEN_POINT, deuceFormatFromLegacyPreference(true));
-    Test.assertEqual(DEUCE_GOLDEN_POINT, deuceFormatFromLegacyPreference(null));
+    Test.assertEqual(DEUCE_STAR_POINT, deuceFormatFromLegacyPreference(true));
+    Test.assertEqual(DEUCE_STAR_POINT, deuceFormatFromLegacyPreference(null));
     return true;
 }
 
 (:test)
-function testDefaultSettingsUseGoldenPoint(logger as Logger) as Boolean {
+function testDefaultSettingsUseStarPoint(logger as Logger) as Boolean {
     var settings = new MatchSettings();
-    Test.assertEqual(DEUCE_GOLDEN_POINT, settings.deuceFormat);
-    Test.assertEqual(DEUCE_GOLDEN_POINT, settings.copy().deuceFormat);
+    Test.assertEqual(DEUCE_STAR_POINT, settings.deuceFormat);
+    Test.assertEqual(DEUCE_STAR_POINT, settings.copy().deuceFormat);
     return true;
 }
 
