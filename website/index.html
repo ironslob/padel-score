@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wrist Rally — Padel scoring for Apple Watch, Garmin &amp; Wear OS</title>
+    <meta
+      name="description"
+      content="Wrist Rally keeps padel score on your wrist. One tap between rallies, instant undo, Star Point and every club format. Apple Watch, Garmin, and Wear OS — no phone required on court."
+    />
+    <meta property="og:title" content="Wrist Rally — Padel scoring on your wrist" />
+    <meta
+      property="og:description"
+      content="The padel scorekeeper for Apple Watch, Garmin, and Wear OS. Tap to score, undo a mistake, and keep your head in the rally."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://wristrally.com/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/mark.svg" />
+    <link rel="canonical" href="https://wristrally.com/" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Wrist Rally",
+        "applicationCategory": "SportsApplication",
+        "operatingSystem": "watchOS, Garmin Connect IQ, Wear OS",
+        "url": "https://wristrally.com/",
+        "description": "Padel scorekeeper for Apple Watch, Garmin, and Wear OS.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="index.html">
+          <img src="assets/mark.svg" width="32" height="32" alt="" />
+          Wrist Rally
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+          <span></span>
+        </button>
+        <nav id="site-nav" class="site-nav">
+          <a href="#features">Features</a>
+          <a href="#platforms">Platforms</a>
+          <a href="#how">How it works</a>
+          <a href="#faq">FAQ</a>
+          <a href="support.html">Support</a>
+          <a class="btn btn-small" href="#download">Get the app</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero">
+        <div class="wrap hero-grid">
+          <div>
+            <p class="eyebrow"><span class="dot"></span> Padel scoring for every watch</p>
+            <h1>Keep the score on your wrist. Keep your head in the rally.</h1>
+            <p class="lede">
+              Wrist Rally is the padel scorekeeper built for Apple Watch, Garmin, and Wear OS.
+              One tap to score. Three seconds to undo. Real padel rules — including Star Point —
+              with no phone on court.
+            </p>
+            <div class="btn-row">
+              <a class="btn btn-primary" href="#download">Get Wrist Rally</a>
+              <a class="btn btn-ghost" href="#demo">Try the scoreboard</a>
+            </div>
+            <div class="trust-row">
+              <span>Apple Watch, Garmin &amp; Wear OS</span>
+              <span>Works fully offline</span>
+              <span>Star Point by default</span>
+              <span>No account required</span>
+            </div>
+          </div>
+
+          <div class="watch-stage" id="demo">
+            <div class="watch-switch" role="tablist" aria-label="Watch platform">
+              <button type="button" role="tab" aria-selected="true" data-watch="apple">Apple Watch</button>
+              <button type="button" role="tab" aria-selected="false" data-watch="garmin">Garmin</button>
+              <button type="button" role="tab" aria-selected="false" data-watch="wear">Wear OS</button>
+            </div>
+            <div class="watch" data-bezel="apple" aria-label="Interactive Wrist Rally scoreboard">
+              <div class="watch-body"></div>
+              <div class="watch-crown" aria-hidden="true"></div>
+              <div class="watch-side" aria-hidden="true"></div>
+              <div class="watch-face">
+                <div class="score-header">
+                  <div class="score-games" id="demo-games">0 – 0</div>
+                  <span class="score-status" id="demo-status">Tap to score</span>
+                </div>
+                <div class="score-row">
+                  <button class="score-side score-us is-serving" type="button" data-side="us">
+                    <img class="serve-ball" src="assets/ball.svg" alt="" />
+                    <span class="undo-ring" hidden></span>
+                    <span class="score-num" id="score-us">0</span>
+                    <span class="score-role">Us</span>
+                  </button>
+                  <button class="score-side score-them" type="button" data-side="them">
+                    <img class="serve-ball" src="assets/ball.svg" alt="" />
+                    <span class="undo-ring" hidden></span>
+                    <span class="score-num" id="score-them">0</span>
+                    <span class="score-role">Them</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <p class="watch-hint">Tap Us or Them to score. Tap the same side again within 3 seconds to undo — just like on the watch.</p>
+            <button class="text-btn" id="demo-reset" type="button">Reset demo</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="features">
+        <div class="wrap">
+          <div class="section-head center">
+            <p class="kicker">On court</p>
+            <h2>Everything you need between rallies. Nothing you don’t.</h2>
+            <p>
+              Wrist Rally is built for players who are moving, talking, and already late on the
+              next serve. Scoring should take about a second — and recovering from a wrong tap
+              should be even faster.
+            </p>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <div class="feature-icon" aria-hidden="true">⌚</div>
+              <h3>Watch-first scoring</h3>
+              <p>
+                Two huge Us / Them buttons. Current game score, games in the set, and who’s
+                serving — all on one screen. No nested menus while the ball is in play.
+              </p>
+            </article>
+            <article class="card">
+              <div class="feature-icon" aria-hidden="true">↩️</div>
+              <h3>Undo in three seconds</h3>
+              <p>
+                Tap the same side again to cancel the last point. A countdown ring shows you
+                still have time. After a game, a brief summary still lets you undo before you
+                move on.
+              </p>
+            </article>
+            <article class="card">
+              <div class="feature-icon" aria-hidden="true">⭐</div>
+              <h3>Star Point, ready</h3>
+              <p>
+                FIP / Premier Padel Star Point is the default. Switch to silver, golden, or
+                regular advantage whenever your club or box league asks for it — even mid-match.
+              </p>
+            </article>
+            <article class="card">
+              <div class="feature-icon" aria-hidden="true">🎾</div>
+              <h3>Serve that just works</h3>
+              <p>
+                Wrist Rally tracks who is serving and rotates after every game and during
+                tie-breaks. A padel ball sits on the serving side so nobody has to ask.
+              </p>
+            </article>
+            <article class="card">
+              <div class="feature-icon" aria-hidden="true">❤️</div>
+              <h3>Tracked as a workout</h3>
+              <p>
+                Start Match starts a Health workout on Apple Watch, a FIT activity on Garmin,
+                or a Health Services exercise on Wear OS — heart rate, calories, and elapsed
+                time with the score, in one session.
+              </p>
+            </article>
+            <article class="card">
+              <div class="feature-icon" aria-hidden="true">📴</div>
+              <h3>Offline, always</h3>
+              <p>
+                Scoring never needs the internet, a backend, or a phone in your bag. The match
+                restores after a restart. Your watch is enough.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section band" id="platforms">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="kicker">Three platforms</p>
+            <h2>The watch you already wear is enough.</h2>
+            <p>
+              Scoring behaviour is identical on Apple Watch, Garmin, and Wear OS. Pick the
+              hardware you play in — Wrist Rally does not make you switch ecosystems.
+            </p>
+          </div>
+          <div class="grid-3">
+            <article class="card platform">
+              <span class="badge">Primary</span>
+              <h3>Apple Watch</h3>
+              <p>
+                The original Wrist Rally experience. Swipe Overview, Score, and Actions. Raise
+                your wrist and return to the match because the workout is yours.
+              </p>
+              <ul>
+                <li>watchOS app with iPhone companion for history and notes</li>
+                <li>HealthKit workout, complications, Live Activities</li>
+                <li>WatchConnectivity sync — watch stays authoritative on court</li>
+              </ul>
+            </article>
+            <article class="card platform">
+              <span class="badge">Connect IQ</span>
+              <h3>Garmin</h3>
+              <p>
+                The same engine on Venu, Forerunner, vívoactive, and other touchscreen watches.
+                Match history lives on the watch. The match is a real Garmin activity.
+              </p>
+              <ul>
+                <li>Connect IQ watch app, no phone required to score</li>
+                <li>FIT recording with score written into Garmin Connect</li>
+                <li>On-watch history, settings, and changeover actions</li>
+              </ul>
+            </article>
+            <article class="card platform">
+              <span class="badge">Standalone</span>
+              <h3>Wear OS</h3>
+              <p>
+                Pixel Watch, Galaxy Watch, and other Wear OS 4+ devices. Built as a standalone
+                watch app — there is no Android phone companion in this version.
+              </p>
+              <ul>
+                <li>Compose UI that follows the Apple Watch screens</li>
+                <li>Health Services exercise session per match</li>
+                <li>Identical scoring rules, including Star Point and 2 sets + TB</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="how">
+        <div class="wrap">
+          <div class="section-head center">
+            <p class="kicker">How it works</p>
+            <h2>From download to first point in three steps.</h2>
+          </div>
+          <div class="steps">
+            <article class="step">
+              <h3>Install on your watch</h3>
+              <p>
+                Open Wrist Rally on Apple Watch, Garmin, or Wear OS. Start Match. Optional
+                warm-up, then choose who serves. Defaults are best of three with Star Point —
+                change them only if you need to.
+              </p>
+            </article>
+            <article class="step">
+              <h3>Tap the side that won the rally</h3>
+              <p>
+                Big Us and Them targets. Games, sets, tie-breaks, and serve rotation are
+                automatic. Wrong tap? Hit the same button again before the ring finishes.
+              </p>
+            </article>
+            <article class="step">
+              <h3>Finish, then look back</h3>
+              <p>
+                Complete the match, end early, or discard a false start. On Apple Watch the
+                iPhone companion holds history and notes. On Garmin, history stays on the watch.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section band" id="formats">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="kicker">Formats</p>
+            <h2>Club night, box league, or FIP rules — same app.</h2>
+            <p>
+              Match length is a setting, not a project. Deuce format can change mid-match if
+              the court next door is playing a different point.
+            </p>
+          </div>
+          <div class="grid-4">
+            <article class="card format is-default">
+              <p class="meta">Default</p>
+              <h3>Star Point</h3>
+              <p>Two advantage cycles, then the next rally decides. Used by FIP, Premier Padel, and the CUPRA FIP Tour in 2026.</p>
+            </article>
+            <article class="card format">
+              <p class="meta">One advantage</p>
+              <h3>Silver Point</h3>
+              <p>Play one advantage. If it is broken, the next point wins the game.</p>
+            </article>
+            <article class="card format">
+              <p class="meta">No-ad</p>
+              <h3>Golden Point</h3>
+              <p>40–40 is immediately decisive. No advantage phase at all.</p>
+            </article>
+            <article class="card format">
+              <p class="meta">Classic</p>
+              <h3>Regular</h3>
+              <p>Advantage repeats until one pair wins two points in a row.</p>
+            </article>
+          </div>
+          <div class="grid-2" style="margin-top: 1.1rem">
+            <article class="card">
+              <h3>Match length</h3>
+              <p>One set, best of three, 2 sets + 10-point match tie-break, best of five, or continuous play for social hitting.</p>
+            </article>
+            <article class="card">
+              <h3>Tie-breaks included</h3>
+              <p>Set tie-break at 6–6 (first to 7, win by 2). Super tie-break when you choose 2 sets + TB. Serve rotation and change-sides reminders are automatic.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="faq">
+        <div class="wrap">
+          <div class="section-head center">
+            <p class="kicker">FAQ</p>
+            <h2>Straight answers before you walk on court.</h2>
+          </div>
+          <div class="faq">
+            <details>
+              <summary>Do I need my phone on court?</summary>
+              <p>
+                No. Scoring runs entirely on the watch. Apple Watch can sync history to iPhone
+                afterwards. Garmin and Wear OS score standalone. Wear OS has no Android phone
+                companion in this version.
+              </p>
+            </details>
+            <details>
+              <summary>Which watches are supported?</summary>
+              <p>
+                Apple Watch on current watchOS, Garmin touchscreen watches via Connect IQ
+                (Venu, Forerunner, vívoactive, selected fēnix / epix), and Wear OS 4+ watches
+                such as Pixel Watch and Galaxy Watch.
+              </p>
+            </details>
+            <details>
+              <summary>Does it support Star Point and golden point?</summary>
+              <p>
+                Yes. Star Point is the default. Silver point, golden point, and regular
+                advantage are in Settings. You can change deuce format during a match; completed
+                games keep their result.
+              </p>
+            </details>
+            <details>
+              <summary>What if I tap the wrong team?</summary>
+              <p>
+                Tap the same button again within about three seconds. The Actions screen can
+                undo later in the match. Game and set summaries also offer undo before you
+                continue.
+              </p>
+            </details>
+            <details>
+              <summary>Does Wrist Rally record a workout?</summary>
+              <p>
+                Yes. Starting a match tries to start a HealthKit workout, a Garmin FIT
+                activity, or a Wear OS Health Services exercise. If another app already owns
+                the session, you can continue without a workout or cancel and stop the other
+                session first.
+              </p>
+            </details>
+            <details>
+              <summary>Is there an account or cloud sync?</summary>
+              <p>
+                Not in this version. Matches live on the device. No login, no backend, no
+                live spectator sharing. That keeps scoring fast and private. Cloud sync is a
+                later milestone.
+              </p>
+            </details>
+            <details>
+              <summary>Is Wrist Rally free?</summary>
+              <p>
+                Store listings will go live with the Wrist Rally name. Pricing will be shown
+                on the App Store, Connect IQ, and Play Store when each build is published.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="section band download" id="download">
+        <div class="wrap">
+          <h2>Start scoring your next match in seconds.</h2>
+          <p>
+            Install Wrist Rally, raise your wrist, tap Start Match. Phone stays in the bag.
+            Head stays in the rally.
+          </p>
+          <div class="store-row">
+            <a class="btn store-btn is-soon" href="#download" aria-disabled="true">
+              <span>
+                <small>Coming soon</small>
+                <strong>App Store</strong>
+              </span>
+            </a>
+            <a class="btn store-btn is-soon" href="#download" aria-disabled="true">
+              <span>
+                <small>Coming soon</small>
+                <strong>Connect IQ</strong>
+              </span>
+            </a>
+            <a class="btn store-btn is-soon" href="#download" aria-disabled="true">
+              <span>
+                <small>Coming soon</small>
+                <strong>Wear OS</strong>
+              </span>
+            </a>
+          </div>
+          <p class="note">
+            App Store, Connect IQ, and Play Store listings will go live under the Wrist Rally name.
+            Want a build before then? <a href="contact.html">Get in touch</a>.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-inner">
+        <p>© <span data-year>2026</span> Wrist Rally. Padel scoring for Apple Watch, Garmin, and Wear OS.</p>
+        <div class="footer-links">
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
+          <a href="support.html">Support</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+    </footer>
+    <script src="js/site.js"></script>
+  </body>
+</html>

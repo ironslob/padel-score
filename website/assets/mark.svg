@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Wrist Rally">
+  <rect width="32" height="32" rx="8" fill="#101613"/>
+  <rect x="1" y="1" width="30" height="30" rx="7" fill="none" stroke="#2a3d34" stroke-width="1"/>
+  <rect x="5" y="8" width="10" height="16" rx="3" fill="#3b82f6" fill-opacity="0.35" stroke="#60a5fa" stroke-width="1"/>
+  <rect x="17" y="8" width="10" height="16" rx="3" fill="#ef4444" fill-opacity="0.35" stroke="#f87171" stroke-width="1"/>
+  <circle cx="16" cy="7.5" r="2.2" fill="#dff65a"/>
+</svg>
