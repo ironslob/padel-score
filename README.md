@@ -137,6 +137,7 @@ android/        Wear OS app (Kotlin domain + Compose UI)
 tests/Unit/     Scoring + persistence unit tests
 docs/           Decision log
 .github/        CI workflows (Apple + Garmin + Wear OS)
+website/        Static marketing site for wristrally.com
 project.yml     XcodeGen manifest
 WristRally.xcodeproj
 ```
@@ -151,3 +152,5 @@ WristRally.xcodeproj
 - Deuce format: regular / star point / silver point / golden point
 
 See [docs/DECISIONS.md](docs/DECISIONS.md) for engineering choices and [spec/](spec/) for authoritative requirements.
+
+The public marketing site lives in [`website/`](website/). Serve it locally with `python3 -m http.server 8080 --directory website` — see [`website/README.md`](website/README.md).
