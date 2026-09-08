@@ -440,7 +440,7 @@ struct StartMatchView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 12) {
-                Text("Padel Score")
+                Text("Wrist Rally")
                     .font(.headline)
                     .multilineTextAlignment(.center)
 

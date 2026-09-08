@@ -15,7 +15,7 @@ struct PhoneRootView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .navigationTitle("Padel Score")
+            .navigationTitle("Wrist Rally")
             .toolbar {
                 if !historyMatches.isEmpty {
                     ToolbarItem(placement: .topBarTrailing) {

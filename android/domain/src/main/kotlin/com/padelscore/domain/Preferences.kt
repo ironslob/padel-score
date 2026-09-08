@@ -79,7 +79,7 @@ object FirstLaunchTipCopy {
 
     val tipSections: List<Pair<String, String>> = listOf(
         "Health" to
-            "Padel Score needs activity permission to track the match as a workout so it can return when you raise your wrist.",
+            "Wrist Rally needs activity permission to track the match as a workout so it can return when you raise your wrist.",
         "Settings" to
             "Match length, scoring at deuce, labels, and serve options are in Settings on the home screen—set them before you start a match.",
     )
@@ -91,7 +91,7 @@ object WorkoutConflictCopy {
     const val cancelMatchStart = "Cancel match start"
     const val message =
         "Another app is already tracking, and Wear OS only allows one workout at a time. " +
-            "Without a workout, Padel Score usually won't return when you raise your wrist."
+            "Without a workout, Wrist Rally usually won't return when you raise your wrist."
     const val genericFailureMessage =
         "Could not start a workout. Scoring continues, but the app usually won't return when you raise your wrist."
     const val healthUnavailableMessage =
@@ -105,7 +105,7 @@ object DuringPlayAccessCopy {
 
     val helpSections: List<Pair<String, String>> = listOf(
         "Recents" to
-            "Swipe up from the watch face to open recent apps, then tap Padel Score. " +
+            "Swipe up from the watch face to open recent apps, then tap Wrist Rally. " +
             "Keep the app in recents so you can return between points.",
         "Glance at your wrist" to
             "Between points, the dimmed always-on screen shows the current score without opening the app.",

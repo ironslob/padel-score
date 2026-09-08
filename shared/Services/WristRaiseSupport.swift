@@ -188,7 +188,7 @@ public enum FirstLaunchTipCopy {
     public static let tipSections: [(title: String, body: String)] = [
         (
             "Health",
-            "Padel Score needs Health access to track the match as a workout so it can return when you raise your wrist."
+            "Wrist Rally needs Health access to track the match as a workout so it can return when you raise your wrist."
         ),
         (
             "Settings",
@@ -206,7 +206,7 @@ public enum WorkoutConflictCopy {
 
     public static let message =
         "Another app is already tracking, and Apple Watch only allows one workout at a time. " +
-        "Without a workout, Padel Score usually won't return when you raise your wrist."
+        "Without a workout, Wrist Rally usually won't return when you raise your wrist."
 
     public static let genericFailureMessage =
         "Could not start a Health workout. Scoring continues, but the app usually won't return when you raise your wrist."
@@ -224,13 +224,13 @@ public enum DuringPlayAccessCopy {
     public static let helpSections: [(title: String, body: String)] = [
         (
             "Smart Stack",
-            "Turn the Digital Crown up or swipe up from the watch face, tap +, and add Padel Score → Match Glance. " +
+            "Turn the Digital Crown up or swipe up from the watch face, tap +, and add Wrist Rally → Match Glance. " +
             "Pin it to keep score and elapsed time at the top. When tracking as a workout, Apple's workout timer " +
             "appears separately; Match Glance shows your score."
         ),
         (
             "Swipe up",
-            "Swipe up from the watch face to open the Dock, then tap Padel Score. " +
+            "Swipe up from the watch face to open the Dock, then tap Wrist Rally. " +
             "Pin the app in the Dock on your iPhone’s Watch app for one-tap access."
         ),
         (
@@ -239,7 +239,7 @@ public enum DuringPlayAccessCopy {
         ),
         (
             "Watch face",
-            "Add the Padel Score complication to see the score on your watch face."
+            "Add the Wrist Rally complication to see the score on your watch face."
         )
     ]
 }

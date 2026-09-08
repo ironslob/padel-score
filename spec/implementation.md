@@ -1,6 +1,6 @@
 # Implementation Specification
 
-**Project:** Padel Score
+**Project:** Wrist Rally
 
 **Version:** 1.0
 

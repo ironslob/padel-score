@@ -1,4 +1,4 @@
-# Padel Score
+# Wrist Rally
 
 Apple Watch–first padel scoring app with an iPhone companion for match history, plus Garmin and Wear OS watch ports.
 
@@ -105,8 +105,8 @@ To pair a Watch simulator with an iPhone simulator: in Xcode, Window → Devices
 
 1. Pair and unlock the Watch with the Watch app on the iPhone (same Apple ID / developer team as above).
 2. Prefer installing via the **PadelScore** iPhone scheme so the Watch app is embedded and installed automatically.
-3. On the Watch, open **Padel Score** from the app list.
-4. If it does not appear: on iPhone open Watch app → My Watch → scroll to **Padel Score** → enable **Show App on Apple Watch**, or run the **PadelScoreWatch** scheme with the physical Watch selected as destination.
+3. On the Watch, open **Wrist Rally** from the app list.
+4. If it does not appear: on iPhone open Watch app → My Watch → scroll to **Wrist Rally** → enable **Show App on Apple Watch**, or run the **PadelScoreWatch** scheme with the physical Watch selected as destination.
 5. Keep the Watch unlocked and nearby during the first install.
 
 Scoring works offline on the Watch alone. When the phone is reachable, WatchConnectivity pushes the active match and history to the iPhone companion.

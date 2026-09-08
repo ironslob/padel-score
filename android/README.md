@@ -1,4 +1,4 @@
-# Padel Score — Wear OS
+# Wrist Rally — Wear OS
 
 Standalone Wear OS scoring app, ported from the Apple Watch app.
 

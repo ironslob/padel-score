@@ -66,7 +66,7 @@ struct MatchLiveActivityView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         default:
             VStack(alignment: .leading, spacing: 4) {
-                Text("Padel Score")
+                Text("Wrist Rally")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Text("\(context.state.gameLeft)–\(context.state.gameRight)")

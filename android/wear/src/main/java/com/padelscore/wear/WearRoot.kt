@@ -152,7 +152,7 @@ fun StartMatchScreen(session: MatchSessionCoordinator, onSettings: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
-            Text("Padel Score", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+            Text("Wrist Rally", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
         }
         item {
             Button(

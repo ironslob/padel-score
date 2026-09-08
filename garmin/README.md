@@ -1,6 +1,6 @@
-# Padel Score — Garmin Connect IQ
+# Wrist Rally — Garmin Connect IQ
 
-Watch app port of Padel Score for Garmin touchscreen watches (Venu 3, Forerunner 965, etc.).
+Watch app port of Wrist Rally for Garmin touchscreen watches (Venu 3, Forerunner 965, etc.).
 
 ## Prerequisites
 

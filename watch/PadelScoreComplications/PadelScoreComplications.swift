@@ -18,7 +18,7 @@ struct ScoreComplicationWidget: Widget {
         StaticConfiguration(kind: kind, provider: ScoreComplicationProvider()) { entry in
             ScoreComplicationView(entry: entry)
         }
-        .configurationDisplayName("Padel Score")
+        .configurationDisplayName("Wrist Rally")
         .description("Shows the current match score on your watch face.")
         .supportedFamilies([
             .accessoryCircular,
@@ -255,7 +255,7 @@ struct MatchGlanceView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             } else {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Padel Score")
+                    Text("Wrist Rally")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                     Text("No active match")
