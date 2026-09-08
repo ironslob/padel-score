@@ -15,7 +15,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C02A1B5180A4ED1F44008326"
+               BlueprintIdentifier = "BBBD25E1601DA99B212FE9B6"
                BuildableName = "WristRally.app"
                BlueprintName = "WristRally"
                ReferencedContainer = "container:WristRally.xcodeproj">
@@ -32,7 +32,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C02A1B5180A4ED1F44008326"
+            BlueprintIdentifier = "BBBD25E1601DA99B212FE9B6"
             BuildableName = "WristRally.app"
             BlueprintName = "WristRally"
             ReferencedContainer = "container:WristRally.xcodeproj">
@@ -44,7 +44,7 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6DE7DC2CD4868FD5F7BC0713"
+               BlueprintIdentifier = "49A3E66DEF257976A083DA7B"
                BuildableName = "WristRallyTests.xctest"
                BlueprintName = "WristRallyTests"
                ReferencedContainer = "container:WristRally.xcodeproj">
@@ -68,7 +68,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C02A1B5180A4ED1F44008326"
+            BlueprintIdentifier = "BBBD25E1601DA99B212FE9B6"
             BuildableName = "WristRally.app"
             BlueprintName = "WristRally"
             ReferencedContainer = "container:WristRally.xcodeproj">
@@ -87,7 +87,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C02A1B5180A4ED1F44008326"
+            BlueprintIdentifier = "BBBD25E1601DA99B212FE9B6"
             BuildableName = "WristRally.app"
             BlueprintName = "WristRally"
             ReferencedContainer = "container:WristRally.xcodeproj">

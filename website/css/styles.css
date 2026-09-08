@@ -392,30 +392,6 @@ h4 {
   gap: 1rem;
 }
 
-.watch-switch {
-  display: flex;
-  padding: 0.25rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--line-strong);
-}
-
-.watch-switch button {
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  padding: 0.4rem 0.8rem;
-  border-radius: 999px;
-  cursor: pointer;
-  font-size: 0.82rem;
-  font-weight: 600;
-}
-
-.watch-switch button[aria-selected="true"] {
-  background: var(--ink);
-  color: #111;
-}
-
 .watch {
   position: relative;
   width: 18.5rem;
@@ -431,26 +407,6 @@ h4 {
   box-shadow:
     inset 0 0 0 2px #3a3d3a,
     inset 0 0 0 7px #111;
-}
-
-.watch[data-bezel="garmin"] .watch-body,
-.watch[data-bezel="wear"] .watch-body {
-  inset: 0.35rem 1.55rem;
-  border-radius: 50%;
-}
-
-.watch[data-bezel="garmin"] .watch-body {
-  background: radial-gradient(circle at 35% 20%, #4a524c, #151716 58%);
-  box-shadow:
-    inset 0 0 0 3px #8b9288,
-    inset 0 0 0 10px #1b1d1b;
-}
-
-.watch[data-bezel="wear"] .watch-body {
-  background: radial-gradient(circle at 40% 18%, #3a3228, #0e0d0c 60%);
-  box-shadow:
-    inset 0 0 0 2px #c4a574,
-    inset 0 0 0 8px #171412;
 }
 
 .watch-crown,
@@ -473,141 +429,20 @@ h4 {
   opacity: 0.85;
 }
 
-.watch[data-bezel="garmin"] .watch-crown,
-.watch[data-bezel="garmin"] .watch-side,
-.watch[data-bezel="wear"] .watch-crown,
-.watch[data-bezel="wear"] .watch-side {
-  display: none;
-}
-
 .watch-face {
   position: absolute;
   inset: 0.85rem 0.85rem 0.95rem;
   border-radius: 2.65rem;
   background: #050605;
-  display: flex;
-  flex-direction: column;
-  padding: 1.15rem 0.85rem 0.95rem;
-  gap: 0.7rem;
-}
-
-.watch[data-bezel="garmin"] .watch-face,
-.watch[data-bezel="wear"] .watch-face {
-  inset: 1.55rem 2.55rem;
-  border-radius: 50%;
-  padding: 1.7rem 1.05rem 1.15rem;
-}
-
-.watch[data-bezel="garmin"] .score-side,
-.watch[data-bezel="wear"] .score-side {
-  min-height: 0;
-}
-
-.score-header {
-  text-align: center;
-  min-height: 2.4rem;
-}
-
-.score-games {
-  font-family: var(--display);
-  font-size: 1.35rem;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.03em;
-}
-
-.score-status {
-  display: block;
-  font-size: 0.72rem;
-  color: var(--muted);
-  min-height: 1em;
-}
-
-.score-status.is-hot {
-  color: var(--warn);
-  font-weight: 700;
-}
-
-.score-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  flex: 1;
-}
-
-.score-side {
-  position: relative;
-  border: 2px solid transparent;
-  border-radius: 0.85rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.15rem;
-  cursor: pointer;
-  color: #fff;
   overflow: hidden;
-  min-height: 7.5rem;
 }
 
-.score-us {
-  background: var(--us-soft);
-  border-color: rgba(96, 165, 250, 0.45);
-}
-
-.score-them {
-  background: var(--them-soft);
-  border-color: rgba(248, 113, 113, 0.45);
-}
-
-.score-side:focus-visible {
-  outline: 2px solid var(--ball);
-  outline-offset: 2px;
-}
-
-.score-num {
-  font-family: var(--display);
-  font-size: 2.15rem;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-
-.score-role {
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.serve-ball {
-  position: absolute;
-  top: 0.45rem;
-  width: 0.85rem;
-  height: 0.85rem;
-  opacity: 0;
-}
-
-.score-side.is-serving .serve-ball {
-  opacity: 1;
-}
-
-.undo-ring {
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  pointer-events: none;
-  background: conic-gradient(from -90deg, currentColor calc(var(--p, 0) * 1%), transparent 0);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  padding: 3px;
-}
-
-.score-us .undo-ring {
-  color: #93c5fd;
-}
-
-.score-them .undo-ring {
-  color: #fca5a5;
+.watch-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border: 0;
 }
 
 .watch-hint {
@@ -615,19 +450,6 @@ h4 {
   font-size: 0.88rem;
   text-align: center;
   max-width: 28ch;
-}
-
-.demo-flash {
-  animation: pulse 0.28s var(--ease);
-}
-
-@keyframes pulse {
-  from {
-    transform: scale(0.97);
-  }
-  to {
-    transform: scale(1);
-  }
 }
 
 /* Sections */

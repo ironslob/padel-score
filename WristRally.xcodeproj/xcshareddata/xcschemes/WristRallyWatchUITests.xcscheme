@@ -8,6 +8,20 @@
       runPostActionsOnFailure = "NO">
       <BuildActionEntries>
          <BuildActionEntry
+            buildForTesting = "NO"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "224534605DFA3D4B4A14286D"
+               BuildableName = "WristRallyWatch.app"
+               BlueprintName = "WristRallyWatch"
+               ReferencedContainer = "container:WristRally.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
             buildForTesting = "YES"
             buildForRunning = "NO"
             buildForProfiling = "NO"
@@ -15,9 +29,9 @@
             buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "49A3E66DEF257976A083DA7B"
-               BuildableName = "WristRallyTests.xctest"
-               BlueprintName = "WristRallyTests"
+               BlueprintIdentifier = "BD0EA7FB9C3C1971E09884F4"
+               BuildableName = "WristRallyWatchUITests.xctest"
+               BlueprintName = "WristRallyWatchUITests"
                ReferencedContainer = "container:WristRally.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +46,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "49A3E66DEF257976A083DA7B"
-            BuildableName = "WristRallyTests.xctest"
-            BlueprintName = "WristRallyTests"
+            BlueprintIdentifier = "BD0EA7FB9C3C1971E09884F4"
+            BuildableName = "WristRallyWatchUITests.xctest"
+            BlueprintName = "WristRallyWatchUITests"
             ReferencedContainer = "container:WristRally.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -44,9 +58,9 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "49A3E66DEF257976A083DA7B"
-               BuildableName = "WristRallyTests.xctest"
-               BlueprintName = "WristRallyTests"
+               BlueprintIdentifier = "BD0EA7FB9C3C1971E09884F4"
+               BuildableName = "WristRallyWatchUITests.xctest"
+               BlueprintName = "WristRallyWatchUITests"
                ReferencedContainer = "container:WristRally.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -64,15 +78,16 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "49A3E66DEF257976A083DA7B"
-            BuildableName = "WristRallyTests.xctest"
-            BlueprintName = "WristRallyTests"
+            BlueprintIdentifier = "224534605DFA3D4B4A14286D"
+            BuildableName = "WristRallyWatch.app"
+            BlueprintName = "WristRallyWatch"
             ReferencedContainer = "container:WristRally.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -80,15 +95,16 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "49A3E66DEF257976A083DA7B"
-            BuildableName = "WristRallyTests.xctest"
-            BlueprintName = "WristRallyTests"
+            BlueprintIdentifier = "224534605DFA3D4B4A14286D"
+            BuildableName = "WristRallyWatch.app"
+            BlueprintName = "WristRallyWatch"
             ReferencedContainer = "container:WristRally.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

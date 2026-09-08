@@ -175,6 +175,21 @@ targets:
       TEST_HOST: ""
       BUNDLE_LOADER: ""
 
+  WristRallyWatchUITests:
+    type: bundle.ui-testing
+    platform: watchOS
+    sources:
+      - path: watch/WristRallyWatchUITests
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.wristrally.watchkitapp.uitests
+      TEST_TARGET_NAME: WristRallyWatch
+      GENERATE_INFOPLIST_FILE: YES
+      TARGETED_DEVICE_FAMILY: "4"
+      SDKROOT: watchos
+      SUPPORTED_PLATFORMS: "watchos watchsimulator"
+    dependencies:
+      - target: WristRallyWatch
+
 schemes:
   WristRally:
     build:
@@ -189,6 +204,14 @@ schemes:
     build:
       targets:
         WristRallyWatch: [all]
+  WristRallyWatchUITests:
+    build:
+      targets:
+        WristRallyWatch: [all]
+        WristRallyWatchUITests: [test]
+    test:
+      targets:
+        - WristRallyWatchUITests
   WristRallyTests:
     build:
       targets:

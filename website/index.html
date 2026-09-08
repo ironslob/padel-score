@@ -74,7 +74,7 @@
             </p>
             <div class="btn-row">
               <a class="btn btn-primary" href="#download">Get Wrist Rally</a>
-              <a class="btn btn-ghost" href="#demo">Try the scoreboard</a>
+              <a class="btn btn-ghost" href="#demo">See it in action</a>
             </div>
             <div class="trust-row">
               <span>Apple Watch, Garmin &amp; Wear OS</span>
@@ -85,38 +85,32 @@
           </div>
 
           <div class="watch-stage" id="demo">
-            <div class="watch-switch" role="tablist" aria-label="Watch platform">
-              <button type="button" role="tab" aria-selected="true" data-watch="apple">Apple Watch</button>
-              <button type="button" role="tab" aria-selected="false" data-watch="garmin">Garmin</button>
-              <button type="button" role="tab" aria-selected="false" data-watch="wear">Wear OS</button>
-            </div>
-            <div class="watch" data-bezel="apple" aria-label="Interactive Wrist Rally scoreboard">
+            <div class="watch">
               <div class="watch-body"></div>
               <div class="watch-crown" aria-hidden="true"></div>
               <div class="watch-side" aria-hidden="true"></div>
               <div class="watch-face">
-                <div class="score-header">
-                  <div class="score-games" id="demo-games">0 – 0</div>
-                  <span class="score-status" id="demo-status">Tap to score</span>
-                </div>
-                <div class="score-row">
-                  <button class="score-side score-us is-serving" type="button" data-side="us">
-                    <img class="serve-ball" src="assets/ball.svg" alt="" />
-                    <span class="undo-ring" hidden></span>
-                    <span class="score-num" id="score-us">0</span>
-                    <span class="score-role">Us</span>
-                  </button>
-                  <button class="score-side score-them" type="button" data-side="them">
-                    <img class="serve-ball" src="assets/ball.svg" alt="" />
-                    <span class="undo-ring" hidden></span>
-                    <span class="score-num" id="score-them">0</span>
-                    <span class="score-role">Them</span>
-                  </button>
-                </div>
+                <video
+                  class="watch-video"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                  poster="assets/score-demo.jpg"
+                  aria-label="Wrist Rally on Apple Watch: tap Us or Them to score, tap again within three seconds to undo"
+                >
+                  <source src="assets/score-demo.mp4" type="video/mp4" />
+                </video>
+                <noscript>
+                  <img
+                    class="watch-video"
+                    src="assets/score-demo.gif"
+                    alt="Wrist Rally scoring on Apple Watch: Us and Them buttons, serve ball, and a game in progress"
+                  />
+                </noscript>
               </div>
             </div>
-            <p class="watch-hint">Tap Us or Them to score. Tap the same side again within 3 seconds to undo — just like on the watch.</p>
-            <button class="text-btn" id="demo-reset" type="button">Reset demo</button>
+            <p class="watch-hint">Wrist Rally on Apple Watch. One tap to score; tap the same side again within three seconds to undo.</p>
           </div>
         </div>
       </section>

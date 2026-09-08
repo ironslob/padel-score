@@ -7,427 +7,447 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		03EF74EFE76E9D3FEE3DCEBA /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */; };
-		040B57A51E6C1A70F7B59B36 /* MatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC88226DEFCD298F1B0BD27F /* MatchStatus.swift */; };
-		04693C8BFD4F9BF094126DC8 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F39A6BB8A9C87682706C31 /* Side.swift */; };
-		05B8B333975B2337AC78A7B1 /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5280AF8EE3046E27284AC07 /* MatchScoreSnapshot.swift */; };
-		068914E9B015B8B918079194 /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AE16A34EFD9E8C139CDB82 /* MatchSettings.swift */; };
-		06E57F55D620F5AD181A5509 /* ScoringEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3A3C1839AE335315C3B2EC /* ScoringEngineTests.swift */; };
-		07F297C2B438902044E72514 /* MatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC88226DEFCD298F1B0BD27F /* MatchStatus.swift */; };
-		08D183B8CD531D8014DE4955 /* WristRallyLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0C3B2561AD78B79ABA7948E /* WristRallyLiveActivity.swift */; };
-		0EFA86C13AA0906016A027C4 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E569C0959CB5D66455E0238 /* DurationFormatter.swift */; };
-		106555E2E5C57A750D6F446D /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E569C0959CB5D66455E0238 /* DurationFormatter.swift */; };
-		1369E0EEB77F4CBECACBA31C /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AE16A34EFD9E8C139CDB82 /* MatchSettings.swift */; };
-		13B10553DDE7A0A081E414A8 /* MatchScoreSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD602323CFA1E272F96BA1B5 /* MatchScoreSnapshotTests.swift */; };
-		1463EBD46CB9D0593AE8B752 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E569C0959CB5D66455E0238 /* DurationFormatter.swift */; };
-		14919B8F2DADC81367C3C5A8 /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FDA4B4F2922F76A4458E484 /* MatchLiveActivityLifecycle.swift */; };
-		1D05611BFA160D28C325E127 /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AE16A34EFD9E8C139CDB82 /* MatchSettings.swift */; };
-		1D27E908C4DB4ADBF4091BA9 /* WatchRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F9E3CF93B6EA45A583A60F /* WatchRootView.swift */; };
-		1E47734A4283C2554AF40D0E /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAE2617B6059D58700143F9 /* MatchStore.swift */; };
-		1F1DF178045BF3E5E86B822D /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB0B8A61BC8E866C82DE480 /* ScoringEngine.swift */; };
-		237C88A89C80EA16421FA5C4 /* MatchLiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FCE07AE677E1B7FE1702AD1 /* MatchLiveActivityManager.swift */; };
-		24263AA00F1D34F114F52971 /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AE16A34EFD9E8C139CDB82 /* MatchSettings.swift */; };
-		26D0ADDF62A10E701511778B /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */; };
-		27022B2D2921EE928A0FB720 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 28AB730EEDD36D17F4FCCE64 /* Assets.xcassets */; };
-		2D107A3BEEDD6C0FD0845CE0 /* PhoneRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22CC73634E156D71C6D5919E /* PhoneRootView.swift */; };
-		2D1CE91BB767A2BE61394410 /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */; };
-		2D56650F632ED40535BC21E0 /* WristRaiseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6655781AD5469BC748B7FC /* WristRaiseSupport.swift */; };
-		2FB79EACA46DFC1619126DBA /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FDA4B4F2922F76A4458E484 /* MatchLiveActivityLifecycle.swift */; };
-		3398CE72C2CAE6EE6C02C2BE /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5280AF8EE3046E27284AC07 /* MatchScoreSnapshot.swift */; };
-		36D1661CB56F2E812B71F02E /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */; };
-		3C9EDABB059B0CE556070578 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E569C0959CB5D66455E0238 /* DurationFormatter.swift */; };
-		3CC5E0C54C636FEA7214A649 /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F667B5CAD398361E2A01A9D /* MatchEvent.swift */; };
-		3F78018956A9FBF94D1B0549 /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99CC8397F215F09A6AC2A53E /* MatchState.swift */; };
-		4D82F3361DC385D4354DC4A6 /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99CC8397F215F09A6AC2A53E /* MatchState.swift */; };
-		4E367278A05149090C45A924 /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F667B5CAD398361E2A01A9D /* MatchEvent.swift */; };
-		525B41F520221ED82115C1E1 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E569C0959CB5D66455E0238 /* DurationFormatter.swift */; };
-		56A05B9CDD495AD682908B19 /* MatchOverviewScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7784767F602335AA12F76C2F /* MatchOverviewScreen.swift */; };
-		5D9124131879AC965156B168 /* WristRallyComplications.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3DF20D1E4C32A866863ADBBB /* WristRallyComplications.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		5DC6C3BC583F898B4DFB46F7 /* WristRaiseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6655781AD5469BC748B7FC /* WristRaiseSupport.swift */; };
-		5F5BF498B484EB383D7E6BCF /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AE16A34EFD9E8C139CDB82 /* MatchSettings.swift */; };
-		66320465F9D1099263F7A393 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F39A6BB8A9C87682706C31 /* Side.swift */; };
-		67FBAE848484D09FDE2306D2 /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAE2617B6059D58700143F9 /* MatchStore.swift */; };
-		6B919D9C92922422D409B2CF /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99CC8397F215F09A6AC2A53E /* MatchState.swift */; };
-		6DE6E0825F16BAC73B6F0DE5 /* MatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC88226DEFCD298F1B0BD27F /* MatchStatus.swift */; };
-		705F5F748D73819E71400061 /* WristRallyWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 7EECBA3C216DC597AF5042BA /* WristRallyWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		7207E92405D5B7C355F8685D /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */; };
-		725A7B8089A6D94CCB21C514 /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */; };
-		748A2721FE819EC4D0873E75 /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED2219439EB11A50944927C /* MatchService.swift */; };
-		76E2EADC52C8CA461B6083A4 /* MatchCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5534DDF606242531FBBB7534 /* MatchCompleteView.swift */; };
-		78AFC5EECDF9B906D09568C9 /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F667B5CAD398361E2A01A9D /* MatchEvent.swift */; };
-		7A020E09D2BD9BEFB03B3795 /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FDA4B4F2922F76A4458E484 /* MatchLiveActivityLifecycle.swift */; };
-		7A2ACCEA5BF1BCF9401C6A8F /* MatchSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B58B293D12B0633725EF30 /* MatchSessionCoordinator.swift */; };
-		7AA38F4A869E1667D9FDBBDB /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F667B5CAD398361E2A01A9D /* MatchEvent.swift */; };
-		7ADC5D3E3980D883DE1934D4 /* WristRaiseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6655781AD5469BC748B7FC /* WristRaiseSupport.swift */; };
-		7B8189E4804A5A2E0B8D78B7 /* WristRaiseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6655781AD5469BC748B7FC /* WristRaiseSupport.swift */; };
-		7E4E1D169C820FB3FBE29075 /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99CC8397F215F09A6AC2A53E /* MatchState.swift */; };
-		7F1C0ABD8315213BC60C74E0 /* ScoreScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 814FBB77004712A10C28A4C1 /* ScoreScreen.swift */; };
-		825CC5AAC6DFC4F0535DE543 /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED2219439EB11A50944927C /* MatchService.swift */; };
-		8283D59E9B1B41475450DCB4 /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */; };
-		8464016A350118613A6F2CBD /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAE2617B6059D58700143F9 /* MatchStore.swift */; };
-		8578E5765B465E97E6BE32CE /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F667B5CAD398361E2A01A9D /* MatchEvent.swift */; };
-		85B5A6871B492EA7C95ED8A5 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F39A6BB8A9C87682706C31 /* Side.swift */; };
-		8851D025EC8D3054D944D568 /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FDA4B4F2922F76A4458E484 /* MatchLiveActivityLifecycle.swift */; };
-		8855C29E3A61EB7EC6EE226F /* WristRallyWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2477DA544767D8F8F7C428A /* WristRallyWatchApp.swift */; };
-		899F404562795E243CA9B8A9 /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAE2617B6059D58700143F9 /* MatchStore.swift */; };
-		94DA941A86FEFE71AA3D4BCD /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5280AF8EE3046E27284AC07 /* MatchScoreSnapshot.swift */; };
-		988C3E02A8A143389C2A22A1 /* MatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC88226DEFCD298F1B0BD27F /* MatchStatus.swift */; };
-		9908FAFE56F6B75A30F9A887 /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5280AF8EE3046E27284AC07 /* MatchScoreSnapshot.swift */; };
-		A329BC2AEEEBF77221738A05 /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAE2617B6059D58700143F9 /* MatchStore.swift */; };
-		A4AB22CF8A715F5698D930E5 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F39A6BB8A9C87682706C31 /* Side.swift */; };
-		A7B58122276B14213B16A718 /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB0B8A61BC8E866C82DE480 /* ScoringEngine.swift */; };
-		A7DC2D4D4BEE89559EEA0448 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F39A6BB8A9C87682706C31 /* Side.swift */; };
-		A823F4F61F7FD143EF3F84B4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 864E2F147507D3F815A808AE /* Assets.xcassets */; };
-		AB0D62D446D04A41BC058C02 /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5280AF8EE3046E27284AC07 /* MatchScoreSnapshot.swift */; };
-		AF9A29F298B82C273E6695DB /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */; };
-		B548E8CE5FFABBF5666F2475 /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */; };
-		B87E2AA087F1C368DCBDB02A /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99CC8397F215F09A6AC2A53E /* MatchState.swift */; };
-		BF080741067D2EB6D16A7E4A /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB0B8A61BC8E866C82DE480 /* ScoringEngine.swift */; };
-		C1A7884444757AD4A69B4CAA /* WristRallyLiveActivity.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5EC885D5139C7BFEEEA3D62A /* WristRallyLiveActivity.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		C2188E92550397E384518DA9 /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */; };
-		C3A91687F7007A0A377E917A /* WarmUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB100B77BCD9FF2A72C7B2EB /* WarmUpView.swift */; };
-		C8662ADECB22DEC12008A394 /* WristRallyComplications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A33452D4B6D5430B73DE194 /* WristRallyComplications.swift */; };
-		CDF6DDE4A18EB6A3D3F0122F /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */; };
-		CF365B4DB69B504496179938 /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED2219439EB11A50944927C /* MatchService.swift */; };
-		D03A6B1507341602F0F763C0 /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED2219439EB11A50944927C /* MatchService.swift */; };
-		D1EA181893A44DD35F66198D /* MatchServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3429803BAEF2F899EDA8F51 /* MatchServiceTests.swift */; };
-		D9C5CDEA78303C43F4C28602 /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED2219439EB11A50944927C /* MatchService.swift */; };
-		DB1C76ACB2A6561C876EE7DE /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB0B8A61BC8E866C82DE480 /* ScoringEngine.swift */; };
-		DF63EE4162D80A1D2249F790 /* MatchDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33F839A16B12716B5C4C16F8 /* MatchDetailView.swift */; };
-		E15AC29AC566F6647F1AEF6F /* MatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC88226DEFCD298F1B0BD27F /* MatchStatus.swift */; };
-		E2209B5327DE9A358282734D /* WristRaiseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6655781AD5469BC748B7FC /* WristRaiseSupport.swift */; };
-		E5C94A1F8AC9F4BFC7C0C261 /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */; };
-		EB869FAA66CE4311EDFBD3F6 /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB0B8A61BC8E866C82DE480 /* ScoringEngine.swift */; };
-		ED5F700D9336127D8D9A5128 /* ActionsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C830D43DC864380321C452BB /* ActionsScreen.swift */; };
-		EDE1D66587A2E1B9E7E0C5DC /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FDA4B4F2922F76A4458E484 /* MatchLiveActivityLifecycle.swift */; };
-		F14E69F6674D310F97A51B47 /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */; };
-		F6BEF7C674F21E5564C5F1BC /* WristRallyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89612FA01E3330D57011549 /* WristRallyApp.swift */; };
-		F722101338D0A58B0E62EC6F /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */; };
-		F7380CBB1305FEC26BF90F6F /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */; };
+		0041E314566CCFAEBB86F81F /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C49A0CE7B55202D864B212 /* MatchSettings.swift */; };
+		03AFEC79C6EF81446B54DD71 /* MatchSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74C915D4D28B643ABD069F0D /* MatchSessionCoordinator.swift */; };
+		08110C22380689173725F2EE /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7EC0062A2AAA75A5A486EE0 /* MatchLiveActivityLifecycle.swift */; };
+		09074C5FF2BA64B65F118F22 /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0641F09E472E915C952437 /* MatchService.swift */; };
+		09936776C76AF5F6F7DE511D /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BAC09CC60A123DC511A9D9 /* ScoringEngine.swift */; };
+		0C90E0EB963228388048E768 /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8D4F96C0E5D66C7DDE307B /* MatchSyncCoordinator.swift */; };
+		0CEC6181F1D8CBCCF661B230 /* MatchScoreSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77DAE269A6BB00BAE58B908F /* MatchScoreSnapshotTests.swift */; };
+		1043065C629EBA5F9E805E52 /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 064849946BD659779C7489E8 /* MatchScoreSnapshot.swift */; };
+		139067171EF44CC2B501CDF7 /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7EC0062A2AAA75A5A486EE0 /* MatchLiveActivityLifecycle.swift */; };
+		1CBC5EDA3B0B0E4F2DDAC5B7 /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 064849946BD659779C7489E8 /* MatchScoreSnapshot.swift */; };
+		1E285255D649C2B1EA90B568 /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB75971DE11B17E3AF7E42E /* MatchEvent.swift */; };
+		1FE31F9C49954291F4B40777 /* WristRallyWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA2B4629E7CD1011FB6C55E /* WristRallyWatchApp.swift */; };
+		2388F3CD046FDFC69AD872B8 /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0641F09E472E915C952437 /* MatchService.swift */; };
+		262B4FC9FE6E16571ECEFDB0 /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C49A0CE7B55202D864B212 /* MatchSettings.swift */; };
+		2A04F22FBE13852E9B640C76 /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7EC0062A2AAA75A5A486EE0 /* MatchLiveActivityLifecycle.swift */; };
+		2AEAEA4BA2DDBD8FA5D4A4CA /* WristRaiseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4527CA13271B01C69B183E8B /* WristRaiseSupport.swift */; };
+		2EB0F487572F7CDA812E1C96 /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8862C8B5FBC0F7C9ED85AC /* MatchStore.swift */; };
+		358CDFA536130B1C5B59A9FD /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C49A0CE7B55202D864B212 /* MatchSettings.swift */; };
+		35950E4976D52903728856A6 /* WristRallyComplications.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EEDF0C9711C9EE6AE00FE3CD /* WristRallyComplications.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		374959AF04D09E7DE0A492B8 /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB75971DE11B17E3AF7E42E /* MatchEvent.swift */; };
+		3837F21B8EBC510EA328AAC5 /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 064849946BD659779C7489E8 /* MatchScoreSnapshot.swift */; };
+		3B32CC830E09A042A81BB2D4 /* WristRallyLiveActivity.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9E5D060EEBB17ABD258D92E2 /* WristRallyLiveActivity.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3C026649D160633CF0006B94 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D74FE4CF10B78E4EF86265A6 /* Assets.xcassets */; };
+		3DBB6BF4D384FD93F1C29BB5 /* MatchServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EEC7A89523A58E5B43869D /* MatchServiceTests.swift */; };
+		41A18DD6A9D199FF8A445347 /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B749836114B95C8BC3FA03A /* WorkoutPauseResumeLogic.swift */; };
+		455D436ADE447FAFD7929A60 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 290F1704E35CBCBF36A2B6C7 /* Assets.xcassets */; };
+		4745EF35F6791DF74BBC3363 /* WristRaiseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4527CA13271B01C69B183E8B /* WristRaiseSupport.swift */; };
+		48BE49EC711DE39EF65C596D /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0641F09E472E915C952437 /* MatchService.swift */; };
+		494D5359EF9B131D69F0A0A5 /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B749836114B95C8BC3FA03A /* WorkoutPauseResumeLogic.swift */; };
+		536676250C4599D14E741742 /* MatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB4CFFDCC3F25683D0B4737D /* MatchStatus.swift */; };
+		53D77188E4C81F2080480B6A /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710B3DF8C8B9B684603E748A /* MatchAction.swift */; };
+		559F248F52CA2A8F078615FC /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C49A0CE7B55202D864B212 /* MatchSettings.swift */; };
+		57CA9DB52DAA8B613C945C64 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA4F8EE1E1BC48E2A78D3CA /* Side.swift */; };
+		5CB7D16DCB13F8C4248DBC90 /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7EC0062A2AAA75A5A486EE0 /* MatchLiveActivityLifecycle.swift */; };
+		66D228E81C6F5FD64DB941C0 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0DF7996A19D1164B61938F /* DurationFormatter.swift */; };
+		695E5F4F4C14ADBC0A898427 /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C4954732C56A02961A09E80 /* MatchState.swift */; };
+		6AC76535AAE759D673FB841A /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB75971DE11B17E3AF7E42E /* MatchEvent.swift */; };
+		6B54C06E1C369CA0C4DE3686 /* ScoreScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D40FF58A84C0DACA116535 /* ScoreScreen.swift */; };
+		6B5ADDECFC1DE084DA1F689B /* MarketingDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055FD85A19ABEDE1101F1A4F /* MarketingDemoTests.swift */; };
+		6CC754AB3529AA52CC5CCA2A /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B749836114B95C8BC3FA03A /* WorkoutPauseResumeLogic.swift */; };
+		6E8127A26CBB7799B9091D4C /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA4F8EE1E1BC48E2A78D3CA /* Side.swift */; };
+		70364B7CE1F5839035B7B6D4 /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB75971DE11B17E3AF7E42E /* MatchEvent.swift */; };
+		72A56BE4752EA35FEB0A8905 /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710B3DF8C8B9B684603E748A /* MatchAction.swift */; };
+		7655FA8C5A5529D5E769E514 /* MatchCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F7B721603C48497AE2F1653 /* MatchCompleteView.swift */; };
+		76A55B8C1CC97CB7E0941557 /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8862C8B5FBC0F7C9ED85AC /* MatchStore.swift */; };
+		7BA6B2871BED46E8688F13A1 /* WristRallyWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 2A6F7B3CF9E6CCF742766D4A /* WristRallyWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7C36ABDE366AABA9EE787FA0 /* WristRallyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2FB2D30608A36D62DD3E781 /* WristRallyApp.swift */; };
+		7C68114583BE8034D15228AC /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BAC09CC60A123DC511A9D9 /* ScoringEngine.swift */; };
+		7DBDDDCAA8065ECBD17CA648 /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710B3DF8C8B9B684603E748A /* MatchAction.swift */; };
+		7E92D7EBCFF349F1A99B8491 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA4F8EE1E1BC48E2A78D3CA /* Side.swift */; };
+		7F923EB099948FD26C3377E3 /* MatchSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C49A0CE7B55202D864B212 /* MatchSettings.swift */; };
+		825781CFFD04C19DD7334399 /* WatchRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC78DB365202CC5ABA76C2F /* WatchRootView.swift */; };
+		83207B67D1BAFAF1FF0E7300 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0DF7996A19D1164B61938F /* DurationFormatter.swift */; };
+		8406C8420CEA71774306C209 /* MatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB4CFFDCC3F25683D0B4737D /* MatchStatus.swift */; };
+		8B411A16FE76BD58BA8B4885 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0DF7996A19D1164B61938F /* DurationFormatter.swift */; };
+		8BA6855D33A68BC641B04210 /* WristRaiseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4527CA13271B01C69B183E8B /* WristRaiseSupport.swift */; };
+		903856F9DA2C535568E35547 /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BAC09CC60A123DC511A9D9 /* ScoringEngine.swift */; };
+		90CCD778643B0A9EDC6E2A49 /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C4954732C56A02961A09E80 /* MatchState.swift */; };
+		91C763E3D3591996EDBB9D6B /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BAC09CC60A123DC511A9D9 /* ScoringEngine.swift */; };
+		921EF7836C393D26F63BA443 /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8862C8B5FBC0F7C9ED85AC /* MatchStore.swift */; };
+		935C5FAE38C254523126DAEC /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0DF7996A19D1164B61938F /* DurationFormatter.swift */; };
+		965505B7C56E8A1C421905CC /* MatchLiveActivityLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7EC0062A2AAA75A5A486EE0 /* MatchLiveActivityLifecycle.swift */; };
+		967C2164B437ED4B71259DB3 /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B749836114B95C8BC3FA03A /* WorkoutPauseResumeLogic.swift */; };
+		997CEEA7643228E62FD423F1 /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710B3DF8C8B9B684603E748A /* MatchAction.swift */; };
+		9B10F05E7F3B7CD9A095DACC /* WristRaiseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4527CA13271B01C69B183E8B /* WristRaiseSupport.swift */; };
+		9B89620F1D0788785FE06D6B /* MatchEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB75971DE11B17E3AF7E42E /* MatchEvent.swift */; };
+		9EBABF96693DD31B418159EE /* MatchLiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3B0BBDE39FD20F9EA838EFC /* MatchLiveActivityManager.swift */; };
+		A44C7C214C1FDD4400E2F6D0 /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8D4F96C0E5D66C7DDE307B /* MatchSyncCoordinator.swift */; };
+		A82DC26D12D2156A76AD0B0E /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA4F8EE1E1BC48E2A78D3CA /* Side.swift */; };
+		A8FBDDDD7C1C8C5F1468BFF4 /* MatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB4CFFDCC3F25683D0B4737D /* MatchStatus.swift */; };
+		B43F2C8CC995C697E81B6B1E /* MatchOverviewScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D83F22CC1923CD1BE30C894A /* MatchOverviewScreen.swift */; };
+		B87EACE416EF6F2B03B54693 /* WarmUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E0CC42E61AF1ACF9C55C21 /* WarmUpView.swift */; };
+		BC6358D08160FE6179E0ABC2 /* MatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB4CFFDCC3F25683D0B4737D /* MatchStatus.swift */; };
+		BE9E52AC36E79493BE16F229 /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C4954732C56A02961A09E80 /* MatchState.swift */; };
+		BEB8360628DB123EC7A63E8E /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA4F8EE1E1BC48E2A78D3CA /* Side.swift */; };
+		BF10BA5562D3D9128A7AB5CF /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C4954732C56A02961A09E80 /* MatchState.swift */; };
+		BF568019C090A304FA314408 /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0641F09E472E915C952437 /* MatchService.swift */; };
+		C2BD6AE5267C23CA863A0222 /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 064849946BD659779C7489E8 /* MatchScoreSnapshot.swift */; };
+		C4B76DDBD7C0447732BA12C4 /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8862C8B5FBC0F7C9ED85AC /* MatchStore.swift */; };
+		CA3AD9339BCE0C07ABEC19FC /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8D4F96C0E5D66C7DDE307B /* MatchSyncCoordinator.swift */; };
+		CBB7324BCC7331F9C1206ACF /* MatchDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC688173CD695EB37C65AB0 /* MatchDetailView.swift */; };
+		CC1E57ED412808A3FB9A3A7A /* MatchScoreSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 064849946BD659779C7489E8 /* MatchScoreSnapshot.swift */; };
+		D4C6F7370AA4BD0EDB1941EB /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0DF7996A19D1164B61938F /* DurationFormatter.swift */; };
+		D81C349143FD9A8987017396 /* MatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8862C8B5FBC0F7C9ED85AC /* MatchStore.swift */; };
+		DD57A96D7A1C224EB0184423 /* WristRaiseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4527CA13271B01C69B183E8B /* WristRaiseSupport.swift */; };
+		DFB4CAB3E9C17B76AF30CA20 /* WorkoutPauseResumeLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B749836114B95C8BC3FA03A /* WorkoutPauseResumeLogic.swift */; };
+		E28764EF73ABA470FB8AC8EA /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C4954732C56A02961A09E80 /* MatchState.swift */; };
+		E5CE7449964C6C3E345A515C /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8D4F96C0E5D66C7DDE307B /* MatchSyncCoordinator.swift */; };
+		E68BFB40AF41F2255D77222C /* ScoringEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D921D8DAC1760686F73758D /* ScoringEngineTests.swift */; };
+		E78CF0ABE88A6C1C48C4E18D /* MatchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 710B3DF8C8B9B684603E748A /* MatchAction.swift */; };
+		EBF467DF5475664254A733C9 /* WristRallyComplications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 196CD6027D67DEB28ABEB5A7 /* WristRallyComplications.swift */; };
+		EE49E2E85EE84862A6E35AD2 /* MatchSyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8D4F96C0E5D66C7DDE307B /* MatchSyncCoordinator.swift */; };
+		EFC5F6C7522FD63D9027A718 /* ActionsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCF75AF8CD8279F83B726795 /* ActionsScreen.swift */; };
+		F157C3F8EA8EA5C18420DEC3 /* PhoneRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3698BFEACC2E5EB51B22550 /* PhoneRootView.swift */; };
+		F4E30E77359E77FEC0ED81A6 /* ScoringEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BAC09CC60A123DC511A9D9 /* ScoringEngine.swift */; };
+		F8F8761A6DB489807DDF89F5 /* MatchStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB4CFFDCC3F25683D0B4737D /* MatchStatus.swift */; };
+		F902CF28AC83D70129048D1F /* MatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0641F09E472E915C952437 /* MatchService.swift */; };
+		FD76F278A76C5BECE72DA6B9 /* WristRallyLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71B80771761C7F94FCF5D62 /* WristRallyLiveActivity.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		480415BF83B58C5CC2C0661C /* PBXContainerItemProxy */ = {
+		7DFA0A4D8C7444D6DF3CC4C3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 4852C7C9976BEA97D8ACFD1F /* Project object */;
+			containerPortal = 04790F5E2173D874F05EDE89 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 41F8D84B854F63B981445495;
-			remoteInfo = WristRallyWatch;
+			remoteGlobalIDString = CB2523C6BDD3957323D7A9D2;
+			remoteInfo = WristRallyComplications;
 		};
-		8EB267C45E3ADF603E7A8427 /* PBXContainerItemProxy */ = {
+		84BCE5571DBF4DB0483CBB99 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 4852C7C9976BEA97D8ACFD1F /* Project object */;
+			containerPortal = 04790F5E2173D874F05EDE89 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D4347D2A56CBEF9AD8524FBD;
+			remoteGlobalIDString = BF85A4FB7AB07DC4601515FE;
 			remoteInfo = WristRallyLiveActivity;
 		};
-		950C4FA2D727B3557E6C2206 /* PBXContainerItemProxy */ = {
+		D1DF868818C22AD0C5DA2B64 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 4852C7C9976BEA97D8ACFD1F /* Project object */;
+			containerPortal = 04790F5E2173D874F05EDE89 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 7638DF011CA6981D7D0A47C1;
-			remoteInfo = WristRallyComplications;
+			remoteGlobalIDString = 224534605DFA3D4B4A14286D;
+			remoteInfo = WristRallyWatch;
+		};
+		F6109CC3454978CCCBA12AF4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 04790F5E2173D874F05EDE89 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 224534605DFA3D4B4A14286D;
+			remoteInfo = WristRallyWatch;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		A0BC3379E3A3BF2CA07A96BC /* Embed Foundation Extensions */ = {
+		32CDAAA2B5356D5E95248783 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				C1A7884444757AD4A69B4CAA /* WristRallyLiveActivity.appex in Embed Foundation Extensions */,
+				3B32CC830E09A042A81BB2D4 /* WristRallyLiveActivity.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		BF31C8D20AB6E3584A0960E5 /* Embed Watch Content */ = {
+		5982B67DCD0F09FC9000B3B6 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				35950E4976D52903728856A6 /* WristRallyComplications.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8769DED55873D32157C9DA55 /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				705F5F748D73819E71400061 /* WristRallyWatch.app in Embed Watch Content */,
+				7BA6B2871BED46E8688F13A1 /* WristRallyWatch.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		EB41339655753B2DE4DC209A /* Embed Foundation Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				5D9124131879AC965156B168 /* WristRallyComplications.appex in Embed Foundation Extensions */,
-			);
-			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		01FD997E0740D7B682F0D9FF /* WristRallyLiveActivity.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WristRallyLiveActivity.entitlements; sourceTree = "<group>"; };
-		0FDA4B4F2922F76A4458E484 /* MatchLiveActivityLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLiveActivityLifecycle.swift; sourceTree = "<group>"; };
-		122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSyncCoordinator.swift; sourceTree = "<group>"; };
-		12F39A6BB8A9C87682706C31 /* Side.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Side.swift; sourceTree = "<group>"; };
-		22CC73634E156D71C6D5919E /* PhoneRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneRootView.swift; sourceTree = "<group>"; };
-		28AB730EEDD36D17F4FCCE64 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		33F839A16B12716B5C4C16F8 /* MatchDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDetailView.swift; sourceTree = "<group>"; };
-		3DF20D1E4C32A866863ADBBB /* WristRallyComplications.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WristRallyComplications.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		3FCE07AE677E1B7FE1702AD1 /* MatchLiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLiveActivityManager.swift; sourceTree = "<group>"; };
-		4E569C0959CB5D66455E0238 /* DurationFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationFormatter.swift; sourceTree = "<group>"; };
-		5534DDF606242531FBBB7534 /* MatchCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCompleteView.swift; sourceTree = "<group>"; };
-		5C3A3C1839AE335315C3B2EC /* ScoringEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoringEngineTests.swift; sourceTree = "<group>"; };
-		5DAE2617B6059D58700143F9 /* MatchStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchStore.swift; sourceTree = "<group>"; };
-		5EC885D5139C7BFEEEA3D62A /* WristRallyLiveActivity.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = WristRallyLiveActivity.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		7784767F602335AA12F76C2F /* MatchOverviewScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverviewScreen.swift; sourceTree = "<group>"; };
-		7EECBA3C216DC597AF5042BA /* WristRallyWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WristRallyWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		814FBB77004712A10C28A4C1 /* ScoreScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreScreen.swift; sourceTree = "<group>"; };
-		864E2F147507D3F815A808AE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		8A33452D4B6D5430B73DE194 /* WristRallyComplications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WristRallyComplications.swift; sourceTree = "<group>"; };
-		8F667B5CAD398361E2A01A9D /* MatchEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchEvent.swift; sourceTree = "<group>"; };
-		96129224EF231025063149C3 /* WristRallyComplications.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WristRallyComplications.entitlements; sourceTree = "<group>"; };
-		97D26C0DE07BCE5013AF252D /* WristRally.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = WristRally.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		99CC8397F215F09A6AC2A53E /* MatchState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchState.swift; sourceTree = "<group>"; };
-		A0C3B2561AD78B79ABA7948E /* WristRallyLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WristRallyLiveActivity.swift; sourceTree = "<group>"; };
-		A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPauseResumeLogic.swift; sourceTree = "<group>"; };
-		B07C649A69F7DEA5409E0CF2 /* WristRallyWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WristRallyWatch.entitlements; sourceTree = "<group>"; };
-		B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchAction.swift; sourceTree = "<group>"; };
-		B595ED7E7254DF7811498847 /* WristRally.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WristRally.entitlements; sourceTree = "<group>"; };
-		C2477DA544767D8F8F7C428A /* WristRallyWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WristRallyWatchApp.swift; sourceTree = "<group>"; };
-		C3AE16A34EFD9E8C139CDB82 /* MatchSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSettings.swift; sourceTree = "<group>"; };
-		C5280AF8EE3046E27284AC07 /* MatchScoreSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchScoreSnapshot.swift; sourceTree = "<group>"; };
-		C830D43DC864380321C452BB /* ActionsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionsScreen.swift; sourceTree = "<group>"; };
-		CED2219439EB11A50944927C /* MatchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchService.swift; sourceTree = "<group>"; };
-		D1B58B293D12B0633725EF30 /* MatchSessionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSessionCoordinator.swift; sourceTree = "<group>"; };
-		DB100B77BCD9FF2A72C7B2EB /* WarmUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarmUpView.swift; sourceTree = "<group>"; };
-		DF6655781AD5469BC748B7FC /* WristRaiseSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WristRaiseSupport.swift; sourceTree = "<group>"; };
-		E3429803BAEF2F899EDA8F51 /* MatchServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchServiceTests.swift; sourceTree = "<group>"; };
-		E3E4A0CD22466BE9A79A6DEE /* WristRallyTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = WristRallyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E89612FA01E3330D57011549 /* WristRallyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WristRallyApp.swift; sourceTree = "<group>"; };
-		E8F9E3CF93B6EA45A583A60F /* WatchRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRootView.swift; sourceTree = "<group>"; };
-		EC88226DEFCD298F1B0BD27F /* MatchStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchStatus.swift; sourceTree = "<group>"; };
-		F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
-		FAB0B8A61BC8E866C82DE480 /* ScoringEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoringEngine.swift; sourceTree = "<group>"; };
-		FD602323CFA1E272F96BA1B5 /* MatchScoreSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchScoreSnapshotTests.swift; sourceTree = "<group>"; };
+		055FD85A19ABEDE1101F1A4F /* MarketingDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketingDemoTests.swift; sourceTree = "<group>"; };
+		064849946BD659779C7489E8 /* MatchScoreSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchScoreSnapshot.swift; sourceTree = "<group>"; };
+		0EA2B4629E7CD1011FB6C55E /* WristRallyWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WristRallyWatchApp.swift; sourceTree = "<group>"; };
+		158A2D9A1F13CC59A94A47BE /* WristRallyComplications.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WristRallyComplications.entitlements; sourceTree = "<group>"; };
+		196CD6027D67DEB28ABEB5A7 /* WristRallyComplications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WristRallyComplications.swift; sourceTree = "<group>"; };
+		1AC78DB365202CC5ABA76C2F /* WatchRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRootView.swift; sourceTree = "<group>"; };
+		1B0DF7996A19D1164B61938F /* DurationFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationFormatter.swift; sourceTree = "<group>"; };
+		1C4954732C56A02961A09E80 /* MatchState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchState.swift; sourceTree = "<group>"; };
+		1D0641F09E472E915C952437 /* MatchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchService.swift; sourceTree = "<group>"; };
+		24E4C871F4C164A93B64ABF2 /* WristRallyWatchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WristRallyWatchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		290F1704E35CBCBF36A2B6C7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2A6F7B3CF9E6CCF742766D4A /* WristRallyWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WristRallyWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2F7B721603C48497AE2F1653 /* MatchCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCompleteView.swift; sourceTree = "<group>"; };
+		31E0CC42E61AF1ACF9C55C21 /* WarmUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarmUpView.swift; sourceTree = "<group>"; };
+		4527CA13271B01C69B183E8B /* WristRaiseSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WristRaiseSupport.swift; sourceTree = "<group>"; };
+		4B749836114B95C8BC3FA03A /* WorkoutPauseResumeLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPauseResumeLogic.swift; sourceTree = "<group>"; };
+		4C8D4F96C0E5D66C7DDE307B /* MatchSyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSyncCoordinator.swift; sourceTree = "<group>"; };
+		53BAC09CC60A123DC511A9D9 /* ScoringEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoringEngine.swift; sourceTree = "<group>"; };
+		603EA78B13B136C6F0EF0583 /* WristRally.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = WristRally.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		68C49A0CE7B55202D864B212 /* MatchSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSettings.swift; sourceTree = "<group>"; };
+		710B3DF8C8B9B684603E748A /* MatchAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchAction.swift; sourceTree = "<group>"; };
+		74C915D4D28B643ABD069F0D /* MatchSessionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSessionCoordinator.swift; sourceTree = "<group>"; };
+		77DAE269A6BB00BAE58B908F /* MatchScoreSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchScoreSnapshotTests.swift; sourceTree = "<group>"; };
+		798F0B55AB415C0F515757DD /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		84EEC7A89523A58E5B43869D /* MatchServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchServiceTests.swift; sourceTree = "<group>"; };
+		8CC688173CD695EB37C65AB0 /* MatchDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDetailView.swift; sourceTree = "<group>"; };
+		8DA4F8EE1E1BC48E2A78D3CA /* Side.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Side.swift; sourceTree = "<group>"; };
+		8E5812AFD9D5A1E5DEC52A31 /* WristRallyTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = WristRallyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F8862C8B5FBC0F7C9ED85AC /* MatchStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchStore.swift; sourceTree = "<group>"; };
+		9D921D8DAC1760686F73758D /* ScoringEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoringEngineTests.swift; sourceTree = "<group>"; };
+		9E5D060EEBB17ABD258D92E2 /* WristRallyLiveActivity.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = WristRallyLiveActivity.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7EC0062A2AAA75A5A486EE0 /* MatchLiveActivityLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLiveActivityLifecycle.swift; sourceTree = "<group>"; };
+		B3B0BBDE39FD20F9EA838EFC /* MatchLiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLiveActivityManager.swift; sourceTree = "<group>"; };
+		B3D40FF58A84C0DACA116535 /* ScoreScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreScreen.swift; sourceTree = "<group>"; };
+		C1B971DD7ECD1B204848D260 /* WristRally.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WristRally.entitlements; sourceTree = "<group>"; };
+		CCF75AF8CD8279F83B726795 /* ActionsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionsScreen.swift; sourceTree = "<group>"; };
+		CFB75971DE11B17E3AF7E42E /* MatchEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchEvent.swift; sourceTree = "<group>"; };
+		D2FB2D30608A36D62DD3E781 /* WristRallyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WristRallyApp.swift; sourceTree = "<group>"; };
+		D5D8F11E2F223443F1475E77 /* WristRallyWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WristRallyWatch.entitlements; sourceTree = "<group>"; };
+		D7022284C29D59E330B79ABF /* WristRallyLiveActivity.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WristRallyLiveActivity.entitlements; sourceTree = "<group>"; };
+		D71B80771761C7F94FCF5D62 /* WristRallyLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WristRallyLiveActivity.swift; sourceTree = "<group>"; };
+		D74FE4CF10B78E4EF86265A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D83F22CC1923CD1BE30C894A /* MatchOverviewScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverviewScreen.swift; sourceTree = "<group>"; };
+		EEDF0C9711C9EE6AE00FE3CD /* WristRallyComplications.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WristRallyComplications.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F3698BFEACC2E5EB51B22550 /* PhoneRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneRootView.swift; sourceTree = "<group>"; };
+		FB4CFFDCC3F25683D0B4737D /* MatchStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchStatus.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		17979BEC1CEEE88488A2337A /* Persistence */ = {
+		0FD1304736202EF88F61DBB8 /* tests */ = {
 			isa = PBXGroup;
 			children = (
-				5DAE2617B6059D58700143F9 /* MatchStore.swift */,
-			);
-			path = Persistence;
-			sourceTree = "<group>";
-		};
-		221AF40793FB1C25F3425712 /* watch */ = {
-			isa = PBXGroup;
-			children = (
-				A0944F784B0DAAFD48BA905A /* WristRallyComplications */,
-				33CA3180B57738A9A1AF229D /* WristRallyWatch */,
-			);
-			path = watch;
-			sourceTree = "<group>";
-		};
-		33CA3180B57738A9A1AF229D /* WristRallyWatch */ = {
-			isa = PBXGroup;
-			children = (
-				C830D43DC864380321C452BB /* ActionsScreen.swift */,
-				28AB730EEDD36D17F4FCCE64 /* Assets.xcassets */,
-				5534DDF606242531FBBB7534 /* MatchCompleteView.swift */,
-				7784767F602335AA12F76C2F /* MatchOverviewScreen.swift */,
-				D1B58B293D12B0633725EF30 /* MatchSessionCoordinator.swift */,
-				B07C649A69F7DEA5409E0CF2 /* WristRallyWatch.entitlements */,
-				C2477DA544767D8F8F7C428A /* WristRallyWatchApp.swift */,
-				814FBB77004712A10C28A4C1 /* ScoreScreen.swift */,
-				DB100B77BCD9FF2A72C7B2EB /* WarmUpView.swift */,
-				E8F9E3CF93B6EA45A583A60F /* WatchRootView.swift */,
-			);
-			path = WristRallyWatch;
-			sourceTree = "<group>";
-		};
-		356C9D90B821A55E8394D3DF /* tests */ = {
-			isa = PBXGroup;
-			children = (
-				B861932BC5C3B8C41F9ABE86 /* Unit */,
+				3A9A49C0ACE80C4ADF980369 /* Unit */,
 			);
 			path = tests;
 			sourceTree = "<group>";
 		};
-		41754552F776BED2E9130C90 /* Products */ = {
+		13D7FC62124505744DB129B7 /* Scoring */ = {
 			isa = PBXGroup;
 			children = (
-				97D26C0DE07BCE5013AF252D /* WristRally.app */,
-				3DF20D1E4C32A866863ADBBB /* WristRallyComplications.appex */,
-				5EC885D5139C7BFEEEA3D62A /* WristRallyLiveActivity.appex */,
-				E3E4A0CD22466BE9A79A6DEE /* WristRallyTests.xctest */,
-				7EECBA3C216DC597AF5042BA /* WristRallyWatch.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		55C02E66A51CF1F87F46381B /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				CED2219439EB11A50944927C /* MatchService.swift */,
-				A4C88E40558A48789D30E02D /* WorkoutPauseResumeLogic.swift */,
-				DF6655781AD5469BC748B7FC /* WristRaiseSupport.swift */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
-		6309D7AA4DA1EE43F48A4413 /* Scoring */ = {
-			isa = PBXGroup;
-			children = (
-				B12D6299B48B3ACCF4EF6C6D /* MatchAction.swift */,
-				FAB0B8A61BC8E866C82DE480 /* ScoringEngine.swift */,
+				710B3DF8C8B9B684603E748A /* MatchAction.swift */,
+				53BAC09CC60A123DC511A9D9 /* ScoringEngine.swift */,
 			);
 			path = Scoring;
 			sourceTree = "<group>";
 		};
-		8CD231710BABED6A8021123A /* Sync */ = {
+		18CF5D992E0902E4D7A72E9C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				122C6CCDF7E34F426E3FC9C7 /* MatchSyncCoordinator.swift */,
+				603EA78B13B136C6F0EF0583 /* WristRally.app */,
+				EEDF0C9711C9EE6AE00FE3CD /* WristRallyComplications.appex */,
+				9E5D060EEBB17ABD258D92E2 /* WristRallyLiveActivity.appex */,
+				8E5812AFD9D5A1E5DEC52A31 /* WristRallyTests.xctest */,
+				2A6F7B3CF9E6CCF742766D4A /* WristRallyWatch.app */,
+				24E4C871F4C164A93B64ABF2 /* WristRallyWatchUITests.xctest */,
 			);
-			path = Sync;
+			name = Products;
 			sourceTree = "<group>";
 		};
-		9DCAB4832985C50E28476988 /* WristRally */ = {
+		3A9A49C0ACE80C4ADF980369 /* Unit */ = {
 			isa = PBXGroup;
 			children = (
-				864E2F147507D3F815A808AE /* Assets.xcassets */,
-				33F839A16B12716B5C4C16F8 /* MatchDetailView.swift */,
-				3FCE07AE677E1B7FE1702AD1 /* MatchLiveActivityManager.swift */,
-				B595ED7E7254DF7811498847 /* WristRally.entitlements */,
-				E89612FA01E3330D57011549 /* WristRallyApp.swift */,
-				22CC73634E156D71C6D5919E /* PhoneRootView.swift */,
-			);
-			path = WristRally;
-			sourceTree = "<group>";
-		};
-		A034FF9CBD8BDE2A5EA9E2CF /* Config */ = {
-			isa = PBXGroup;
-			children = (
-				F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */,
-			);
-			path = Config;
-			sourceTree = "<group>";
-		};
-		A0944F784B0DAAFD48BA905A /* WristRallyComplications */ = {
-			isa = PBXGroup;
-			children = (
-				96129224EF231025063149C3 /* WristRallyComplications.entitlements */,
-				8A33452D4B6D5430B73DE194 /* WristRallyComplications.swift */,
-			);
-			path = WristRallyComplications;
-			sourceTree = "<group>";
-		};
-		AC664728CFE8D9066FA4BED0 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				8F667B5CAD398361E2A01A9D /* MatchEvent.swift */,
-				0FDA4B4F2922F76A4458E484 /* MatchLiveActivityLifecycle.swift */,
-				C5280AF8EE3046E27284AC07 /* MatchScoreSnapshot.swift */,
-				C3AE16A34EFD9E8C139CDB82 /* MatchSettings.swift */,
-				99CC8397F215F09A6AC2A53E /* MatchState.swift */,
-				EC88226DEFCD298F1B0BD27F /* MatchStatus.swift */,
-				12F39A6BB8A9C87682706C31 /* Side.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		B861932BC5C3B8C41F9ABE86 /* Unit */ = {
-			isa = PBXGroup;
-			children = (
-				FD602323CFA1E272F96BA1B5 /* MatchScoreSnapshotTests.swift */,
-				E3429803BAEF2F899EDA8F51 /* MatchServiceTests.swift */,
-				5C3A3C1839AE335315C3B2EC /* ScoringEngineTests.swift */,
+				77DAE269A6BB00BAE58B908F /* MatchScoreSnapshotTests.swift */,
+				84EEC7A89523A58E5B43869D /* MatchServiceTests.swift */,
+				9D921D8DAC1760686F73758D /* ScoringEngineTests.swift */,
 			);
 			path = Unit;
 			sourceTree = "<group>";
 		};
-		BFC29C8833326A02F9BDAB6D = {
+		3E0BA4A3621AE211964352F8 /* WristRallyComplications */ = {
 			isa = PBXGroup;
 			children = (
-				A034FF9CBD8BDE2A5EA9E2CF /* Config */,
-				CE9C71619A96DF32DF9EB91C /* iPhone */,
-				DB4A19D769B6723D1636E15B /* shared */,
-				356C9D90B821A55E8394D3DF /* tests */,
-				221AF40793FB1C25F3425712 /* watch */,
-				41754552F776BED2E9130C90 /* Products */,
+				158A2D9A1F13CC59A94A47BE /* WristRallyComplications.entitlements */,
+				196CD6027D67DEB28ABEB5A7 /* WristRallyComplications.swift */,
 			);
+			path = WristRallyComplications;
 			sourceTree = "<group>";
 		};
-		CE9C71619A96DF32DF9EB91C /* iPhone */ = {
+		49F367E0DD8A2852E4594DA3 /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
-				9DCAB4832985C50E28476988 /* WristRally */,
-				E60F4CFAC68121FD0A5F10A3 /* WristRallyLiveActivity */,
+				8F8862C8B5FBC0F7C9ED85AC /* MatchStore.swift */,
 			);
-			path = iPhone;
+			path = Persistence;
 			sourceTree = "<group>";
 		};
-		DB4A19D769B6723D1636E15B /* shared */ = {
+		4FF145DC08FDED8710BA9631 /* WristRallyLiveActivity */ = {
 			isa = PBXGroup;
 			children = (
-				AC664728CFE8D9066FA4BED0 /* Models */,
-				17979BEC1CEEE88488A2337A /* Persistence */,
-				6309D7AA4DA1EE43F48A4413 /* Scoring */,
-				55C02E66A51CF1F87F46381B /* Services */,
-				8CD231710BABED6A8021123A /* Sync */,
-				F11E9E1C0202CE9A32786E43 /* Utilities */,
-			);
-			path = shared;
-			sourceTree = "<group>";
-		};
-		E60F4CFAC68121FD0A5F10A3 /* WristRallyLiveActivity */ = {
-			isa = PBXGroup;
-			children = (
-				01FD997E0740D7B682F0D9FF /* WristRallyLiveActivity.entitlements */,
-				A0C3B2561AD78B79ABA7948E /* WristRallyLiveActivity.swift */,
+				D7022284C29D59E330B79ABF /* WristRallyLiveActivity.entitlements */,
+				D71B80771761C7F94FCF5D62 /* WristRallyLiveActivity.swift */,
 			);
 			path = WristRallyLiveActivity;
 			sourceTree = "<group>";
 		};
-		F11E9E1C0202CE9A32786E43 /* Utilities */ = {
+		5CC2C13AEDC9A010B4954D88 /* WristRally */ = {
 			isa = PBXGroup;
 			children = (
-				4E569C0959CB5D66455E0238 /* DurationFormatter.swift */,
+				D74FE4CF10B78E4EF86265A6 /* Assets.xcassets */,
+				8CC688173CD695EB37C65AB0 /* MatchDetailView.swift */,
+				B3B0BBDE39FD20F9EA838EFC /* MatchLiveActivityManager.swift */,
+				F3698BFEACC2E5EB51B22550 /* PhoneRootView.swift */,
+				C1B971DD7ECD1B204848D260 /* WristRally.entitlements */,
+				D2FB2D30608A36D62DD3E781 /* WristRallyApp.swift */,
+			);
+			path = WristRally;
+			sourceTree = "<group>";
+		};
+		67BE28B018E94593940E69F5 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				798F0B55AB415C0F515757DD /* Signing.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		87CBB2241EEE4F2A9D08925B /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				CFB75971DE11B17E3AF7E42E /* MatchEvent.swift */,
+				A7EC0062A2AAA75A5A486EE0 /* MatchLiveActivityLifecycle.swift */,
+				064849946BD659779C7489E8 /* MatchScoreSnapshot.swift */,
+				68C49A0CE7B55202D864B212 /* MatchSettings.swift */,
+				1C4954732C56A02961A09E80 /* MatchState.swift */,
+				FB4CFFDCC3F25683D0B4737D /* MatchStatus.swift */,
+				8DA4F8EE1E1BC48E2A78D3CA /* Side.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		936CA3C2F305A5B395358AC4 /* Sync */ = {
+			isa = PBXGroup;
+			children = (
+				4C8D4F96C0E5D66C7DDE307B /* MatchSyncCoordinator.swift */,
+			);
+			path = Sync;
+			sourceTree = "<group>";
+		};
+		96A1EE15331F9A460C962193 /* iPhone */ = {
+			isa = PBXGroup;
+			children = (
+				5CC2C13AEDC9A010B4954D88 /* WristRally */,
+				4FF145DC08FDED8710BA9631 /* WristRallyLiveActivity */,
+			);
+			path = iPhone;
+			sourceTree = "<group>";
+		};
+		9887D4197D23D1312F9C89F5 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				1B0DF7996A19D1164B61938F /* DurationFormatter.swift */,
 			);
 			path = Utilities;
+			sourceTree = "<group>";
+		};
+		9C87F05CFCF8BB8FC6DF62DA /* watch */ = {
+			isa = PBXGroup;
+			children = (
+				3E0BA4A3621AE211964352F8 /* WristRallyComplications */,
+				E7E95760B4492028084230D1 /* WristRallyWatch */,
+				DE7262E710664D38F2E678D1 /* WristRallyWatchUITests */,
+			);
+			path = watch;
+			sourceTree = "<group>";
+		};
+		B7CE068DAB7C211574017EC7 = {
+			isa = PBXGroup;
+			children = (
+				67BE28B018E94593940E69F5 /* Config */,
+				96A1EE15331F9A460C962193 /* iPhone */,
+				C4056826B6DF1F7CB69A75D8 /* shared */,
+				0FD1304736202EF88F61DBB8 /* tests */,
+				9C87F05CFCF8BB8FC6DF62DA /* watch */,
+				18CF5D992E0902E4D7A72E9C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C4056826B6DF1F7CB69A75D8 /* shared */ = {
+			isa = PBXGroup;
+			children = (
+				87CBB2241EEE4F2A9D08925B /* Models */,
+				49F367E0DD8A2852E4594DA3 /* Persistence */,
+				13D7FC62124505744DB129B7 /* Scoring */,
+				DC48AC65FCF3303315DDCF4D /* Services */,
+				936CA3C2F305A5B395358AC4 /* Sync */,
+				9887D4197D23D1312F9C89F5 /* Utilities */,
+			);
+			path = shared;
+			sourceTree = "<group>";
+		};
+		DC48AC65FCF3303315DDCF4D /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				1D0641F09E472E915C952437 /* MatchService.swift */,
+				4B749836114B95C8BC3FA03A /* WorkoutPauseResumeLogic.swift */,
+				4527CA13271B01C69B183E8B /* WristRaiseSupport.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		DE7262E710664D38F2E678D1 /* WristRallyWatchUITests */ = {
+			isa = PBXGroup;
+			children = (
+				055FD85A19ABEDE1101F1A4F /* MarketingDemoTests.swift */,
+			);
+			path = WristRallyWatchUITests;
+			sourceTree = "<group>";
+		};
+		E7E95760B4492028084230D1 /* WristRallyWatch */ = {
+			isa = PBXGroup;
+			children = (
+				CCF75AF8CD8279F83B726795 /* ActionsScreen.swift */,
+				290F1704E35CBCBF36A2B6C7 /* Assets.xcassets */,
+				2F7B721603C48497AE2F1653 /* MatchCompleteView.swift */,
+				D83F22CC1923CD1BE30C894A /* MatchOverviewScreen.swift */,
+				74C915D4D28B643ABD069F0D /* MatchSessionCoordinator.swift */,
+				B3D40FF58A84C0DACA116535 /* ScoreScreen.swift */,
+				31E0CC42E61AF1ACF9C55C21 /* WarmUpView.swift */,
+				1AC78DB365202CC5ABA76C2F /* WatchRootView.swift */,
+				D5D8F11E2F223443F1475E77 /* WristRallyWatch.entitlements */,
+				0EA2B4629E7CD1011FB6C55E /* WristRallyWatchApp.swift */,
+			);
+			path = WristRallyWatch;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		41F8D84B854F63B981445495 /* WristRallyWatch */ = {
+		224534605DFA3D4B4A14286D /* WristRallyWatch */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5B0819D7B4C37DE3E3417790 /* Build configuration list for PBXNativeTarget "WristRallyWatch" */;
+			buildConfigurationList = EA43ED3444FAD90CB1E4E29D /* Build configuration list for PBXNativeTarget "WristRallyWatch" */;
 			buildPhases = (
-				69434BF84CC4FB3301A045F4 /* Sources */,
-				18C32012BE8D6ABA913AF3DF /* Resources */,
-				EB41339655753B2DE4DC209A /* Embed Foundation Extensions */,
+				04AB25EED45C410235D82D53 /* Sources */,
+				6EE07CBA40F8B1C40C201E3C /* Resources */,
+				5982B67DCD0F09FC9000B3B6 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				12468561FEC57A8F30121F6E /* PBXTargetDependency */,
+				3C27BAA4B931ED75F5E09793 /* PBXTargetDependency */,
 			);
 			name = WristRallyWatch;
 			packageProductDependencies = (
 			);
 			productName = WristRallyWatch;
-			productReference = 7EECBA3C216DC597AF5042BA /* WristRallyWatch.app */;
+			productReference = 2A6F7B3CF9E6CCF742766D4A /* WristRallyWatch.app */;
 			productType = "com.apple.product-type.application";
 		};
-		6DE7DC2CD4868FD5F7BC0713 /* WristRallyTests */ = {
+		49A3E66DEF257976A083DA7B /* WristRallyTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3B5E4CF5BD71D414EEE84957 /* Build configuration list for PBXNativeTarget "WristRallyTests" */;
+			buildConfigurationList = E49E39B62890A4CA26CC0AFC /* Build configuration list for PBXNativeTarget "WristRallyTests" */;
 			buildPhases = (
-				B9BAA9930F71C0928EA7BF31 /* Sources */,
+				4DB220C43741EE9958339B7D /* Sources */,
 			);
 			buildRules = (
 			);
@@ -437,53 +457,54 @@
 			packageProductDependencies = (
 			);
 			productName = WristRallyTests;
-			productReference = E3E4A0CD22466BE9A79A6DEE /* WristRallyTests.xctest */;
+			productReference = 8E5812AFD9D5A1E5DEC52A31 /* WristRallyTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		7638DF011CA6981D7D0A47C1 /* WristRallyComplications */ = {
+		BBBD25E1601DA99B212FE9B6 /* WristRally */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7F82FAD3C8AACF3666A9B4BA /* Build configuration list for PBXNativeTarget "WristRallyComplications" */;
+			buildConfigurationList = 61177112F852143795D8F391 /* Build configuration list for PBXNativeTarget "WristRally" */;
 			buildPhases = (
-				AC17F04B7331AE114DBE2457 /* Sources */,
+				8359A34BA5DE05BEDC87573E /* Sources */,
+				619C633D2AD43DD71AE541FD /* Resources */,
+				32CDAAA2B5356D5E95248783 /* Embed Foundation Extensions */,
+				8769DED55873D32157C9DA55 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-			);
-			name = WristRallyComplications;
-			packageProductDependencies = (
-			);
-			productName = WristRallyComplications;
-			productReference = 3DF20D1E4C32A866863ADBBB /* WristRallyComplications.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
-		C02A1B5180A4ED1F44008326 /* WristRally */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 8C0B968DEE136FB3AF729E8F /* Build configuration list for PBXNativeTarget "WristRally" */;
-			buildPhases = (
-				B0F61FF0DDB792E9121BACAC /* Sources */,
-				7BEFA593C9AC5B553320C556 /* Resources */,
-				A0BC3379E3A3BF2CA07A96BC /* Embed Foundation Extensions */,
-				BF31C8D20AB6E3584A0960E5 /* Embed Watch Content */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				05856787DDA5B4B8E0EBE1B4 /* PBXTargetDependency */,
-				2900CE3A5F0D0FBAF2186725 /* PBXTargetDependency */,
+				E1708DC8A0A6BBFF03EA638F /* PBXTargetDependency */,
+				6FB0BF555E16D266D57FBE83 /* PBXTargetDependency */,
 			);
 			name = WristRally;
 			packageProductDependencies = (
 			);
 			productName = WristRally;
-			productReference = 97D26C0DE07BCE5013AF252D /* WristRally.app */;
+			productReference = 603EA78B13B136C6F0EF0583 /* WristRally.app */;
 			productType = "com.apple.product-type.application";
 		};
-		D4347D2A56CBEF9AD8524FBD /* WristRallyLiveActivity */ = {
+		BD0EA7FB9C3C1971E09884F4 /* WristRallyWatchUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D19051C26C32F498F5464E81 /* Build configuration list for PBXNativeTarget "WristRallyLiveActivity" */;
+			buildConfigurationList = F43F970D8C3339D34EBDC42E /* Build configuration list for PBXNativeTarget "WristRallyWatchUITests" */;
 			buildPhases = (
-				9FD9D29EEB2FCD248A640791 /* Sources */,
+				20688A8CB0E85EF5F2F1E885 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3A1E39CEEEE7E01467728532 /* PBXTargetDependency */,
+			);
+			name = WristRallyWatchUITests;
+			packageProductDependencies = (
+			);
+			productName = WristRallyWatchUITests;
+			productReference = 24E4C871F4C164A93B64ABF2 /* WristRallyWatchUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		BF85A4FB7AB07DC4601515FE /* WristRallyLiveActivity */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1E200DA5DBF8DFB293ADEDA8 /* Build configuration list for PBXNativeTarget "WristRallyLiveActivity" */;
+			buildPhases = (
+				47B7305DE9CB0AAAC06768DE /* Sources */,
 			);
 			buildRules = (
 			);
@@ -493,304 +514,326 @@
 			packageProductDependencies = (
 			);
 			productName = WristRallyLiveActivity;
-			productReference = 5EC885D5139C7BFEEEA3D62A /* WristRallyLiveActivity.appex */;
+			productReference = 9E5D060EEBB17ABD258D92E2 /* WristRallyLiveActivity.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		CB2523C6BDD3957323D7A9D2 /* WristRallyComplications */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9E6FE959D38F5A50FD73E9F4 /* Build configuration list for PBXNativeTarget "WristRallyComplications" */;
+			buildPhases = (
+				E3052C9224000C49BDF2844B /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WristRallyComplications;
+			packageProductDependencies = (
+			);
+			productName = WristRallyComplications;
+			productReference = EEDF0C9711C9EE6AE00FE3CD /* WristRallyComplications.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		4852C7C9976BEA97D8ACFD1F /* Project object */ = {
+		04790F5E2173D874F05EDE89 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
-					41F8D84B854F63B981445495 = {
+					224534605DFA3D4B4A14286D = {
 						DevelopmentTeam = 547PA5L58A;
 						ProvisioningStyle = Automatic;
 					};
-					6DE7DC2CD4868FD5F7BC0713 = {
+					49A3E66DEF257976A083DA7B = {
 						DevelopmentTeam = 547PA5L58A;
 						ProvisioningStyle = Automatic;
 					};
-					7638DF011CA6981D7D0A47C1 = {
+					BBBD25E1601DA99B212FE9B6 = {
 						DevelopmentTeam = 547PA5L58A;
 						ProvisioningStyle = Automatic;
 					};
-					C02A1B5180A4ED1F44008326 = {
+					BD0EA7FB9C3C1971E09884F4 = {
+						DevelopmentTeam = 547PA5L58A;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 224534605DFA3D4B4A14286D;
+					};
+					BF85A4FB7AB07DC4601515FE = {
 						DevelopmentTeam = 547PA5L58A;
 						ProvisioningStyle = Automatic;
 					};
-					D4347D2A56CBEF9AD8524FBD = {
+					CB2523C6BDD3957323D7A9D2 = {
 						DevelopmentTeam = 547PA5L58A;
 						ProvisioningStyle = Automatic;
 					};
 				};
 			};
-			buildConfigurationList = E0CE50DCF5F6ACF9691A0E3A /* Build configuration list for PBXProject "WristRally" */;
+			buildConfigurationList = CB701705489C3A0D4BE44590 /* Build configuration list for PBXProject "WristRally" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
 				en,
 			);
-			mainGroup = BFC29C8833326A02F9BDAB6D;
+			mainGroup = B7CE068DAB7C211574017EC7;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 41754552F776BED2E9130C90 /* Products */;
+			productRefGroup = 18CF5D992E0902E4D7A72E9C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C02A1B5180A4ED1F44008326 /* WristRally */,
-				D4347D2A56CBEF9AD8524FBD /* WristRallyLiveActivity */,
-				41F8D84B854F63B981445495 /* WristRallyWatch */,
-				7638DF011CA6981D7D0A47C1 /* WristRallyComplications */,
-				6DE7DC2CD4868FD5F7BC0713 /* WristRallyTests */,
+				BBBD25E1601DA99B212FE9B6 /* WristRally */,
+				BF85A4FB7AB07DC4601515FE /* WristRallyLiveActivity */,
+				224534605DFA3D4B4A14286D /* WristRallyWatch */,
+				CB2523C6BDD3957323D7A9D2 /* WristRallyComplications */,
+				49A3E66DEF257976A083DA7B /* WristRallyTests */,
+				BD0EA7FB9C3C1971E09884F4 /* WristRallyWatchUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		18C32012BE8D6ABA913AF3DF /* Resources */ = {
+		619C633D2AD43DD71AE541FD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27022B2D2921EE928A0FB720 /* Assets.xcassets in Resources */,
+				3C026649D160633CF0006B94 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7BEFA593C9AC5B553320C556 /* Resources */ = {
+		6EE07CBA40F8B1C40C201E3C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A823F4F61F7FD143EF3F84B4 /* Assets.xcassets in Resources */,
+				455D436ADE447FAFD7929A60 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		69434BF84CC4FB3301A045F4 /* Sources */ = {
+		04AB25EED45C410235D82D53 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED5F700D9336127D8D9A5128 /* ActionsScreen.swift in Sources */,
-				1463EBD46CB9D0593AE8B752 /* DurationFormatter.swift in Sources */,
-				E5C94A1F8AC9F4BFC7C0C261 /* MatchAction.swift in Sources */,
-				76E2EADC52C8CA461B6083A4 /* MatchCompleteView.swift in Sources */,
-				78AFC5EECDF9B906D09568C9 /* MatchEvent.swift in Sources */,
-				14919B8F2DADC81367C3C5A8 /* MatchLiveActivityLifecycle.swift in Sources */,
-				56A05B9CDD495AD682908B19 /* MatchOverviewScreen.swift in Sources */,
-				AB0D62D446D04A41BC058C02 /* MatchScoreSnapshot.swift in Sources */,
-				CF365B4DB69B504496179938 /* MatchService.swift in Sources */,
-				7A2ACCEA5BF1BCF9401C6A8F /* MatchSessionCoordinator.swift in Sources */,
-				068914E9B015B8B918079194 /* MatchSettings.swift in Sources */,
-				B87E2AA087F1C368DCBDB02A /* MatchState.swift in Sources */,
-				040B57A51E6C1A70F7B59B36 /* MatchStatus.swift in Sources */,
-				8464016A350118613A6F2CBD /* MatchStore.swift in Sources */,
-				AF9A29F298B82C273E6695DB /* MatchSyncCoordinator.swift in Sources */,
-				8855C29E3A61EB7EC6EE226F /* WristRallyWatchApp.swift in Sources */,
-				7F1C0ABD8315213BC60C74E0 /* ScoreScreen.swift in Sources */,
-				BF080741067D2EB6D16A7E4A /* ScoringEngine.swift in Sources */,
-				04693C8BFD4F9BF094126DC8 /* Side.swift in Sources */,
-				C3A91687F7007A0A377E917A /* WarmUpView.swift in Sources */,
-				1D27E908C4DB4ADBF4091BA9 /* WatchRootView.swift in Sources */,
-				8283D59E9B1B41475450DCB4 /* WorkoutPauseResumeLogic.swift in Sources */,
-				2D56650F632ED40535BC21E0 /* WristRaiseSupport.swift in Sources */,
+				EFC5F6C7522FD63D9027A718 /* ActionsScreen.swift in Sources */,
+				935C5FAE38C254523126DAEC /* DurationFormatter.swift in Sources */,
+				72A56BE4752EA35FEB0A8905 /* MatchAction.swift in Sources */,
+				7655FA8C5A5529D5E769E514 /* MatchCompleteView.swift in Sources */,
+				6AC76535AAE759D673FB841A /* MatchEvent.swift in Sources */,
+				5CB7D16DCB13F8C4248DBC90 /* MatchLiveActivityLifecycle.swift in Sources */,
+				B43F2C8CC995C697E81B6B1E /* MatchOverviewScreen.swift in Sources */,
+				3837F21B8EBC510EA328AAC5 /* MatchScoreSnapshot.swift in Sources */,
+				48BE49EC711DE39EF65C596D /* MatchService.swift in Sources */,
+				03AFEC79C6EF81446B54DD71 /* MatchSessionCoordinator.swift in Sources */,
+				358CDFA536130B1C5B59A9FD /* MatchSettings.swift in Sources */,
+				BE9E52AC36E79493BE16F229 /* MatchState.swift in Sources */,
+				BC6358D08160FE6179E0ABC2 /* MatchStatus.swift in Sources */,
+				C4B76DDBD7C0447732BA12C4 /* MatchStore.swift in Sources */,
+				EE49E2E85EE84862A6E35AD2 /* MatchSyncCoordinator.swift in Sources */,
+				6B54C06E1C369CA0C4DE3686 /* ScoreScreen.swift in Sources */,
+				903856F9DA2C535568E35547 /* ScoringEngine.swift in Sources */,
+				57CA9DB52DAA8B613C945C64 /* Side.swift in Sources */,
+				B87EACE416EF6F2B03B54693 /* WarmUpView.swift in Sources */,
+				825781CFFD04C19DD7334399 /* WatchRootView.swift in Sources */,
+				967C2164B437ED4B71259DB3 /* WorkoutPauseResumeLogic.swift in Sources */,
+				4745EF35F6791DF74BBC3363 /* WristRaiseSupport.swift in Sources */,
+				1FE31F9C49954291F4B40777 /* WristRallyWatchApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9FD9D29EEB2FCD248A640791 /* Sources */ = {
+		20688A8CB0E85EF5F2F1E885 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				106555E2E5C57A750D6F446D /* DurationFormatter.swift in Sources */,
-				03EF74EFE76E9D3FEE3DCEBA /* MatchAction.swift in Sources */,
-				3CC5E0C54C636FEA7214A649 /* MatchEvent.swift in Sources */,
-				7A020E09D2BD9BEFB03B3795 /* MatchLiveActivityLifecycle.swift in Sources */,
-				3398CE72C2CAE6EE6C02C2BE /* MatchScoreSnapshot.swift in Sources */,
-				D03A6B1507341602F0F763C0 /* MatchService.swift in Sources */,
-				24263AA00F1D34F114F52971 /* MatchSettings.swift in Sources */,
-				6B919D9C92922422D409B2CF /* MatchState.swift in Sources */,
-				988C3E02A8A143389C2A22A1 /* MatchStatus.swift in Sources */,
-				899F404562795E243CA9B8A9 /* MatchStore.swift in Sources */,
-				7207E92405D5B7C355F8685D /* MatchSyncCoordinator.swift in Sources */,
-				08D183B8CD531D8014DE4955 /* WristRallyLiveActivity.swift in Sources */,
-				A7B58122276B14213B16A718 /* ScoringEngine.swift in Sources */,
-				A7DC2D4D4BEE89559EEA0448 /* Side.swift in Sources */,
-				F14E69F6674D310F97A51B47 /* WorkoutPauseResumeLogic.swift in Sources */,
-				7B8189E4804A5A2E0B8D78B7 /* WristRaiseSupport.swift in Sources */,
+				6B5ADDECFC1DE084DA1F689B /* MarketingDemoTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AC17F04B7331AE114DBE2457 /* Sources */ = {
+		47B7305DE9CB0AAAC06768DE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3C9EDABB059B0CE556070578 /* DurationFormatter.swift in Sources */,
-				725A7B8089A6D94CCB21C514 /* MatchAction.swift in Sources */,
-				8578E5765B465E97E6BE32CE /* MatchEvent.swift in Sources */,
-				EDE1D66587A2E1B9E7E0C5DC /* MatchLiveActivityLifecycle.swift in Sources */,
-				94DA941A86FEFE71AA3D4BCD /* MatchScoreSnapshot.swift in Sources */,
-				D9C5CDEA78303C43F4C28602 /* MatchService.swift in Sources */,
-				5F5BF498B484EB383D7E6BCF /* MatchSettings.swift in Sources */,
-				4D82F3361DC385D4354DC4A6 /* MatchState.swift in Sources */,
-				6DE6E0825F16BAC73B6F0DE5 /* MatchStatus.swift in Sources */,
-				1E47734A4283C2554AF40D0E /* MatchStore.swift in Sources */,
-				C2188E92550397E384518DA9 /* MatchSyncCoordinator.swift in Sources */,
-				C8662ADECB22DEC12008A394 /* WristRallyComplications.swift in Sources */,
-				1F1DF178045BF3E5E86B822D /* ScoringEngine.swift in Sources */,
-				85B5A6871B492EA7C95ED8A5 /* Side.swift in Sources */,
-				F722101338D0A58B0E62EC6F /* WorkoutPauseResumeLogic.swift in Sources */,
-				7ADC5D3E3980D883DE1934D4 /* WristRaiseSupport.swift in Sources */,
+				8B411A16FE76BD58BA8B4885 /* DurationFormatter.swift in Sources */,
+				53D77188E4C81F2080480B6A /* MatchAction.swift in Sources */,
+				1E285255D649C2B1EA90B568 /* MatchEvent.swift in Sources */,
+				965505B7C56E8A1C421905CC /* MatchLiveActivityLifecycle.swift in Sources */,
+				C2BD6AE5267C23CA863A0222 /* MatchScoreSnapshot.swift in Sources */,
+				BF568019C090A304FA314408 /* MatchService.swift in Sources */,
+				262B4FC9FE6E16571ECEFDB0 /* MatchSettings.swift in Sources */,
+				E28764EF73ABA470FB8AC8EA /* MatchState.swift in Sources */,
+				536676250C4599D14E741742 /* MatchStatus.swift in Sources */,
+				D81C349143FD9A8987017396 /* MatchStore.swift in Sources */,
+				0C90E0EB963228388048E768 /* MatchSyncCoordinator.swift in Sources */,
+				F4E30E77359E77FEC0ED81A6 /* ScoringEngine.swift in Sources */,
+				6E8127A26CBB7799B9091D4C /* Side.swift in Sources */,
+				41A18DD6A9D199FF8A445347 /* WorkoutPauseResumeLogic.swift in Sources */,
+				2AEAEA4BA2DDBD8FA5D4A4CA /* WristRaiseSupport.swift in Sources */,
+				FD76F278A76C5BECE72DA6B9 /* WristRallyLiveActivity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B0F61FF0DDB792E9121BACAC /* Sources */ = {
+		4DB220C43741EE9958339B7D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				525B41F520221ED82115C1E1 /* DurationFormatter.swift in Sources */,
-				26D0ADDF62A10E701511778B /* MatchAction.swift in Sources */,
-				DF63EE4162D80A1D2249F790 /* MatchDetailView.swift in Sources */,
-				4E367278A05149090C45A924 /* MatchEvent.swift in Sources */,
-				8851D025EC8D3054D944D568 /* MatchLiveActivityLifecycle.swift in Sources */,
-				237C88A89C80EA16421FA5C4 /* MatchLiveActivityManager.swift in Sources */,
-				05B8B333975B2337AC78A7B1 /* MatchScoreSnapshot.swift in Sources */,
-				825CC5AAC6DFC4F0535DE543 /* MatchService.swift in Sources */,
-				1D05611BFA160D28C325E127 /* MatchSettings.swift in Sources */,
-				3F78018956A9FBF94D1B0549 /* MatchState.swift in Sources */,
-				E15AC29AC566F6647F1AEF6F /* MatchStatus.swift in Sources */,
-				A329BC2AEEEBF77221738A05 /* MatchStore.swift in Sources */,
-				36D1661CB56F2E812B71F02E /* MatchSyncCoordinator.swift in Sources */,
-				F6BEF7C674F21E5564C5F1BC /* WristRallyApp.swift in Sources */,
-				2D107A3BEEDD6C0FD0845CE0 /* PhoneRootView.swift in Sources */,
-				DB1C76ACB2A6561C876EE7DE /* ScoringEngine.swift in Sources */,
-				66320465F9D1099263F7A393 /* Side.swift in Sources */,
-				2D1CE91BB767A2BE61394410 /* WorkoutPauseResumeLogic.swift in Sources */,
-				E2209B5327DE9A358282734D /* WristRaiseSupport.swift in Sources */,
+				D4C6F7370AA4BD0EDB1941EB /* DurationFormatter.swift in Sources */,
+				997CEEA7643228E62FD423F1 /* MatchAction.swift in Sources */,
+				70364B7CE1F5839035B7B6D4 /* MatchEvent.swift in Sources */,
+				08110C22380689173725F2EE /* MatchLiveActivityLifecycle.swift in Sources */,
+				1043065C629EBA5F9E805E52 /* MatchScoreSnapshot.swift in Sources */,
+				0CEC6181F1D8CBCCF661B230 /* MatchScoreSnapshotTests.swift in Sources */,
+				09074C5FF2BA64B65F118F22 /* MatchService.swift in Sources */,
+				3DBB6BF4D384FD93F1C29BB5 /* MatchServiceTests.swift in Sources */,
+				559F248F52CA2A8F078615FC /* MatchSettings.swift in Sources */,
+				695E5F4F4C14ADBC0A898427 /* MatchState.swift in Sources */,
+				8406C8420CEA71774306C209 /* MatchStatus.swift in Sources */,
+				76A55B8C1CC97CB7E0941557 /* MatchStore.swift in Sources */,
+				E5CE7449964C6C3E345A515C /* MatchSyncCoordinator.swift in Sources */,
+				91C763E3D3591996EDBB9D6B /* ScoringEngine.swift in Sources */,
+				E68BFB40AF41F2255D77222C /* ScoringEngineTests.swift in Sources */,
+				7E92D7EBCFF349F1A99B8491 /* Side.swift in Sources */,
+				494D5359EF9B131D69F0A0A5 /* WorkoutPauseResumeLogic.swift in Sources */,
+				8BA6855D33A68BC641B04210 /* WristRaiseSupport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B9BAA9930F71C0928EA7BF31 /* Sources */ = {
+		8359A34BA5DE05BEDC87573E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0EFA86C13AA0906016A027C4 /* DurationFormatter.swift in Sources */,
-				B548E8CE5FFABBF5666F2475 /* MatchAction.swift in Sources */,
-				7AA38F4A869E1667D9FDBBDB /* MatchEvent.swift in Sources */,
-				2FB79EACA46DFC1619126DBA /* MatchLiveActivityLifecycle.swift in Sources */,
-				9908FAFE56F6B75A30F9A887 /* MatchScoreSnapshot.swift in Sources */,
-				13B10553DDE7A0A081E414A8 /* MatchScoreSnapshotTests.swift in Sources */,
-				748A2721FE819EC4D0873E75 /* MatchService.swift in Sources */,
-				D1EA181893A44DD35F66198D /* MatchServiceTests.swift in Sources */,
-				1369E0EEB77F4CBECACBA31C /* MatchSettings.swift in Sources */,
-				7E4E1D169C820FB3FBE29075 /* MatchState.swift in Sources */,
-				07F297C2B438902044E72514 /* MatchStatus.swift in Sources */,
-				67FBAE848484D09FDE2306D2 /* MatchStore.swift in Sources */,
-				F7380CBB1305FEC26BF90F6F /* MatchSyncCoordinator.swift in Sources */,
-				EB869FAA66CE4311EDFBD3F6 /* ScoringEngine.swift in Sources */,
-				06E57F55D620F5AD181A5509 /* ScoringEngineTests.swift in Sources */,
-				A4AB22CF8A715F5698D930E5 /* Side.swift in Sources */,
-				CDF6DDE4A18EB6A3D3F0122F /* WorkoutPauseResumeLogic.swift in Sources */,
-				5DC6C3BC583F898B4DFB46F7 /* WristRaiseSupport.swift in Sources */,
+				83207B67D1BAFAF1FF0E7300 /* DurationFormatter.swift in Sources */,
+				7DBDDDCAA8065ECBD17CA648 /* MatchAction.swift in Sources */,
+				CBB7324BCC7331F9C1206ACF /* MatchDetailView.swift in Sources */,
+				9B89620F1D0788785FE06D6B /* MatchEvent.swift in Sources */,
+				2A04F22FBE13852E9B640C76 /* MatchLiveActivityLifecycle.swift in Sources */,
+				9EBABF96693DD31B418159EE /* MatchLiveActivityManager.swift in Sources */,
+				1CBC5EDA3B0B0E4F2DDAC5B7 /* MatchScoreSnapshot.swift in Sources */,
+				2388F3CD046FDFC69AD872B8 /* MatchService.swift in Sources */,
+				7F923EB099948FD26C3377E3 /* MatchSettings.swift in Sources */,
+				BF10BA5562D3D9128A7AB5CF /* MatchState.swift in Sources */,
+				A8FBDDDD7C1C8C5F1468BFF4 /* MatchStatus.swift in Sources */,
+				921EF7836C393D26F63BA443 /* MatchStore.swift in Sources */,
+				CA3AD9339BCE0C07ABEC19FC /* MatchSyncCoordinator.swift in Sources */,
+				F157C3F8EA8EA5C18420DEC3 /* PhoneRootView.swift in Sources */,
+				7C68114583BE8034D15228AC /* ScoringEngine.swift in Sources */,
+				BEB8360628DB123EC7A63E8E /* Side.swift in Sources */,
+				6CC754AB3529AA52CC5CCA2A /* WorkoutPauseResumeLogic.swift in Sources */,
+				9B10F05E7F3B7CD9A095DACC /* WristRaiseSupport.swift in Sources */,
+				7C36ABDE366AABA9EE787FA0 /* WristRallyApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E3052C9224000C49BDF2844B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66D228E81C6F5FD64DB941C0 /* DurationFormatter.swift in Sources */,
+				E78CF0ABE88A6C1C48C4E18D /* MatchAction.swift in Sources */,
+				374959AF04D09E7DE0A492B8 /* MatchEvent.swift in Sources */,
+				139067171EF44CC2B501CDF7 /* MatchLiveActivityLifecycle.swift in Sources */,
+				CC1E57ED412808A3FB9A3A7A /* MatchScoreSnapshot.swift in Sources */,
+				F902CF28AC83D70129048D1F /* MatchService.swift in Sources */,
+				0041E314566CCFAEBB86F81F /* MatchSettings.swift in Sources */,
+				90CCD778643B0A9EDC6E2A49 /* MatchState.swift in Sources */,
+				F8F8761A6DB489807DDF89F5 /* MatchStatus.swift in Sources */,
+				2EB0F487572F7CDA812E1C96 /* MatchStore.swift in Sources */,
+				A44C7C214C1FDD4400E2F6D0 /* MatchSyncCoordinator.swift in Sources */,
+				09936776C76AF5F6F7DE511D /* ScoringEngine.swift in Sources */,
+				A82DC26D12D2156A76AD0B0E /* Side.swift in Sources */,
+				DFB4CAB3E9C17B76AF30CA20 /* WorkoutPauseResumeLogic.swift in Sources */,
+				DD57A96D7A1C224EB0184423 /* WristRaiseSupport.swift in Sources */,
+				EBF467DF5475664254A733C9 /* WristRallyComplications.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		05856787DDA5B4B8E0EBE1B4 /* PBXTargetDependency */ = {
+		3A1E39CEEEE7E01467728532 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 41F8D84B854F63B981445495 /* WristRallyWatch */;
-			targetProxy = 480415BF83B58C5CC2C0661C /* PBXContainerItemProxy */;
+			target = 224534605DFA3D4B4A14286D /* WristRallyWatch */;
+			targetProxy = D1DF868818C22AD0C5DA2B64 /* PBXContainerItemProxy */;
 		};
-		12468561FEC57A8F30121F6E /* PBXTargetDependency */ = {
+		3C27BAA4B931ED75F5E09793 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 7638DF011CA6981D7D0A47C1 /* WristRallyComplications */;
-			targetProxy = 950C4FA2D727B3557E6C2206 /* PBXContainerItemProxy */;
+			target = CB2523C6BDD3957323D7A9D2 /* WristRallyComplications */;
+			targetProxy = 7DFA0A4D8C7444D6DF3CC4C3 /* PBXContainerItemProxy */;
 		};
-		2900CE3A5F0D0FBAF2186725 /* PBXTargetDependency */ = {
+		6FB0BF555E16D266D57FBE83 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = D4347D2A56CBEF9AD8524FBD /* WristRallyLiveActivity */;
-			targetProxy = 8EB267C45E3ADF603E7A8427 /* PBXContainerItemProxy */;
+			target = BF85A4FB7AB07DC4601515FE /* WristRallyLiveActivity */;
+			targetProxy = 84BCE5571DBF4DB0483CBB99 /* PBXContainerItemProxy */;
+		};
+		E1708DC8A0A6BBFF03EA638F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 224534605DFA3D4B4A14286D /* WristRallyWatch */;
+			targetProxy = F6109CC3454978CCCBA12AF4 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		016AA32709215B4612EC8EF5 /* Release */ = {
+		2AF0DCEAB9FAB5C5B8DEA8CC /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
-				WATCHOS_DEPLOYMENT_TARGET = 11.0;
-			};
-			name = Release;
-		};
-		0B46ECB2BC2B693A47DB04BE /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
+			baseConfigurationReference = 798F0B55AB415C0F515757DD /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = watch/WristRallyWatch/WristRallyWatch.entitlements;
-				CURRENT_PROJECT_VERSION = 7;
+				CODE_SIGN_ENTITLEMENTS = iPhone/WristRally/WristRally.entitlements;
+				CURRENT_PROJECT_VERSION = 6;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = watch/WristRallyWatch/Info.plist;
+				INFOPLIST_FILE = iPhone/WristRally/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Wrist Rally";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Wrist Rally reads workout data when you choose to track a match as a workout.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Wrist Rally saves workout duration when you track a match as a workout.";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.codebrewery.wristrally;
-				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.wristrally.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.wristrally;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		2ED9FB64C9A4A269D1B5DD0A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 798F0B55AB415C0F515757DD /* Signing.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.wristrally.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "";
+			};
+			name = Debug;
+		};
+		4CAFAC92BF8BA311C5C20A56 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 798F0B55AB415C0F515757DD /* Signing.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = watch/WristRallyComplications/WristRallyComplications.entitlements;
+				CURRENT_PROJECT_VERSION = 6;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = watch/WristRallyComplications/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.wristrally.watchkitapp.complications;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";
@@ -798,12 +841,12 @@
 			};
 			name = Release;
 		};
-		0DDD5FE6B69B9329B157C5A1 /* Debug */ = {
+		59D683E5177B1CE6702D80F4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
+			baseConfigurationReference = 798F0B55AB415C0F515757DD /* Signing.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = watch/WristRallyComplications/WristRallyComplications.entitlements;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 6;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = watch/WristRallyComplications/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -820,12 +863,12 @@
 			};
 			name = Debug;
 		};
-		7835F8F3D6125A66830D4C85 /* Release */ = {
+		730C9660961A45774858CEDF /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
+			baseConfigurationReference = 798F0B55AB415C0F515757DD /* Signing.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = iPhone/WristRallyLiveActivity/WristRallyLiveActivity.entitlements;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 6;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = iPhone/WristRallyLiveActivity/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -840,9 +883,114 @@
 			};
 			name = Release;
 		};
-		81096FF827C7DB114408DA3D /* Debug */ = {
+		7991EEEEDE091BC8CEDF325B /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
+			baseConfigurationReference = 798F0B55AB415C0F515757DD /* Signing.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.wristrally.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "";
+			};
+			name = Release;
+		};
+		8A0B0202A389EBE1981A479C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.wristrally.watchkitapp.uitests;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = WristRallyWatch;
+			};
+			name = Release;
+		};
+		A1A85BE1DA955D24B8EF6E8F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 798F0B55AB415C0F515757DD /* Signing.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = watch/WristRallyWatch/WristRallyWatch.entitlements;
+				CURRENT_PROJECT_VERSION = 6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = watch/WristRallyWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Wrist Rally";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Wrist Rally reads workout data when you choose to track a match as a workout.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Wrist Rally saves workout duration when you track a match as a workout.";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.codebrewery.wristrally;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.wristrally.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+		A3373A857C3BECA48F988145 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 798F0B55AB415C0F515757DD /* Signing.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = iPhone/WristRally/WristRally.entitlements;
+				CURRENT_PROJECT_VERSION = 6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iPhone/WristRally/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Wrist Rally";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.wristrally;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		A82B5EAEAB6777C71E0E64A8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.wristrally.watchkitapp.uitests;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = WristRallyWatch;
+			};
+			name = Debug;
+		};
+		AFB4A4F52A1C11E954D13488 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 798F0B55AB415C0F515757DD /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -904,30 +1052,69 @@
 			};
 			name = Debug;
 		};
-		9D177D02D8980E11B9A1ED93 /* Debug */ = {
+		E5A265447028BA2539272A6E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
+			baseConfigurationReference = 798F0B55AB415C0F515757DD /* Signing.xcconfig */;
 			buildSettings = {
-				BUNDLE_LOADER = "";
-				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.wristrally.tests;
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "";
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
 			};
-			name = Debug;
+			name = Release;
 		};
-		9D41444B47824C2740447DF2 /* Debug */ = {
+		F55F3FDC7E606A40A46104E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
+			baseConfigurationReference = 798F0B55AB415C0F515757DD /* Signing.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = iPhone/WristRallyLiveActivity/WristRallyLiveActivity.entitlements;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 6;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = iPhone/WristRallyLiveActivity/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -942,61 +1129,13 @@
 			};
 			name = Debug;
 		};
-		B34135F8A86A08D2583C6790 /* Release */ = {
+		FD19C346F7E7E39C55C5C16E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = watch/WristRallyComplications/WristRallyComplications.entitlements;
-				CURRENT_PROJECT_VERSION = 7;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = watch/WristRallyComplications/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.wristrally.watchkitapp.complications;
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "watchos watchsimulator";
-				TARGETED_DEVICE_FAMILY = 4;
-			};
-			name = Release;
-		};
-		C7E7EE53211E314AB23E8620 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = iPhone/WristRally/WristRally.entitlements;
-				CURRENT_PROJECT_VERSION = 7;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = iPhone/WristRally/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Wrist Rally";
-				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.wristrally;
-				SDKROOT = iphoneos;
-				SUPPORTS_MACCATALYST = NO;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Release;
-		};
-		D16A1B5DBCE5D7C315D9A8D7 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
+			baseConfigurationReference = 798F0B55AB415C0F515757DD /* Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = watch/WristRallyWatch/WristRallyWatch.entitlements;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = watch/WristRallyWatch/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Wrist Rally";
@@ -1011,110 +1150,75 @@
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";
 				TARGETED_DEVICE_FAMILY = 4;
 			};
-			name = Debug;
-		};
-		D1DB54682EEDEDCA886820F5 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = iPhone/WristRally/WristRally.entitlements;
-				CURRENT_PROJECT_VERSION = 7;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = iPhone/WristRally/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Wrist Rally";
-				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.wristrally;
-				SDKROOT = iphoneos;
-				SUPPORTS_MACCATALYST = NO;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Debug;
-		};
-		D4D45EB343E12CFB264715FB /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = F96A289BF996A6F9FFE8B9AE /* Signing.xcconfig */;
-			buildSettings = {
-				BUNDLE_LOADER = "";
-				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.codebrewery.wristrally.tests;
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "";
-			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3B5E4CF5BD71D414EEE84957 /* Build configuration list for PBXNativeTarget "WristRallyTests" */ = {
+		1E200DA5DBF8DFB293ADEDA8 /* Build configuration list for PBXNativeTarget "WristRallyLiveActivity" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				9D177D02D8980E11B9A1ED93 /* Debug */,
-				D4D45EB343E12CFB264715FB /* Release */,
+				F55F3FDC7E606A40A46104E4 /* Debug */,
+				730C9660961A45774858CEDF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		5B0819D7B4C37DE3E3417790 /* Build configuration list for PBXNativeTarget "WristRallyWatch" */ = {
+		61177112F852143795D8F391 /* Build configuration list for PBXNativeTarget "WristRally" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				D16A1B5DBCE5D7C315D9A8D7 /* Debug */,
-				0B46ECB2BC2B693A47DB04BE /* Release */,
+				2AF0DCEAB9FAB5C5B8DEA8CC /* Debug */,
+				A3373A857C3BECA48F988145 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		7F82FAD3C8AACF3666A9B4BA /* Build configuration list for PBXNativeTarget "WristRallyComplications" */ = {
+		9E6FE959D38F5A50FD73E9F4 /* Build configuration list for PBXNativeTarget "WristRallyComplications" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0DDD5FE6B69B9329B157C5A1 /* Debug */,
-				B34135F8A86A08D2583C6790 /* Release */,
+				59D683E5177B1CE6702D80F4 /* Debug */,
+				4CAFAC92BF8BA311C5C20A56 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		8C0B968DEE136FB3AF729E8F /* Build configuration list for PBXNativeTarget "WristRally" */ = {
+		CB701705489C3A0D4BE44590 /* Build configuration list for PBXProject "WristRally" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				D1DB54682EEDEDCA886820F5 /* Debug */,
-				C7E7EE53211E314AB23E8620 /* Release */,
+				AFB4A4F52A1C11E954D13488 /* Debug */,
+				E5A265447028BA2539272A6E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		D19051C26C32F498F5464E81 /* Build configuration list for PBXNativeTarget "WristRallyLiveActivity" */ = {
+		E49E39B62890A4CA26CC0AFC /* Build configuration list for PBXNativeTarget "WristRallyTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				9D41444B47824C2740447DF2 /* Debug */,
-				7835F8F3D6125A66830D4C85 /* Release */,
+				2ED9FB64C9A4A269D1B5DD0A /* Debug */,
+				7991EEEEDE091BC8CEDF325B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		E0CE50DCF5F6ACF9691A0E3A /* Build configuration list for PBXProject "WristRally" */ = {
+		EA43ED3444FAD90CB1E4E29D /* Build configuration list for PBXNativeTarget "WristRallyWatch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				81096FF827C7DB114408DA3D /* Debug */,
-				016AA32709215B4612EC8EF5 /* Release */,
+				A1A85BE1DA955D24B8EF6E8F /* Debug */,
+				FD19C346F7E7E39C55C5C16E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F43F970D8C3339D34EBDC42E /* Build configuration list for PBXNativeTarget "WristRallyWatchUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A82B5EAEAB6777C71E0E64A8 /* Debug */,
+				8A0B0202A389EBE1981A479C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 4852C7C9976BEA97D8ACFD1F /* Project object */;
+	rootObject = 04790F5E2173D874F05EDE89 /* Project object */;
 }
