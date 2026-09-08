@@ -116,7 +116,7 @@ Future backend work is intentionally excluded.
 Recommended structure:
 
 ```text
-PadelScore/
+WristRally/
 
     WatchApp/
 

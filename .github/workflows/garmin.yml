@@ -58,7 +58,7 @@ jobs:
           mkdir -p bin
           monkeyc \
             -f monkey.jungle \
-            -o "bin/PadelScore-${{ matrix.device }}.prg" \
+            -o "bin/WristRally-${{ matrix.device }}.prg" \
             -y developer_key.der \
             -d "${{ matrix.device }}" \
             -w
@@ -66,8 +66,8 @@ jobs:
       - name: Upload .prg
         uses: actions/upload-artifact@v4
         with:
-          name: padel-score-${{ matrix.device }}
-          path: garmin/bin/PadelScore-${{ matrix.device }}.prg
+          name: wrist-rally-${{ matrix.device }}
+          path: garmin/bin/WristRally-${{ matrix.device }}.prg
           if-no-files-found: error
 
   test:

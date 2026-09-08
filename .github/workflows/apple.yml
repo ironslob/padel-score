@@ -12,7 +12,7 @@ on:
       - "tests/**"
       - "project.yml"
       - "Config/**"
-      - "PadelScore.xcodeproj/**"
+      - "WristRally.xcodeproj/**"
       - ".github/workflows/apple.yml"
   pull_request:
     paths:
@@ -22,7 +22,7 @@ on:
       - "tests/**"
       - "project.yml"
       - "Config/**"
-      - "PadelScore.xcodeproj/**"
+      - "WristRally.xcodeproj/**"
       - ".github/workflows/apple.yml"
   workflow_dispatch:
 
@@ -79,11 +79,11 @@ jobs:
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
           echo "Using simulator: $NAME"
 
-      - name: Run PadelScoreTests
+      - name: Run WristRallyTests
         run: |
           set -o pipefail
           xcodebuild \
-            -scheme PadelScoreTests \
+            -scheme WristRallyTests \
             -destination "platform=iOS Simulator,name=${{ steps.ios_dest.outputs.name }}" \
             CODE_SIGNING_ALLOWED=NO \
             test \
@@ -118,7 +118,7 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild \
-            -scheme PadelScoreWatch \
+            -scheme WristRallyWatch \
             -destination 'generic/platform=watchOS Simulator' \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
@@ -129,7 +129,7 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild \
-            -scheme PadelScoreWatch \
+            -scheme WristRallyWatch \
             -sdk watchos \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
@@ -165,7 +165,7 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild \
-            -scheme PadelScore \
+            -scheme WristRally \
             -destination 'generic/platform=iOS Simulator' \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \

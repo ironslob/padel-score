@@ -1,6 +1,6 @@
-name: PadelScore
+name: WristRally
 options:
-  bundleIdPrefix: com.codebrewery.padelscore
+  bundleIdPrefix: com.codebrewery.wristrally
   deploymentTarget:
     iOS: "18.0"
     watchOS: "11.0"
@@ -15,30 +15,30 @@ configFiles:
 settings:
   SWIFT_VERSION: "5.0"
 targets:
-  PadelScore:
+  WristRally:
     type: application
     platform: iOS
     configFiles:
       Debug: Config/Signing.xcconfig
       Release: Config/Signing.xcconfig
     sources:
-      - path: iPhone/PadelScore
+      - path: iPhone/WristRally
         excludes:
           - Info.plist
       - path: shared
         excludes:
           - "**/*Tests*"
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.padelscore
+      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.wristrally
       GENERATE_INFOPLIST_FILE: YES
-      INFOPLIST_FILE: iPhone/PadelScore/Info.plist
+      INFOPLIST_FILE: iPhone/WristRally/Info.plist
       ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       INFOPLIST_KEY_CFBundleDisplayName: Wrist Rally
       INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
       INFOPLIST_KEY_UILaunchScreen_Generation: YES
       INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
       INFOPLIST_KEY_NSSupportsLiveActivities: YES
-      CODE_SIGN_ENTITLEMENTS: iPhone/PadelScore/PadelScore.entitlements
+      CODE_SIGN_ENTITLEMENTS: iPhone/WristRally/WristRally.entitlements
       CURRENT_PROJECT_VERSION: 6
       MARKETING_VERSION: "1.0"
       SUPPORTS_MACCATALYST: NO
@@ -47,34 +47,34 @@ targets:
       App Groups:
         enabled: true
         groups:
-          - group.com.codebrewery.padelscores
+          - group.com.codebrewery.wristrally
     dependencies:
-      - target: PadelScoreWatch
+      - target: WristRallyWatch
         embed: true
-      - target: PadelScoreLiveActivity
+      - target: WristRallyLiveActivity
         embed: true
     scheme:
       testTargets:
-        - PadelScoreTests
+        - WristRallyTests
 
-  PadelScoreLiveActivity:
+  WristRallyLiveActivity:
     type: app-extension
     platform: iOS
     configFiles:
       Debug: Config/Signing.xcconfig
       Release: Config/Signing.xcconfig
     sources:
-      - path: iPhone/PadelScoreLiveActivity
+      - path: iPhone/WristRallyLiveActivity
         excludes:
           - Info.plist
       - path: shared
         excludes:
           - "**/*Tests*"
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.padelscore.liveactivity
+      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.wristrally.liveactivity
       GENERATE_INFOPLIST_FILE: NO
-      INFOPLIST_FILE: iPhone/PadelScoreLiveActivity/Info.plist
-      CODE_SIGN_ENTITLEMENTS: iPhone/PadelScoreLiveActivity/PadelScoreLiveActivity.entitlements
+      INFOPLIST_FILE: iPhone/WristRallyLiveActivity/Info.plist
+      CODE_SIGN_ENTITLEMENTS: iPhone/WristRallyLiveActivity/WristRallyLiveActivity.entitlements
       CURRENT_PROJECT_VERSION: 6
       MARKETING_VERSION: "1.0"
       TARGETED_DEVICE_FAMILY: "1"
@@ -82,68 +82,68 @@ targets:
       App Groups:
         enabled: true
         groups:
-          - group.com.codebrewery.padelscores
+          - group.com.codebrewery.wristrally
     scheme: {}
 
-  PadelScoreWatch:
+  WristRallyWatch:
     type: application
     platform: watchOS
     configFiles:
       Debug: Config/Signing.xcconfig
       Release: Config/Signing.xcconfig
     sources:
-      - path: watch/PadelScoreWatch
+      - path: watch/WristRallyWatch
         excludes:
           - Info.plist
       - path: shared
         excludes:
           - "**/*Tests*"
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.padelscore.watchkitapp
+      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.wristrally.watchkitapp
       GENERATE_INFOPLIST_FILE: YES
-      INFOPLIST_FILE: watch/PadelScoreWatch/Info.plist
+      INFOPLIST_FILE: watch/WristRallyWatch/Info.plist
       ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       INFOPLIST_KEY_CFBundleDisplayName: Wrist Rally
-      INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.codebrewery.padelscore
+      INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.codebrewery.wristrally
       INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp: YES
       INFOPLIST_KEY_NSHealthShareUsageDescription: Wrist Rally reads workout data when you choose to track a match as a workout.
       INFOPLIST_KEY_NSHealthUpdateUsageDescription: Wrist Rally saves workout duration when you track a match as a workout.
-      CODE_SIGN_ENTITLEMENTS: watch/PadelScoreWatch/PadelScoreWatch.entitlements
+      CODE_SIGN_ENTITLEMENTS: watch/WristRallyWatch/WristRallyWatch.entitlements
       CURRENT_PROJECT_VERSION: 6
       MARKETING_VERSION: "1.0"
       TARGETED_DEVICE_FAMILY: "4"
       SDKROOT: watchos
       SUPPORTED_PLATFORMS: "watchos watchsimulator"
     dependencies:
-      - target: PadelScoreComplications
+      - target: WristRallyComplications
         embed: true
     capabilities:
       App Groups:
         enabled: true
         groups:
-          - group.com.codebrewery.padelscores
+          - group.com.codebrewery.wristrally
       HealthKit:
         enabled: true
     scheme: {}
 
-  PadelScoreComplications:
+  WristRallyComplications:
     type: app-extension
     platform: watchOS
     configFiles:
       Debug: Config/Signing.xcconfig
       Release: Config/Signing.xcconfig
     sources:
-      - path: watch/PadelScoreComplications
+      - path: watch/WristRallyComplications
         excludes:
           - Info.plist
       - path: shared
         excludes:
           - "**/*Tests*"
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.padelscore.watchkitapp.complications
+      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.wristrally.watchkitapp.complications
       GENERATE_INFOPLIST_FILE: NO
-      INFOPLIST_FILE: watch/PadelScoreComplications/Info.plist
-      CODE_SIGN_ENTITLEMENTS: watch/PadelScoreComplications/PadelScoreComplications.entitlements
+      INFOPLIST_FILE: watch/WristRallyComplications/Info.plist
+      CODE_SIGN_ENTITLEMENTS: watch/WristRallyComplications/WristRallyComplications.entitlements
       CURRENT_PROJECT_VERSION: 6
       MARKETING_VERSION: "1.0"
       TARGETED_DEVICE_FAMILY: "4"
@@ -153,10 +153,10 @@ targets:
       App Groups:
         enabled: true
         groups:
-          - group.com.codebrewery.padelscores
+          - group.com.codebrewery.wristrally
     scheme: {}
 
-  PadelScoreTests:
+  WristRallyTests:
     type: bundle.unit-test
     platform: iOS
     configFiles:
@@ -169,31 +169,31 @@ targets:
           - "**/*Tests*"
     settings:
       GENERATE_INFOPLIST_FILE: YES
-      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.padelscore.tests
+      PRODUCT_BUNDLE_IDENTIFIER: com.codebrewery.wristrally.tests
       TARGETED_DEVICE_FAMILY: "1"
       # Hostless unit tests — shared sources compiled into the test bundle.
       TEST_HOST: ""
       BUNDLE_LOADER: ""
 
 schemes:
-  PadelScore:
+  WristRally:
     build:
       targets:
-        PadelScoreWatch: [all]
-        PadelScore: [all]
-        PadelScoreTests: [test]
+        WristRallyWatch: [all]
+        WristRally: [all]
+        WristRallyTests: [test]
     test:
       targets:
-        - PadelScoreTests
-  PadelScoreWatch:
+        - WristRallyTests
+  WristRallyWatch:
     build:
       targets:
-        PadelScoreWatch: [all]
-  PadelScoreTests:
+        WristRallyWatch: [all]
+  WristRallyTests:
     build:
       targets:
-        PadelScoreTests: [build, test]
+        WristRallyTests: [build, test]
     test:
       targets:
-        - PadelScoreTests
+        - WristRallyTests
       gatherCoverageData: false

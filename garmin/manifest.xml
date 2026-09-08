@@ -4,7 +4,7 @@
         id="a1b2c3d4-e5f6-7890-abcd-ef1234567890"
         type="watch-app"
         name="@Strings.AppName"
-        entry="PadelScoreApp"
+        entry="WristRallyApp"
         launcherIcon="@Drawables.LauncherIcon"
         minApiLevel="4.2.0">
 

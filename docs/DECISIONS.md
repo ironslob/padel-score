@@ -52,7 +52,7 @@ Documented decisions that were not fully prescribed by `/spec`.
 
 ## Project generation
 
-**Choice:** `XcodeGen` (`project.yml`) generates `PadelScore.xcodeproj`.
+**Choice:** `XcodeGen` (`project.yml`) generates `WristRally.xcodeproj`.
 
 **Why:** Keeps the multi-target layout reproducible in git without hand-editing `pbxproj`.
 

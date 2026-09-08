@@ -13,11 +13,11 @@ These files define behaviour that **must match** on Apple Watch, Garmin, and Wea
 1. Read `spec/product.md` for intended behaviour.
 2. Implement in `shared/Scoring/ScoringEngine.swift` (and related models/services).
 3. Mirror the same logic in `garmin/source/ScoringEngine.mc` and `garmin/source/Models.mc`.
-4. Mirror the same logic in `android/domain/src/main/kotlin/com/padelscore/domain/ScoringEngine.kt`.
+4. Mirror the same logic in `android/domain/src/main/kotlin/com/wristrally/domain/ScoringEngine.kt`.
 5. Add or update tests:
    - `tests/Unit/ScoringEngineTests.swift`
    - `garmin/source/ScoringEngineTests.mc`
-   - `android/domain/src/test/kotlin/com/padelscore/domain/ScoringEngineTests.kt`
+   - `android/domain/src/test/kotlin/com/wristrally/domain/ScoringEngineTests.kt`
 6. Call out any intentional platform difference in `docs/DECISIONS.md`.
 
 ## Design constraints

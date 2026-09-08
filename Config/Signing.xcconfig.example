@@ -8,5 +8,5 @@
 DEVELOPMENT_TEAM = YOUR_TEAM_ID_HERE
 CODE_SIGN_STYLE = Automatic
 CODE_SIGN_IDENTITY = Apple Development
-BUNDLE_ID_ROOT = com.yourname.padelscore
-APP_GROUP_ID = group.com.yourname.padelscore
+BUNDLE_ID_ROOT = com.yourname.wristrally
+APP_GROUP_ID = group.com.yourname.wristrally

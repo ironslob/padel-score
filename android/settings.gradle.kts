@@ -14,7 +14,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "PadelScore"
+rootProject.name = "WristRally"
 include(":domain")
 include(":wear")
 

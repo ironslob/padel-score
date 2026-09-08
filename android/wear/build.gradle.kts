@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.padelscore.wear"
+    namespace = "com.wristrally.wear"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.codebrewery.padelscore.wear"
+        applicationId = "com.codebrewery.wristrally.wear"
         minSdk = 30
         targetSdk = 35
         versionCode = 1

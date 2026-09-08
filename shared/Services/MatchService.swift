@@ -13,7 +13,7 @@ public final class MatchService: ObservableObject {
 
     private let engine: ScoringEngine
     private let store: MatchStore
-    private let logger = Logger(subsystem: "com.padelscore", category: "MatchService")
+    private let logger = Logger(subsystem: "com.wristrally", category: "MatchService")
     private var syncHandler: ((MatchState?, [MatchState], Set<UUID>) -> Void)?
 
     public init(store: MatchStore, engine: ScoringEngine = ScoringEngine(), autoRestore: Bool = true) {
