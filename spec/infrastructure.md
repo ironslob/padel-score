@@ -1,6 +1,6 @@
 # Infrastructure Specification
 
-**Project:** Padel Score
+**Project:** Wrist Rally
 
 **Version:** 1.0
 
@@ -10,7 +10,7 @@
 
 ## Scope
 
-This document defines the infrastructure, tooling and operational environment for the Padel Score project.
+This document defines the infrastructure, tooling and operational environment for the Wrist Rally project.
 
 It covers:
 

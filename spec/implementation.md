@@ -1,6 +1,6 @@
 # Implementation Specification
 
-**Project:** Padel Score
+**Project:** Wrist Rally
 
 **Version:** 1.0
 
@@ -116,7 +116,7 @@ Future backend work is intentionally excluded.
 Recommended structure:
 
 ```text
-PadelScore/
+WristRally/
 
     WatchApp/
 

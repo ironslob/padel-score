@@ -19,7 +19,7 @@ class StartView extends WatchUi.View {
         var height = dc.getHeight();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-        dc.drawText(width / 2, height / 4, Graphics.FONT_MEDIUM, "Padel Score", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, height / 4, Graphics.FONT_MEDIUM, "Wrist Rally", Graphics.TEXT_JUSTIFY_CENTER);
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
         dc.drawText(width / 2, height / 4 + 28, Graphics.FONT_XTINY, "Tap to start match", Graphics.TEXT_JUSTIFY_CENTER);
 

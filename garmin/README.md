@@ -1,6 +1,6 @@
-# Padel Score — Garmin Connect IQ
+# Wrist Rally — Garmin Connect IQ
 
-Watch app port of Padel Score for Garmin touchscreen watches (Venu 3, Forerunner 965, etc.).
+Watch app port of Wrist Rally for Garmin touchscreen watches (Venu 3, Forerunner 965, etc.).
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ garmin/
 │   ├── MatchService.mc   # Match lifecycle + persistence + FIT coordination
 │   ├── FitActivityManager.mc  # ActivityRecording / FitContributor session
 │   ├── MatchStore.mc     # Application.Storage persistence
-│   ├── PadelScoreApp.mc  # App entry point
+│   ├── WristRallyApp.mc  # App entry point
 │   └── *View.mc          # Watch UI screens
 └── resources/
     ├── strings/
@@ -42,10 +42,10 @@ cd garmin
 # Generate a key once if you don't have one:
 # openssl genrsa -out developer_key.pem 4096
 # openssl pkcs8 -topk8 -inform PEM -outform DER -in developer_key.pem -out developer_key.der -nocrypt
-monkeyc -f monkey.jungle -o bin/PadelScore.prg -y /path/to/developer_key.der -d venu3
+monkeyc -f monkey.jungle -o bin/WristRally.prg -y /path/to/developer_key.der -d venu3
 ```
 
-Install on a physical watch: copy `bin/PadelScore.prg` to `GARMIN/Apps/` on the device via USB.
+Install on a physical watch: copy `bin/WristRally.prg` to `GARMIN/Apps/` on the device via USB.
 
 ## CI
 

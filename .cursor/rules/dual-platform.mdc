@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Dual-platform watch apps
 
-Padel Score ships on **three watch platforms**:
+Wrist Rally ships on **three watch platforms**:
 
 | Platform | Path | Stack |
 |----------|------|-------|
@@ -32,7 +32,7 @@ Scoring behaviour must stay identical across platforms:
 
 - Swift source of truth: `shared/Scoring/ScoringEngine.swift`, `shared/Models/`
 - Garmin port: `garmin/source/ScoringEngine.mc`, `garmin/source/Models.mc`
-- Wear OS port: `android/domain/src/main/kotlin/com/padelscore/domain/ScoringEngine.kt`
+- Wear OS port: `android/domain/src/main/kotlin/com/wristrally/domain/ScoringEngine.kt`
 - Spec reference: `spec/product.md`
 
 When changing scoring rules, update all three engines and add/adjust tests on all sides.
@@ -44,8 +44,8 @@ When changing scoring rules, update all three engines and add/adjust tests on al
 | Scoring engine | `shared/Scoring/` | `garmin/source/ScoringEngine.mc` | `android/domain/.../ScoringEngine.kt` |
 | Match service | `shared/Services/MatchService.swift` | `garmin/source/MatchService.mc` | `android/domain/.../MatchService.kt` |
 | Persistence | `shared/Persistence/` | `garmin/source/MatchStore.mc` | `android/domain/.../MatchStore.kt` |
-| Watch UI | `watch/PadelScoreWatch/` | `garmin/source/*View.mc` | `android/wear/` |
-| Glance / complication | `watch/PadelScoreComplications/` | widget (not yet built) | tiles (not yet built) |
+| Watch UI | `watch/WristRallyWatch/` | `garmin/source/*View.mc` | `android/wear/` |
+| Glance / complication | `watch/WristRallyComplications/` | widget (not yet built) | tiles (not yet built) |
 | Phone sync | `shared/Sync/` | Connect IQ Mobile SDK (not yet built) | Data Layer (not yet built) |
 | Workout tracking | HealthKit | FIT / ActivityRecording + FitContributor | Health Services |
 

@@ -1,6 +1,6 @@
 # Architecture Specification
 
-**Project:** Padel Score
+**Project:** Wrist Rally
 
 **Version:** 1.0
 
@@ -10,7 +10,7 @@
 
 ## Scope
 
-This document describes the overall software architecture of the Padel Score application.
+This document describes the overall software architecture of the Wrist Rally application.
 
 It defines:
 

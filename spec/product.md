@@ -1,6 +1,6 @@
 # Product Specification
 
-**Project:** Padel Score
+**Project:** Wrist Rally
 
 **Version:** 1.0
 
@@ -12,7 +12,7 @@
 
 ## Scope
 
-This document describes the product requirements for the Padel Score application.
+This document describes the product requirements for the Wrist Rally application.
 
 It defines:
 
@@ -34,7 +34,7 @@ Where behaviour is not explicitly defined, sensible engineering decisions should
 
 # 2. Vision
 
-Padel Score is an Apple Watch-first scoring application designed specifically for tracking padel matches.
+Wrist Rally is an Apple Watch-first scoring application designed specifically for tracking padel matches.
 
 The primary goal is to make score keeping require almost zero mental effort while playing.
 
@@ -261,7 +261,7 @@ If no active match exists the watch should display a primary start action.
 Start Match
 ```
 
-Starting a match always tries to start a platform workout/activity so the match is tracked as training and — where the platform supports it — so Padel Score can return when the player raises their wrist (Health workout on Apple Watch, Health Services exercise on Wear OS, FIT activity on Garmin). If another app already owns the session, the watch prompts to continue without a workout/activity or cancel so the other session can be ended first.
+Starting a match always tries to start a platform workout/activity so the match is tracked as training and — where the platform supports it — so Wrist Rally can return when the player raises their wrist (Health workout on Apple Watch, Health Services exercise on Wear OS, FIT activity on Garmin). If another app already owns the session, the watch prompts to continue without a workout/activity or cancel so the other session can be ended first.
 
 Default settings:
 

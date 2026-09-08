@@ -52,7 +52,7 @@ Documented decisions that were not fully prescribed by `/spec`.
 
 ## Project generation
 
-**Choice:** `XcodeGen` (`project.yml`) generates `PadelScore.xcodeproj`.
+**Choice:** `XcodeGen` (`project.yml`) generates `WristRally.xcodeproj`.
 
 **Why:** Keeps the multi-target layout reproducible in git without hand-editing `pbxproj`.
 
@@ -82,7 +82,7 @@ The HealthKit workout (Apple), Health Services exercise (Wear), and FIT activity
 
 **Choice:** Start Match always tries to start a HealthKit workout. There is no home-screen or Settings choice between “Track as workout” and “Score only”. If another app already owns the session, the watch prompts to continue without a workout or cancel the match start. The next Start Match tries again.
 
-**Why:** HealthKit has no API to detect another session in advance, and owning the workout is what makes wrist-raise return to Padel Score. Asking every time added a control most starts do not need. Garmin mirrors the always-try / continue-without / cancel shape with FIT `ActivityRecording` (see Garmin scoring parity); wrist reclaim is best-effort rather than HealthKit-equivalent.
+**Why:** HealthKit has no API to detect another session in advance, and owning the workout is what makes wrist-raise return to Wrist Rally. Asking every time added a control most starts do not need. Garmin mirrors the always-try / continue-without / cancel shape with FIT `ActivityRecording` (see Garmin scoring parity); wrist reclaim is best-effort rather than HealthKit-equivalent.
 
 ## Wear OS watch app
 

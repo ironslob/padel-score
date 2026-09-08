@@ -40,7 +40,7 @@ public final class FileMatchStore: MatchStore {
 
     public convenience init(fileManager: FileManager = .default) {
         let base = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let dir = base.appendingPathComponent("PadelScore", isDirectory: true)
+        let dir = base.appendingPathComponent("WristRally", isDirectory: true)
         self.init(directory: dir, fileManager: fileManager)
     }
 
