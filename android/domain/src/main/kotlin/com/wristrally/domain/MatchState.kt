@@ -180,6 +180,11 @@ data class MatchState(
             completedSets.isEmpty() &&
             !hasScoredPoints
 
+    fun duration(at: Instant = Instant.now()): Double {
+        val end = finishedAt ?: at
+        return secondsBetween(startedAt, end)
+    }
+
     fun warmUpElapsed(at: Instant = Instant.now()): Double =
         maxOf(0.0, secondsBetween(startedAt, at))
 

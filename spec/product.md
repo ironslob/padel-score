@@ -44,7 +44,7 @@ The Apple Watch is the primary product.
 
 A Garmin Connect IQ port and a Wear OS port ship in parallel. Scoring behaviour must stay identical.
 
-The iPhone exists to support the Apple Watch experience by providing history, review and future synchronisation. Wear OS is standalone in this version — there is no Android phone companion yet.
+The iPhone exists to support the Apple Watch experience by providing history, review and future synchronisation. Wear OS scoring is standalone; a matching Android phone companion reviews history over the Data Layer.
 
 ---
 
@@ -166,12 +166,11 @@ Primary:
 Secondary:
 
 - iPhone companion
+- Android phone companion (Wear OS)
 
 No iPad.
 
 No Mac.
-
-No Android phone app.
 
 ---
 
@@ -619,9 +618,9 @@ Future versions will rely on this history.
 
 ---
 
-# 22. iPhone Companion
+# 22. Phone companions
 
-The iPhone application exists primarily for review.
+The iPhone and Android phone applications exist primarily for review.
 
 Version 1 allows users to:
 
@@ -631,7 +630,7 @@ Version 1 allows users to:
 - add notes
 - delete matches from history
 
-The iPhone does **not** score matches during Version 1.
+The phones do **not** score matches during Version 1. Wear OS scoring remains standalone if the Android phone app is not installed.
 
 ---
 
@@ -754,6 +753,6 @@ Version 1 is considered successful when a user can:
 3. Record an entire match without confusion.
 4. Recover from mistakes using Undo.
 5. End the match.
-6. View the completed match on their iPhone.
+6. View the completed match on their phone.
 
 If these tasks feel effortless, the product has achieved its primary goal.

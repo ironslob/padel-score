@@ -11,55 +11,36 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.wear.compose.material3.MaterialTheme
-import com.wristrally.domain.FileMatchStore
-import com.wristrally.domain.MatchService
 
 class MainActivity : ComponentActivity() {
-    private val appModel: WearAppModel by lazy { WearAppModel(this) }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val app = application as WristRallyWearApp
         setContent {
             MaterialTheme {
-                WearApp(appModel)
+                WearApp(app)
             }
         }
     }
 }
 
-class WearAppModel(activity: MainActivity) {
-    val service: MatchService
-    val session: MatchSessionCoordinator
-
-    init {
-        val filesDir = activity.filesDir.toPath().resolve("WristRally")
-        service = MatchService(FileMatchStore(filesDir))
-        session = MatchSessionCoordinator(
-            service = service,
-            workoutManager = HealthServicesWorkoutManager(activity.applicationContext),
-            tipStore = SharedPreferencesTipStore.create(activity),
-            serveStore = SharedPreferencesStore.create(activity),
-        )
-    }
-}
-
 @Composable
-fun WearApp(model: WearAppModel) {
+fun WearApp(app: WristRallyWearApp) {
     var revision by remember { mutableIntStateOf(0) }
-    DisposableEffect(model) {
+    DisposableEffect(app) {
         val listener: () -> Unit = { revision += 1 }
-        model.service.addListener(listener)
-        model.session.addListener(listener)
+        app.service.addListener(listener)
+        app.session.addListener(listener)
         onDispose {
-            model.service.removeListener(listener)
+            app.service.removeListener(listener)
         }
     }
-    LifecycleResumeEffect(model) {
-        model.session.handleBecameActive()
+    LifecycleResumeEffect(app) {
+        app.session.handleBecameActive()
         onPauseOrDispose { }
     }
     // Read revision so Compose subscribes to service/session updates.
     @Suppress("UNUSED_VARIABLE")
     val tick = revision
-    WearRoot(service = model.service, session = model.session)
+    WearRoot(service = app.service, session = app.session)
 }

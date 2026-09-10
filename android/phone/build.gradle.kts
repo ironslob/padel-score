@@ -5,12 +5,12 @@ plugins {
 }
 
 android {
-    namespace = "com.wristrally.wear"
+    namespace = "com.wristrally.phone"
     compileSdk = 35
 
     defaultConfig {
         applicationId = "com.codebrewery.wristrally"
-        minSdk = 30
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -44,11 +44,10 @@ dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.activity:activity-compose:1.9.3")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
-    implementation("androidx.wear.compose:compose-material3:1.5.0")
-    implementation("androidx.wear.compose:compose-foundation:1.5.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+    implementation("androidx.navigation:navigation-compose:2.8.5")
+    implementation("androidx.compose.material3:material3:1.3.1")
+    implementation("androidx.compose.material:material-icons-extended:1.7.6")
     implementation("androidx.compose.ui:ui-tooling-preview:1.7.6")
-    implementation("androidx.health:health-services-client:1.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.9.0")
-    implementation("androidx.concurrent:concurrent-futures-ktx:1.2.0")
 }

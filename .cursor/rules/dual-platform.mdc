@@ -11,9 +11,9 @@ Wrist Rally ships on **three watch platforms**:
 |----------|------|-------|
 | Apple Watch | `watch/`, `shared/` | Swift, SwiftUI, WatchConnectivity |
 | Garmin | `garmin/` | Monkey C, Connect IQ |
-| Wear OS | `android/domain/`, `android/wear/` | Kotlin, Jetpack Compose for Wear OS |
+| Wear OS | `android/domain/`, `android/wear/`, `android/phone/` | Kotlin, Jetpack Compose for Wear OS + phone |
 
-The **iPhone app** (`iPhone/`) is an Apple companion only — not a fourth primary target. There is no Android phone companion yet.
+The **iPhone app** (`iPhone/`) is an Apple companion only — not a fourth primary target. The **Android phone app** (`android/phone/`) is the Wear OS companion (history / notes / deletion).
 
 ## When adding or changing a feature
 
@@ -24,7 +24,7 @@ Before finishing work, answer:
 2. **Is this watch UX?** Implement on all three platforms where APIs allow, or document a deliberate gap.
 3. **Is this Apple-only?** (HealthKit, complications, Live Activities, WatchConnectivity) — note the Garmin/Wear equivalent or mark as deferred in `docs/DECISIONS.md`.
 4. **Is this Garmin-only?** (Connect IQ widgets, FIT recording, BLE via Garmin Connect Mobile) — note the Apple/Wear equivalent or mark as deferred.
-5. **Is this Wear-only?** (Health Services, tiles, Data Layer) — note the Apple/Garmin equivalent or mark as deferred.
+5. **Is this Wear-only?** (Health Services, tiles) — note the Apple/Garmin equivalent or mark as deferred.
 
 ## Scoring parity (non-negotiable)
 
@@ -45,8 +45,9 @@ When changing scoring rules, update all three engines and add/adjust tests on al
 | Match service | `shared/Services/MatchService.swift` | `garmin/source/MatchService.mc` | `android/domain/.../MatchService.kt` |
 | Persistence | `shared/Persistence/` | `garmin/source/MatchStore.mc` | `android/domain/.../MatchStore.kt` |
 | Watch UI | `watch/WristRallyWatch/` | `garmin/source/*View.mc` | `android/wear/` |
+| Phone UI | `iPhone/` | — | `android/phone/` |
 | Glance / complication | `watch/WristRallyComplications/` | widget (not yet built) | tiles (not yet built) |
-| Phone sync | `shared/Sync/` | Connect IQ Mobile SDK (not yet built) | Data Layer (not yet built) |
+| Phone sync | `shared/Sync/` | Connect IQ Mobile SDK (not yet built) | `android/sync/` (Data Layer) |
 | Workout tracking | HealthKit | FIT / ActivityRecording + FitContributor | Health Services |
 
 ## If parity isn't feasible now
