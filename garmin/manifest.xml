@@ -6,7 +6,7 @@
         name="@Strings.AppName"
         entry="WristRallyApp"
         launcherIcon="@Drawables.LauncherIcon"
-        minApiLevel="4.2.0">
+        minApiLevel="4.1.0">
 
         <iq:products>
             <!-- Primary touchscreen targets -->

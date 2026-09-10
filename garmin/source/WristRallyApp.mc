@@ -32,7 +32,7 @@ function makeStartPair(service as MatchService) as [Views, InputDelegates] {
     return [view, new StartDelegate(service, view)];
 }
 
-function pushStartView(service as MatchService, slide as Number) as Void {
+function pushStartView(service as MatchService, slide as WatchUi.SlideType) as Void {
     var view = new StartView(service);
     WatchUi.pushView(view, new StartDelegate(service, view), slide);
 }
@@ -52,7 +52,7 @@ function pushHistoryView(service as MatchService) as Void {
     WatchUi.pushView(view, new HistoryDelegate(view), WatchUi.SLIDE_UP);
 }
 
-function pushCompleteView(service as MatchService, slide as Number) as Void {
+function pushCompleteView(service as MatchService, slide as WatchUi.SlideType) as Void {
     var view = new MatchCompleteView(service);
     WatchUi.pushView(view, new MatchCompleteDelegate(service), slide);
 }
