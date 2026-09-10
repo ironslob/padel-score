@@ -70,6 +70,16 @@ Documented decisions that were not fully prescribed by `/spec`.
 
 **Still Garmin-only gaps:** phone companion sync, complications, and Live Activities. See `garmin/README.md`.
 
+## Garmin button input
+
+**Choice:** Garmin watches without a touchscreen (Instinct 2/3 Solar, Instinct Crossover MIP, Forerunner 255) are first-class. Scoring is one physical press: **Up awards Us**, **Down awards Them**. The same button again within three seconds undoes, matching a second tap. Menu (or Select) opens Actions; Back returns to Overview. Every other screen uses a highlight + Select list (Start, Settings, warm-up, server pick, interstitials, history, match complete). Touch watches keep tap-to-score. A **Buttons: Auto / On / Off** setting (touch devices only) turns the same Up/Down scoring on for hybrid Fenix/Epix gloves or rain; Auto follows `isTouchScreen` (including when the user disables touch in system settings). Off is ignored on hardware with no touchscreen.
+
+Up/Down map to **logical** Us/Them, not visual left/right, so muscle memory stays stable when Swap sides is on. Physical keys are handled via `onKey`, with `onNextPage` / `onPreviousPage` as a fallback on devices that never send `onKey`. On touch hardware with Buttons On, those behaviors consume Up/Down so they do not change pager pages, and they do not award from a swipe.
+
+Apple Watch and Wear OS stay tap-only.
+
+**Why:** The spec wants a point in about one second. Highlight-then-confirm would add a second press on the most frequent action. Menus are infrequent, so a focus ring there is the normal Garmin pattern. Shipping Instinct-class devices without a full button path would leave Start, Settings, and changeovers unreachable.
+
 ## Pre-match warm-up
 
 **Choice:** Warm-up is a `needsWarmUp` flag on match state, not a new event kind. Completing it records nothing; elapsed time is `now - startedAt`. An optional minute limit can auto-advance; the default is no limit. Replay restores the flag the same way it restores a New Serve prompt. It is armed only at match start, never at set boundaries.

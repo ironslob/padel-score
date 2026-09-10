@@ -42,6 +42,21 @@ module UiHelpers {
         dc.drawText(x + w / 2, y + h / 2 - 8, Graphics.FONT_MEDIUM, label, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
+    function drawFocusOutline(dc as Dc, x as Number, y as Number, w as Number, h as Number) as Void {
+        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(3);
+        dc.drawRoundedRectangle(x - 1, y - 1, w + 2, h + 2, BUTTON_CORNER_RADIUS);
+        dc.setPenWidth(1);
+    }
+
+    function scoreNumberFont() {
+        var width = System.getDeviceSettings().screenWidth;
+        if (width < 200) {
+            return Graphics.FONT_NUMBER_MEDIUM;
+        }
+        return Graphics.FONT_NUMBER_HOT;
+    }
+
     function formatDuration(ms as Number) as String {
         var totalSeconds = (ms / 1000).toNumber();
         var minutes = totalSeconds / 60;

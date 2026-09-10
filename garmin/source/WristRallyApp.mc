@@ -27,16 +27,46 @@ function getApp() as WristRallyApp {
     return Application.getApp() as WristRallyApp;
 }
 
+function makeStartPair(service as MatchService) as [Views, InputDelegates] {
+    var view = new StartView(service);
+    return [view, new StartDelegate(service, view)];
+}
+
+function pushStartView(service as MatchService, slide as Number) as Void {
+    var view = new StartView(service);
+    WatchUi.pushView(view, new StartDelegate(service, view), slide);
+}
+
+function makeWarmUpPair(service as MatchService) as [Views, InputDelegates] {
+    var view = new WarmUpView(service);
+    return [view, new WarmUpDelegate(service, view)];
+}
+
+function pushWarmUpView(service as MatchService) as Void {
+    var view = new WarmUpView(service);
+    WatchUi.pushView(view, new WarmUpDelegate(service, view), WatchUi.SLIDE_LEFT);
+}
+
+function pushHistoryView(service as MatchService) as Void {
+    var view = new HistoryView(service);
+    WatchUi.pushView(view, new HistoryDelegate(view), WatchUi.SLIDE_UP);
+}
+
+function pushCompleteView(service as MatchService, slide as Number) as Void {
+    var view = new MatchCompleteView(service);
+    WatchUi.pushView(view, new MatchCompleteDelegate(service), slide);
+}
+
 function returnToStart(service as MatchService) as Void {
     service.discardMatch();
     WatchUi.popView(WatchUi.SLIDE_RIGHT);
-    WatchUi.pushView(new StartView(service), new StartDelegate(service), WatchUi.SLIDE_RIGHT);
+    pushStartView(service, WatchUi.SLIDE_RIGHT);
 }
 
 function pushMatchStartViews(service as MatchService) as Void {
     var match = service.activeMatch;
     if (match != null && match.needsWarmUp) {
-        WatchUi.pushView(new WarmUpView(service), new WarmUpDelegate(service), WatchUi.SLIDE_LEFT);
+        pushWarmUpView(service);
     } else {
         WatchUi.pushView(new SelectServerView(service), new SelectServerDelegate(service, true), WatchUi.SLIDE_LEFT);
     }
@@ -45,11 +75,11 @@ function pushMatchStartViews(service as MatchService) as Void {
 function buildRootNavigation(service as MatchService) as [Views] or [Views, InputDelegates] {
     var match = service.activeMatch;
     if (match == null) {
-        return [new StartView(service), new StartDelegate(service)];
+        return makeStartPair(service);
     }
     if (match.status == IN_PROGRESS) {
         if (match.needsWarmUp) {
-            return [new WarmUpView(service), new WarmUpDelegate(service)];
+            return makeWarmUpPair(service);
         }
         if (match.needsServerSelection) {
             return [new SelectServerView(service), new SelectServerDelegate(service, true)];
@@ -58,7 +88,8 @@ function buildRootNavigation(service as MatchService) as [Views] or [Views, Inpu
         return [pager, new MatchPagerDelegate(service, pager)];
     }
     if (match.status == COMPLETED || match.status == ENDED_EARLY) {
-        return [new MatchCompleteView(service), new MatchCompleteDelegate(service)];
+        var complete = new MatchCompleteView(service);
+        return [complete, new MatchCompleteDelegate(service)];
     }
-    return [new StartView(service), new StartDelegate(service)];
+    return makeStartPair(service);
 }

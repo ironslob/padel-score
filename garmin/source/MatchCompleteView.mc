@@ -1,5 +1,6 @@
 import Toybox.Graphics;
 import Toybox.Lang;
+import Toybox.System;
 import Toybox.WatchUi;
 
 class MatchCompleteView extends WatchUi.View {
@@ -42,6 +43,9 @@ class MatchCompleteView extends WatchUi.View {
         dc.drawText(width / 2, 108, Graphics.FONT_XTINY, UiHelpers.formatDuration(UiHelpers.matchDuration(match)), Graphics.TEXT_JUSTIFY_CENTER);
 
         UiHelpers.drawPrimaryButton(dc, "Done", width / 2 - 70, height - 70, 140, 44, UiHelpers.COLOR_ACCENT);
+        if (ButtonInput.needsButtonNav()) {
+            UiHelpers.drawFocusOutline(dc, width / 2 - 70, height - 70, 140, 44);
+        }
     }
 }
 
@@ -61,11 +65,28 @@ class MatchCompleteDelegate extends WatchUi.BehaviorDelegate {
         var y = coords[1];
 
         if (x >= width / 2 - 70 && x <= width / 2 + 70 && y >= height - 70 && y <= height - 26) {
-            service.acknowledgeCompletedMatch();
-            WatchUi.popView(WatchUi.SLIDE_RIGHT);
-            WatchUi.pushView(new StartView(service), new StartDelegate(service), WatchUi.SLIDE_RIGHT);
+            finish();
             return true;
         }
         return false;
+    }
+
+    function onSelect() as Boolean {
+        if (!ButtonInput.needsButtonNav()) {
+            return false;
+        }
+        finish();
+        return true;
+    }
+
+    function onBack() as Boolean {
+        finish();
+        return true;
+    }
+
+    private function finish() as Void {
+        service.acknowledgeCompletedMatch();
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
+        pushStartView(service, WatchUi.SLIDE_RIGHT);
     }
 }

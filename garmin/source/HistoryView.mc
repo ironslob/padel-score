@@ -36,7 +36,8 @@ class HistoryView extends WatchUi.View {
 
         if (scrollIndex > 0 || scrollIndex + 4 < matches.size()) {
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
-            dc.drawText(width / 2, dc.getHeight() - 16, Graphics.FONT_XTINY, "Swipe to scroll", Graphics.TEXT_JUSTIFY_CENTER);
+            var hint = ButtonInput.needsButtonNav() ? "Up/Down to scroll" : "Swipe to scroll";
+            dc.drawText(width / 2, dc.getHeight() - 16, Graphics.FONT_XTINY, hint, Graphics.TEXT_JUSTIFY_CENTER);
         }
     }
 
@@ -88,6 +89,16 @@ class HistoryDelegate extends WatchUi.BehaviorDelegate {
             return true;
         }
         return false;
+    }
+
+    function onNextPage() as Boolean {
+        view.scrollDown();
+        return true;
+    }
+
+    function onPreviousPage() as Boolean {
+        view.scrollUp();
+        return true;
     }
 
     function onBack() as Boolean {

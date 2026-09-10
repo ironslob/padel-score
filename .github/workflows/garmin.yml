@@ -1,4 +1,4 @@
-# Garmin Connect IQ CI — compile (+ optional unit tests) for touchscreen targets.
+# Garmin Connect IQ CI — compile (+ optional unit tests) for touchscreen and button-only targets.
 # No repo secrets required for compile checks (ephemeral developer key).
 # Optional: set GARMIN_DEVELOPER_KEY_BASE64 to reuse a stable signing key.
 
@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         # Primary touchscreen targets from garmin/manifest.xml
-        device: [venu3, venu3s, fr965, fr265, vivoactive5]
+        device: [venu3, venu3s, fr965, fr265, vivoactive5, instinct2, fr255]
     container:
       image: ghcr.io/matco/connectiq-tester:latest
       options: --entrypoint ""
