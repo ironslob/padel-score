@@ -4,7 +4,7 @@ Watch app port of Wrist Rally for Garmin Connect IQ (touchscreen and button-only
 
 ## Prerequisites
 
-1. [Connect IQ SDK Manager](https://developer.garmin.com/connect-iq/sdk/) — install SDK 4.1+ (9.x recommended)
+1. [Connect IQ SDK Manager](https://developer.garmin.com/connect-iq/sdk/) — install SDK 4.1+ (9.x recommended). App `minApiLevel` is **3.4.0** so Instinct 2 (CIQ 3.4) can install.
 2. [Monkey C extension](https://marketplace.visualstudio.com/items?itemName=garmin.monkey-c) for VS Code / Cursor
 3. A simulator profile (e.g. **Venu 3** or **Instinct 2**)
 
