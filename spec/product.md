@@ -160,7 +160,7 @@ The objective is an excellent scoring application.
 Primary:
 
 - Apple Watch
-- Garmin touchscreen watches (Connect IQ)
+- Garmin watches (Connect IQ), including touchscreen and button-only models
 - Wear OS watches (Pixel Watch, Galaxy Watch, and other Wear OS 4+ devices)
 
 Secondary:
@@ -329,6 +329,8 @@ Them
 ```
 
 Pressing either immediately awards a point.
+
+On Garmin watches without a touchscreen, and when Button scoring is On, **Up awards Us** and **Down awards Them**. Pressing the same button again within three seconds undoes, matching a second tap. Menu or Select opens Actions; Back returns to Overview. Other Garmin screens use highlight + Select.
 
 ---
 

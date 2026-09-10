@@ -7,4 +7,5 @@
     <property id="matchSetFormat" type="number">1</property>
     <property id="warmUpEnabled" type="boolean">true</property>
     <property id="warmUpMinutes" type="number">0</property>
+    <property id="buttonScoringMode" type="number">0</property>
 </properties>

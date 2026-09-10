@@ -404,6 +404,28 @@ class MatchService {
         return next;
     }
 
+    function getButtonScoringMode() as Number {
+        var value = Application.Properties.getValue("buttonScoringMode");
+        if (value == null) {
+            return ButtonInput.SCORING_AUTO;
+        }
+        return ButtonInput.clampScoringMode(value as Number);
+    }
+
+    function setButtonScoringMode(mode as Number) as Void {
+        Application.Properties.setValue("buttonScoringMode", ButtonInput.clampScoringMode(mode));
+    }
+
+    function cycleButtonScoringMode() as Number {
+        var next = ButtonInput.cycleScoringMode(getButtonScoringMode());
+        setButtonScoringMode(next);
+        return next;
+    }
+
+    function buttonScoringActive() as Boolean {
+        return ButtonInput.buttonScoringActive(getButtonScoringMode());
+    }
+
     function settingsForNewMatch() as MatchSettings {
         var settings = new MatchSettings();
         settings.deuceFormat = getDeuceFormat();

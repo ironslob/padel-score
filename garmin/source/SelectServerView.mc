@@ -20,7 +20,8 @@ class SelectServerView extends WatchUi.View {
 
         UiHelpers.drawHeader(dc, "Who is serving?");
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
-        dc.drawText(width / 2, 28, Graphics.FONT_XTINY, "Tap your side", Graphics.TEXT_JUSTIFY_CENTER);
+        var hint = service.buttonScoringActive() ? "Up Us  Down Them" : "Tap your side";
+        dc.drawText(width / 2, 28, Graphics.FONT_XTINY, hint, Graphics.TEXT_JUSTIFY_CENTER);
 
         var buttonY = height / 2 - 10;
         var buttonH = 56;
@@ -38,11 +39,13 @@ class SelectServerView extends WatchUi.View {
 class SelectServerDelegate extends WatchUi.BehaviorDelegate {
     private var service as MatchService;
     private var pushPagerAfter as Boolean;
+    private var didChoose as Boolean;
 
     function initialize(service as MatchService, pushPagerAfter as Boolean) {
         BehaviorDelegate.initialize();
         self.service = service;
         self.pushPagerAfter = pushPagerAfter;
+        didChoose = false;
     }
 
     function onTap(clickEvent as ClickEvent) as Boolean {
@@ -65,14 +68,44 @@ class SelectServerDelegate extends WatchUi.BehaviorDelegate {
         }
 
         var side = x < width / 2 ? LEFT : RIGHT;
-        service.selectServer(side);
-        WatchUi.popView(WatchUi.SLIDE_LEFT);
-        if (pushPagerAfter) {
-            var pager = new MatchPagerView(service, 1);
-            WatchUi.pushView(pager, new MatchPagerDelegate(service, pager), WatchUi.SLIDE_LEFT);
-        } else {
-            WatchUi.requestUpdate();
+        chooseServer(side);
+        return true;
+    }
+
+    function onKey(keyEvent as WatchUi.KeyEvent) as Boolean {
+        if (!service.buttonScoringActive()) {
+            return false;
         }
+        if (keyIsUp(keyEvent)) {
+            chooseServer(LEFT);
+            return true;
+        }
+        if (keyIsDown(keyEvent)) {
+            chooseServer(RIGHT);
+            return true;
+        }
+        return false;
+    }
+
+    function onPreviousPage() as Boolean {
+        if (!service.buttonScoringActive()) {
+            return false;
+        }
+        if (ButtonInput.isTouchScreen()) {
+            return true;
+        }
+        chooseServer(LEFT);
+        return true;
+    }
+
+    function onNextPage() as Boolean {
+        if (!service.buttonScoringActive()) {
+            return false;
+        }
+        if (ButtonInput.isTouchScreen()) {
+            return true;
+        }
+        chooseServer(RIGHT);
         return true;
     }
 
@@ -84,5 +117,20 @@ class SelectServerDelegate extends WatchUi.BehaviorDelegate {
         }
         // Between sets a server still has to be chosen, or scoring is blocked.
         return true;
+    }
+
+    private function chooseServer(side as Side) as Void {
+        if (didChoose) {
+            return;
+        }
+        didChoose = true;
+        service.selectServer(side);
+        WatchUi.popView(WatchUi.SLIDE_LEFT);
+        if (pushPagerAfter) {
+            var pager = new MatchPagerView(service, 1);
+            WatchUi.pushView(pager, new MatchPagerDelegate(service, pager), WatchUi.SLIDE_LEFT);
+        } else {
+            WatchUi.requestUpdate();
+        }
     }
 }

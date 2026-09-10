@@ -11,6 +11,8 @@ class MatchPagerView extends WatchUi.View {
     var page as Number;
     var undoProgressLeft as Float;
     var undoProgressRight as Float;
+    var actionFocus as Number;
+    var actionScroll as Number;
 
     function initialize(service as MatchService, page as Number) {
         View.initialize();
@@ -18,10 +20,16 @@ class MatchPagerView extends WatchUi.View {
         self.page = page;
         undoProgressLeft = 0.0;
         undoProgressRight = 0.0;
+        actionFocus = 0;
+        actionScroll = 0;
     }
 
     function setPage(newPage as Number) as Void {
         page = newPage;
+        if (page == 2) {
+            actionFocus = 0;
+            actionScroll = 0;
+        }
         WatchUi.requestUpdate();
     }
 
@@ -88,11 +96,20 @@ class MatchPagerView extends WatchUi.View {
         var leftServing = match.currentServer != null && match.currentServer == sides[0];
         var rightServing = match.currentServer != null && match.currentServer == sides[1];
 
-        drawScoreButton(dc, game[0], roles[0], 6, buttonY, buttonW, buttonH, leftColor, leftServing, undoProgressLeft);
-        drawScoreButton(dc, game[1], roles[1], width / 2 + 4, buttonY, buttonW, buttonH, rightColor, rightServing, undoProgressRight);
+        drawScoreButton(dc, game[0], roles[0], [6, buttonY, buttonW, buttonH] as Array<Number>, leftColor, leftServing, undoProgressLeft);
+        drawScoreButton(dc, game[1], roles[1], [width / 2 + 4, buttonY, buttonW, buttonH] as Array<Number>, rightColor, rightServing, undoProgressRight);
+
+        if (service.buttonScoringActive()) {
+            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+            dc.drawText(width / 2, height - 28, Graphics.FONT_XTINY, "Up Us   Down Them", Graphics.TEXT_JUSTIFY_CENTER);
+        }
     }
 
-    private function drawScoreButton(dc as Dc, score as String, role as String, x as Number, y as Number, w as Number, h as Number, color as Number, isServing as Boolean, undoProgress as Float) as Void {
+    private function drawScoreButton(dc as Dc, score as String, role as String, frame as Array<Number>, color as Number, isServing as Boolean, undoProgress as Float) as Void {
+        var x = frame[0];
+        var y = frame[1];
+        var w = frame[2];
+        var h = frame[3];
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
         dc.fillRoundedRectangle(x, y, w, h, UiHelpers.BUTTON_CORNER_RADIUS);
         if (undoProgress > 0) {
@@ -105,7 +122,7 @@ class MatchPagerView extends WatchUi.View {
             dc.fillCircle(x + w / 2, y + 14, 4);
         }
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x + w / 2, y + h / 2 - 16, Graphics.FONT_NUMBER_HOT, score, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(x + w / 2, y + h / 2 - 16, UiHelpers.scoreNumberFont(), score, Graphics.TEXT_JUSTIFY_CENTER);
         if (role.length() > 0) {
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
             dc.drawText(x + w / 2, y + h - 18, Graphics.FONT_XTINY, role, Graphics.TEXT_JUSTIFY_CENTER);
@@ -134,13 +151,17 @@ class MatchPagerView extends WatchUi.View {
 
     private function drawActionsPage(dc as Dc, match as MatchState) as Void {
         var width = dc.getWidth();
+        var height = dc.getHeight();
         UiHelpers.drawHeader(dc, "Actions");
 
         var keys = actionKeys(match);
+        ensureActionFocusVisible(keys, height);
+        var visible = actionVisibleCount(height);
         var y = 32;
         var buttonH = 32;
         var buttonW = width - 32;
-        for (var i = 0; i < keys.size(); i += 1) {
+        var shown = 0;
+        for (var i = actionScroll; i < keys.size() && shown < visible; i += 1) {
             var key = keys[i];
             var label = actionLabel(key);
             var color = actionColor(key);
@@ -148,7 +169,58 @@ class MatchPagerView extends WatchUi.View {
                 color = Graphics.COLOR_DK_GRAY;
             }
             UiHelpers.drawPrimaryButton(dc, label, 16, y, buttonW, buttonH, color);
+            if (ButtonInput.needsButtonNav() && i == actionFocus) {
+                UiHelpers.drawFocusOutline(dc, 16, y, buttonW, buttonH);
+            }
             y += buttonH + 6;
+            shown += 1;
+        }
+
+        if (actionScroll > 0 || actionScroll + visible < keys.size()) {
+            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
+            var hint = ButtonInput.needsButtonNav() ? "Up/Down to scroll" : "Swipe to scroll";
+            dc.drawText(width / 2, height - 16, Graphics.FONT_XTINY, hint, Graphics.TEXT_JUSTIFY_CENTER);
+        }
+    }
+
+    function actionVisibleCount(height as Number) as Number {
+        var available = height - 32 - 18;
+        var count = available / 38;
+        if (count < 2) {
+            count = 2;
+        }
+        if (count > 5) {
+            count = 5;
+        }
+        return count;
+    }
+
+    function ensureActionFocusVisible(keys as Array<String>, height as Number) as Void {
+        if (actionFocus < 0) {
+            actionFocus = 0;
+        }
+        if (actionFocus >= keys.size()) {
+            actionFocus = keys.size() - 1;
+        }
+        if (actionFocus < 0) {
+            actionFocus = 0;
+        }
+        var visible = actionVisibleCount(height);
+        var maxScroll = keys.size() - visible;
+        if (maxScroll < 0) {
+            maxScroll = 0;
+        }
+        if (actionFocus < actionScroll) {
+            actionScroll = actionFocus;
+        }
+        if (actionFocus >= actionScroll + visible) {
+            actionScroll = actionFocus - visible + 1;
+        }
+        if (actionScroll > maxScroll) {
+            actionScroll = maxScroll;
+        }
+        if (actionScroll < 0) {
+            actionScroll = 0;
         }
     }
 
@@ -184,21 +256,24 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
     var service as MatchService;
     var view as MatchPagerView;
     private var undoSide as Side or Null;
-    private var undoStartedAt as Number or Null;
     private var undoStartedMs as Number or Null;
     private var undoTimer as Timer.Timer or Null;
+    private var keyHandledScore as Boolean;
+    private var lastButtonScoreMs as Number;
 
     function initialize(service as MatchService, pagerView as MatchPagerView) {
         BehaviorDelegate.initialize();
         self.service = service;
         view = pagerView;
         undoSide = null;
-        undoStartedAt = null;
         undoStartedMs = null;
         undoTimer = null;
+        keyHandledScore = false;
+        lastButtonScoreMs = 0;
     }
 
     function onTap(clickEvent as ClickEvent) as Boolean {
+        keyHandledScore = false;
         var match = service.activeMatch;
         if (match == null) {
             return false;
@@ -227,9 +302,17 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
 
         var visual = x < width / 2 ? LEFT : RIGHT;
         var side = match.logicalSideForVisual(visual);
-        var now = Time.now().value();
+        return awardOrUndo(side);
+    }
 
-        if (undoSide == side && undoStartedAt != null && (now - undoStartedAt) < MatchSettings.QUICK_UNDO_TIMEOUT_MS) {
+    private function awardOrUndo(side as Side) as Boolean {
+        var match = service.activeMatch;
+        if (match == null || match.status != IN_PROGRESS) {
+            return false;
+        }
+        var nowMs = System.getTimer();
+        if (undoSide == side && undoStartedMs != null
+            && (nowMs - undoStartedMs) < MatchSettings.QUICK_UNDO_TIMEOUT_MS) {
             clearUndoWindow();
             service.undoLastPoint();
             checkMatchComplete(null, service.activeMatch);
@@ -242,7 +325,7 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
         checkMatchComplete(match, updated);
         if (service.activeMatch != null && service.activeMatch.status == IN_PROGRESS
             && !didPointEndGame(match, service.activeMatch)) {
-            startUndoWindow(side, now);
+            startUndoWindow(side);
         }
         WatchUi.requestUpdate();
         return true;
@@ -254,11 +337,20 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
             return false;
         }
         var keys = view.actionKeys(match);
+        var visible = view.actionVisibleCount(System.getDeviceSettings().screenHeight);
         var row = ((y - 32) / 38).toNumber();
-        if (row < 0 || row >= keys.size()) {
+        if (row < 0 || row >= visible) {
             return false;
         }
-        var key = keys[row];
+        var index = view.actionScroll + row;
+        if (index < 0 || index >= keys.size()) {
+            return false;
+        }
+        var key = keys[index];
+        return activateAction(key);
+    }
+
+    private function activateAction(key as String) as Boolean {
         if (key.equals("undo") && service.canUndo()) {
             service.undoLastPoint();
             checkMatchComplete(null, service.activeMatch);
@@ -290,6 +382,7 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onSwipe(swipeEvent as SwipeEvent) as Boolean {
+        keyHandledScore = false;
         var direction = swipeEvent.getDirection();
         if (direction == WatchUi.SWIPE_LEFT && view.page < 2) {
             view.setPage(view.page + 1);
@@ -298,10 +391,79 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
             view.setPage(view.page - 1);
             return true;
         }
+        if (view.page == 2) {
+            if (direction == WatchUi.SWIPE_UP) {
+                moveActionFocus(1);
+                return true;
+            }
+            if (direction == WatchUi.SWIPE_DOWN) {
+                moveActionFocus(-1);
+                return true;
+            }
+        }
         return false;
     }
 
+    function onKey(keyEvent as WatchUi.KeyEvent) as Boolean {
+        if (view.page != 1 || !service.buttonScoringActive()) {
+            return false;
+        }
+        if (keyIsUp(keyEvent)) {
+            return awardFromButton(LEFT);
+        }
+        if (keyIsDown(keyEvent)) {
+            return awardFromButton(RIGHT);
+        }
+        if (keyIsSelect(keyEvent) && ButtonInput.needsButtonNav()) {
+            view.setPage(2);
+            return true;
+        }
+        return false;
+    }
+
+    function onSelect() as Boolean {
+        if (!ButtonInput.needsButtonNav()) {
+            return false;
+        }
+        if (view.page == 0) {
+            view.setPage(1);
+            return true;
+        }
+        if (view.page == 1) {
+            view.setPage(2);
+            return true;
+        }
+        var match = service.activeMatch;
+        if (match == null) {
+            return false;
+        }
+        var keys = view.actionKeys(match);
+        if (view.actionFocus < 0 || view.actionFocus >= keys.size()) {
+            return false;
+        }
+        return activateAction(keys[view.actionFocus]);
+    }
+
+    function onMenu() as Boolean {
+        view.setPage(2);
+        return true;
+    }
+
     function onNextPage() as Boolean {
+        if (view.page == 1 && service.buttonScoringActive()) {
+            if (keyHandledScore) {
+                keyHandledScore = false;
+                return true;
+            }
+            if (!ButtonInput.isTouchScreen()) {
+                return awardFromButton(RIGHT);
+            }
+            return true;
+        }
+        if (view.page == 2 && ButtonInput.needsButtonNav()) {
+            moveActionFocus(1);
+            return true;
+        }
         if (view.page < 2) {
             view.setPage(view.page + 1);
             return true;
@@ -310,6 +472,20 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onPreviousPage() as Boolean {
+        if (view.page == 1 && service.buttonScoringActive()) {
+            if (keyHandledScore) {
+                keyHandledScore = false;
+                return true;
+            }
+            if (!ButtonInput.isTouchScreen()) {
+                return awardFromButton(LEFT);
+            }
+            return true;
+        }
+        if (view.page == 2 && ButtonInput.needsButtonNav()) {
+            moveActionFocus(-1);
+            return true;
+        }
         if (view.page > 0) {
             view.setPage(view.page - 1);
             return true;
@@ -325,9 +501,37 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
         return false;
     }
 
-    private function startUndoWindow(side as Side, at as Number) as Void {
+    private function awardFromButton(side as Side) as Boolean {
+        var now = System.getTimer();
+        if (lastButtonScoreMs != 0 && (now - lastButtonScoreMs) < 80) {
+            keyHandledScore = true;
+            return true;
+        }
+        lastButtonScoreMs = now;
+        keyHandledScore = true;
+        return awardOrUndo(side);
+    }
+
+    private function moveActionFocus(delta as Number) as Void {
+        var match = service.activeMatch;
+        if (match == null) {
+            return;
+        }
+        var keys = view.actionKeys(match);
+        var next = view.actionFocus + delta;
+        if (next < 0) {
+            next = 0;
+        }
+        if (next >= keys.size()) {
+            next = keys.size() - 1;
+        }
+        view.actionFocus = next;
+        view.ensureActionFocusVisible(keys, System.getDeviceSettings().screenHeight);
+        WatchUi.requestUpdate();
+    }
+
+    private function startUndoWindow(side as Side) as Void {
         undoSide = side;
-        undoStartedAt = at;
         undoStartedMs = System.getTimer();
         if (undoTimer == null) {
             undoTimer = new Timer.Timer();
@@ -381,7 +585,6 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
 
     private function clearUndoWindow() as Void {
         undoSide = null;
-        undoStartedAt = null;
         undoStartedMs = null;
         view.undoProgressLeft = 0.0;
         view.undoProgressRight = 0.0;
@@ -423,12 +626,7 @@ class MatchPagerDelegate extends WatchUi.BehaviorDelegate {
 
     private function navigateToComplete() as Void {
         WatchUi.popView(WatchUi.SLIDE_LEFT);
-        WatchUi.pushView(new MatchCompleteView(service), new MatchCompleteDelegate(service), WatchUi.SLIDE_LEFT);
-    }
-
-    private function navigateToStart() as Void {
-        WatchUi.popView(WatchUi.SLIDE_RIGHT);
-        WatchUi.pushView(new StartView(service), new StartDelegate(service), WatchUi.SLIDE_RIGHT);
+        pushCompleteView(service, WatchUi.SLIDE_LEFT);
     }
 }
 
@@ -447,11 +645,11 @@ class MatchActionConfirmDelegate extends WatchUi.ConfirmationDelegate {
             if (action == 1) {
                 service.finishMatch();
                 WatchUi.popView(WatchUi.SLIDE_LEFT);
-                WatchUi.pushView(new MatchCompleteView(service), new MatchCompleteDelegate(service), WatchUi.SLIDE_LEFT);
+                pushCompleteView(service, WatchUi.SLIDE_LEFT);
             } else if (action == 2) {
                 service.discardMatch();
                 WatchUi.popView(WatchUi.SLIDE_RIGHT);
-                WatchUi.pushView(new StartView(service), new StartDelegate(service), WatchUi.SLIDE_RIGHT);
+                pushStartView(service, WatchUi.SLIDE_RIGHT);
             }
         }
         return true;

@@ -11,6 +11,7 @@ class GameInterstitialView extends WatchUi.View {
     var startedAt as Number;
     var timeoutMs as Number;
     var scrollIndex as Number;
+    var focusIndex as Number;
 
     function initialize(service as MatchService, completedSet as Boolean, isTieBreak as Boolean) {
         View.initialize();
@@ -20,6 +21,7 @@ class GameInterstitialView extends WatchUi.View {
         startedAt = System.getTimer();
         timeoutMs = completedSet ? 0 : MatchSettings.QUICK_UNDO_TIMEOUT_MS;
         scrollIndex = 0;
+        focusIndex = completedSet ? 0 : 1;
     }
 
     function onUpdate(dc as Dc) as Void {
@@ -65,6 +67,13 @@ class GameInterstitialView extends WatchUi.View {
         var buttonW = width / 2 - 14;
         UiHelpers.drawPrimaryButton(dc, "Undo", 8, buttonY, buttonW, buttonH, Graphics.COLOR_ORANGE);
         UiHelpers.drawPrimaryButton(dc, "Next", width / 2 + 6, buttonY, buttonW, buttonH, Graphics.COLOR_GREEN);
+        if (ButtonInput.needsButtonNav()) {
+            if (focusIndex == 0) {
+                UiHelpers.drawFocusOutline(dc, 8, buttonY, buttonW, buttonH);
+            } else {
+                UiHelpers.drawFocusOutline(dc, width / 2 + 6, buttonY, buttonW, buttonH);
+            }
+        }
 
         if (timeoutMs > 0) {
             var elapsed = System.getTimer() - startedAt;
@@ -95,12 +104,22 @@ class GameInterstitialView extends WatchUi.View {
                 buttonHeight(),
                 actionColor(key)
             );
+            if (ButtonInput.needsButtonNav() && i == focusIndex) {
+                UiHelpers.drawFocusOutline(
+                    dc,
+                    16,
+                    top + shown * (buttonHeight() + buttonGap()),
+                    width - 32,
+                    buttonHeight()
+                );
+            }
             shown += 1;
         }
 
         if (scrollIndex > 0 || scrollIndex + visible < keys.size()) {
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
-            dc.drawText(width / 2, height - 14, Graphics.FONT_XTINY, "Swipe to scroll", Graphics.TEXT_JUSTIFY_CENTER);
+            var hint = ButtonInput.needsButtonNav() ? "Up/Down to scroll" : "Swipe to scroll";
+            dc.drawText(width / 2, height - 14, Graphics.FONT_XTINY, hint, Graphics.TEXT_JUSTIFY_CENTER);
         }
     }
 
@@ -153,6 +172,26 @@ class GameInterstitialView extends WatchUi.View {
             scrollIndex -= 1;
             WatchUi.requestUpdate();
         }
+    }
+
+    function moveFocus(delta as Number, match as MatchState, height as Number) as Void {
+        var keys = actionKeys(match);
+        var next = focusIndex + delta;
+        if (next < 0) {
+            next = 0;
+        }
+        if (next >= keys.size()) {
+            next = keys.size() - 1;
+        }
+        focusIndex = next;
+        var visible = visibleButtonCount(height);
+        if (focusIndex < scrollIndex) {
+            scrollIndex = focusIndex;
+        }
+        if (focusIndex >= scrollIndex + visible) {
+            scrollIndex = focusIndex - visible + 1;
+        }
+        WatchUi.requestUpdate();
     }
 
     private function clampScroll(keys as Array<String>, height as Number) as Void {
@@ -262,11 +301,20 @@ class GameInterstitialDelegate extends WatchUi.BehaviorDelegate {
 
     function onNextPage() as Boolean {
         if (!view.completedSet) {
-            return false;
+            if (!ButtonInput.needsButtonNav()) {
+                return false;
+            }
+            view.focusIndex = 1;
+            WatchUi.requestUpdate();
+            return true;
         }
         var match = service.activeMatch;
         if (match == null) {
             return false;
+        }
+        if (ButtonInput.needsButtonNav()) {
+            view.moveFocus(1, match, System.getDeviceSettings().screenHeight);
+            return true;
         }
         view.scrollDown(match, System.getDeviceSettings().screenHeight);
         return true;
@@ -274,10 +322,46 @@ class GameInterstitialDelegate extends WatchUi.BehaviorDelegate {
 
     function onPreviousPage() as Boolean {
         if (!view.completedSet) {
-            return false;
+            if (!ButtonInput.needsButtonNav()) {
+                return false;
+            }
+            view.focusIndex = 0;
+            WatchUi.requestUpdate();
+            return true;
+        }
+        if (ButtonInput.needsButtonNav()) {
+            var match = service.activeMatch;
+            if (match == null) {
+                return false;
+            }
+            view.moveFocus(-1, match, System.getDeviceSettings().screenHeight);
+            return true;
         }
         view.scrollUp();
         return true;
+    }
+
+    function onSelect() as Boolean {
+        if (!ButtonInput.needsButtonNav()) {
+            return false;
+        }
+        var match = service.activeMatch;
+        if (match == null) {
+            dismiss();
+            return true;
+        }
+        if (!view.completedSet) {
+            if (view.focusIndex == 0) {
+                service.undoLastPoint();
+            }
+            dismiss();
+            return true;
+        }
+        var keys = view.actionKeys(match);
+        if (view.focusIndex < 0 || view.focusIndex >= keys.size()) {
+            return false;
+        }
+        return handleSetAction(keys[view.focusIndex]);
     }
 
     function onBack() as Boolean {
@@ -367,11 +451,7 @@ class SetEndMatchConfirmDelegate extends WatchUi.ConfirmationDelegate {
         if (response == WatchUi.CONFIRM_YES) {
             service.finishMatch();
             WatchUi.popView(WatchUi.SLIDE_LEFT);
-            WatchUi.pushView(
-                new MatchCompleteView(service),
-                new MatchCompleteDelegate(service),
-                WatchUi.SLIDE_LEFT
-            );
+            pushCompleteView(service, WatchUi.SLIDE_LEFT);
         }
         return true;
     }
