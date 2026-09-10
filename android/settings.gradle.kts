@@ -16,6 +16,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "WristRally"
 include(":domain")
+include(":sync")
 include(":wear")
+include(":phone")
 
 // Wear needs the Android SDK; domain unit tests can still run without it.

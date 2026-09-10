@@ -256,6 +256,7 @@ class MatchService(
             runCatching { store.saveMatchNotes(matchNotes) }
         }
         notifySync()
+        notifyListeners()
     }
 
     fun note(id: UUID): String = matchNotes[id].orEmpty()
@@ -274,11 +275,12 @@ class MatchService(
         }
         matchNotes = next
         runCatching { store.saveMatchNotes(next) }
+        notifyListeners()
     }
 
     fun applyRemoteSnapshot(active: MatchState?, archive: List<MatchState>) {
-        activeMatch = active
         archivedMatches = visibleArchive(archive)
+        activeMatch = active
         runCatching { store.saveActiveMatch(active) }
         runCatching { store.replaceArchive(archivedMatches) }
     }
@@ -293,6 +295,7 @@ class MatchService(
             runCatching { store.deleteArchivedMatch(match.id) }
         }
         archivedMatches = archivedMatches.filterNot { incoming.contains(it.id) }
+        notifyListeners()
     }
 
     private fun visibleArchive(matches: List<MatchState>): List<MatchState> =

@@ -1,6 +1,6 @@
 # Wrist Rally
 
-Apple Watch–first padel scoring app with an iPhone companion for match history, plus Garmin and Wear OS watch ports.
+Apple Watch–first padel scoring app with iPhone and Android phone companions for match history, plus Garmin and Wear OS watch ports.
 
 V1 is fully on-device. No backend, authentication, CloudKit, or statistics.
 
@@ -111,7 +111,7 @@ TestFlight and App Store Connect identify the app as `com.codebrewery.wristrally
 4. If it does not appear: on iPhone open Watch app → My Watch → scroll to **Wrist Rally** → enable **Show App on Apple Watch**, or run the **WristRallyWatch** scheme with the physical Watch selected as destination.
 5. Keep the Watch unlocked and nearby during the first install.
 
-Scoring works offline on the Watch alone. When the phone is reachable, WatchConnectivity pushes the active match and history to the iPhone companion.
+Scoring works offline on the Watch alone. When the phone is reachable, WatchConnectivity pushes the active match and history to the iPhone companion. Wear OS does the same for the Android phone app over the Data Layer (`android/phone/`).
 
 ## CI
 
@@ -121,7 +121,7 @@ Separate GitHub Actions workflows (path-filtered so each platform only builds wh
 |----------|------|----------------|
 | [Apple](.github/workflows/apple.yml) | `watch/`, `iPhone/`, `shared/`, `tests/` | Unit tests, Watch + iPhone compile (unsigned) |
 | [Garmin](.github/workflows/garmin.yml) | `garmin/` | Connect IQ compile for touchscreen devices + Monkey C tests |
-| [Wear OS](.github/workflows/wear.yml) | `android/` | Kotlin domain unit tests + Wear debug APK |
+| [Wear OS](.github/workflows/wear.yml) | `android/` | Kotlin domain + sync unit tests, Wear + phone debug APKs |
 
 Neither Apple nor Garmin workflow requires secrets for compile checks. For a stable Garmin signing key in CI, set `GARMIN_DEVELOPER_KEY_BASE64` (see [`garmin/README.md`](garmin/README.md)). Wear OS CI needs no secrets.
 
@@ -133,7 +133,7 @@ shared/         Scoring engine, models, persistence, services, sync
 watch/          Watch SwiftUI app
 iPhone/         iPhone companion SwiftUI app
 garmin/         Garmin Connect IQ watch app (Monkey C)
-android/        Wear OS app (Kotlin domain + Compose UI)
+android/        Wear OS app + Android phone companion (Kotlin)
 tests/Unit/     Scoring + persistence unit tests
 docs/           Decision log
 .github/        CI workflows (Apple + Garmin + Wear OS)
@@ -149,6 +149,7 @@ WristRally.xcodeproj
 - 3-second undo on the score screen; undo also on Actions
 - Local persistence and restore after restart
 - iPhone match history, notes, and deletion
+- Android phone companion (Wear OS history, notes, deletion, Data Layer sync)
 - Deuce format: regular / star point / silver point / golden point
 
 See [docs/DECISIONS.md](docs/DECISIONS.md) for engineering choices and [spec/](spec/) for authoritative requirements.

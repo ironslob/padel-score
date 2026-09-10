@@ -86,9 +86,15 @@ The HealthKit workout (Apple), Health Services exercise (Wear), and FIT activity
 
 ## Wear OS watch app
 
-**Choice:** A standalone Wear OS app in `android/`, with a JVM Kotlin port of the scoring engine (`android/domain`) and Jetpack Compose UI (`android/wear`) that follows the Apple Watch screens rather than Garmin’s on-watch history. Health Services tries to start one tennis exercise session per match (including warm-up), matching HealthKit’s role. Tiles, Data Layer phone sync, and an Android companion are deferred.
+**Choice:** A standalone Wear OS app in `android/`, with a JVM Kotlin port of the scoring engine (`android/domain`) and Jetpack Compose UI (`android/wear`) that follows the Apple Watch screens rather than Garmin’s on-watch history. Health Services tries to start one tennis exercise session per match (including warm-up), matching HealthKit’s role. Tiles and complications stay deferred.
 
 **Why:** Wear OS is the Android equivalent of the Watch app. Extracting Kotlin Multiplatform would churn the Swift and Monkey C trees; a third engine port matches the existing Garmin pattern, with Swift remaining the source of truth. History stays off the watch, as on Apple Watch. Health Services is the closest wrist-raise analog; if another exercise owns the session, the same continue-without-workout / cancel prompt is shown.
+
+## Wear OS ↔ Android phone sync: Data Layer
+
+**Choice:** Phone and Wear share applicationId `com.codebrewery.wristrally` (required by Play services) and the same signing cert. A `:sync` Android library pushes node-owned DataItems: the watch writes `/wristrally/snapshot` (active + archive), the phone writes `/wristrally/deleted` (tombstones). `MessageClient` repeats the same payload when the counterpart is reachable. Kotlin source packages stay `com.wristrally.wear` / `com.wristrally.phone`. Wear remains `standalone=true`. Notes stay phone-local, same as iOS. An ongoing notification is the Live Activity analog; denying POST_NOTIFICATIONS does not block history.
+
+**Why:** DataItems are owned by the writer, unlike WatchConnectivity’s single last-writer-wins context. Splitting paths stops the phone from applying its own stale snapshot. `MatchService` already had the authority rules; the transport is the missing piece. Google would prefer cloud for workout history, but V1 has no backend, so this matches Apple’s local companion.
 
 ## Match / super tie-break (2 sets + TB)
 

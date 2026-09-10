@@ -1,4 +1,4 @@
-# Wear OS — compile + domain unit tests.
+# Wear OS — domain + sync tests, Wear + phone debug APKs.
 # No repo secrets required.
 
 name: Wear OS
@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   test:
-    name: Domain tests
+    name: Domain and sync tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,9 +32,16 @@ jobs:
           distribution: temurin
           java-version: "21"
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Domain unit tests
         working-directory: android
         run: ./gradlew :domain:test --no-daemon
+
+      - name: Sync unit tests
+        working-directory: android
+        run: ./gradlew :sync:test --no-daemon
 
   build-wear:
     name: Build Wear APK
@@ -55,3 +62,23 @@ jobs:
       - name: Assemble Wear debug APK
         working-directory: android
         run: ./gradlew :wear:assembleDebug --no-daemon
+
+  build-phone:
+    name: Build phone APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Assemble phone debug APK
+        working-directory: android
+        run: ./gradlew :phone:assembleDebug --no-daemon
