@@ -94,8 +94,8 @@ class MatchPagerView extends WatchUi.View {
         var leftServing = match.currentServer != null && match.currentServer == sides[0];
         var rightServing = match.currentServer != null && match.currentServer == sides[1];
 
-        drawScoreButton(dc, game[0], roles[0], 6, buttonY, buttonW, buttonH, leftColor, leftServing, undoProgressLeft);
-        drawScoreButton(dc, game[1], roles[1], width / 2 + 4, buttonY, buttonW, buttonH, rightColor, rightServing, undoProgressRight);
+        drawScoreButton(dc, game[0], roles[0], [6, buttonY, buttonW, buttonH] as Array<Number>, leftColor, leftServing, undoProgressLeft);
+        drawScoreButton(dc, game[1], roles[1], [width / 2 + 4, buttonY, buttonW, buttonH] as Array<Number>, rightColor, rightServing, undoProgressRight);
 
         if (service.buttonScoringActive()) {
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
@@ -103,7 +103,11 @@ class MatchPagerView extends WatchUi.View {
         }
     }
 
-    private function drawScoreButton(dc as Dc, score as String, role as String, x as Number, y as Number, w as Number, h as Number, color as Number, isServing as Boolean, undoProgress as Float) as Void {
+    private function drawScoreButton(dc as Dc, score as String, role as String, frame as Array<Number>, color as Number, isServing as Boolean, undoProgress as Float) as Void {
+        var x = frame[0];
+        var y = frame[1];
+        var w = frame[2];
+        var h = frame[3];
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
         dc.fillRoundedRectangle(x, y, w, h, UiHelpers.BUTTON_CORNER_RADIUS);
         if (undoProgress > 0) {
