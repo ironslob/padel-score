@@ -27,7 +27,14 @@ struct ScoreScreen: View {
 
     private var game: (left: String, right: String) { match.scoreScreenGameDisplay }
     private var games: (left: String, right: String) { match.scoreScreenSetDisplay }
-    private var undoTimeout: TimeInterval { MatchSettings.quickUndoTimeoutSeconds }
+    /// Marketing demo can pass `-quickUndoTimeoutSeconds 0` so same-side taps
+    /// score immediately instead of waiting out the three-second undo window.
+    private var undoTimeout: TimeInterval {
+        if UserDefaults.standard.object(forKey: "quickUndoTimeoutSeconds") != nil {
+            return UserDefaults.standard.double(forKey: "quickUndoTimeoutSeconds")
+        }
+        return MatchSettings.quickUndoTimeoutSeconds
+    }
     private var leftRole: String { match.servingRoleLabels.left }
     private var rightRole: String { match.servingRoleLabels.right }
     private var scoreSides: (left: Side, right: Side) { match.scoreScreenSides }
@@ -284,8 +291,9 @@ struct ScoreScreen: View {
         let updatedMatch = service.activeMatch
 
         // For points that end a game, we show a dedicated Game interstitial with undo
-        // instead of keeping the in-button quick undo active.
-        if !didPointEndGame(previous: previousMatch, updated: updatedMatch) {
+        // instead of keeping the in-button quick undo active. A 0 timeout skips the
+        // window entirely so demo clips can score the same side back-to-back.
+        if undoTimeout > 0, !didPointEndGame(previous: previousMatch, updated: updatedMatch) {
             beginUndoWindow(for: logicalSide)
         } else {
             clearUndoWindow()

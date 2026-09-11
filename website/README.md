@@ -42,7 +42,7 @@ Opening `index.html` as a `file://` URL works for a quick look, but a local serv
 
 ## What to click when testing
 
-1. **Home** — hero copy, looping Watch clip (Us / Them scoring, serve ball, undo ring), three-platform trust row.
+1. **Home** — hero copy, looping Watch clip (a game from 0–0 through Game), three-platform trust row.
 2. **Clip** — the hero video should autoplay, muted, and loop. A GIF lives at `assets/score-demo.gif` as a no-JS fallback.
 3. **Nav** — Features, Platforms, How it works, FAQ, Get the app. On a narrow viewport, use the menu button.
 4. **FAQ** — open/close accordion items.
@@ -59,7 +59,7 @@ Needs Xcode, a Watch simulator, [XcodeGen](https://github.com/yonaskolb/XcodeGen
 website/scripts/record-score-demo.sh
 ```
 
-That boots Apple Watch Series 11 (46mm), drives `MarketingDemoTests` (start match, score, undo), and writes `website/assets/score-demo.{mp4,gif,jpg}`. Override the device with `WATCH_UDID=…`. After recording, inspect the raw movie and adjust `TRIM_START` in the script if the scoreboard starts later than expected.
+That boots Apple Watch Series 11 (46mm), uninstalls leftover matches, and drives `MarketingDemoTests`: 15–0 (undo ring), 30–0, a Them tap that is undone, then 30–15, 40–15, Game, next game. Simulator video is trimmed to that sequence and encoded at 20 fps so the countdown ring keeps its in-between frames. GIF encode uses a single palette and `dither=none`. Override the device with `WATCH_UDID=…`.
 
 ## Publishing later
 
