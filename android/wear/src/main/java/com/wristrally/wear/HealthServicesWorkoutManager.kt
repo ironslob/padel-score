@@ -1,15 +1,19 @@
 package com.wristrally.wear
 
 import android.content.Context
-import androidx.health.services.client.HealthServices
 import androidx.health.services.client.ExerciseClient
+import androidx.health.services.client.HealthServices
+import androidx.health.services.client.data.DataType
 import androidx.health.services.client.data.ExerciseConfig
 import androidx.health.services.client.data.ExerciseType
-import androidx.health.services.client.data.DataType
+import androidx.health.services.client.data.ExerciseTypeCapabilities
 import com.wristrally.domain.WorkoutSessionError
+import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 interface WorkoutSessionManaging {
     val isRunning: Boolean
@@ -18,9 +22,13 @@ interface WorkoutSessionManaging {
 }
 
 class HealthServicesWorkoutManager(
-    context: Context,
+    private val context: Context,
 ) : WorkoutSessionManaging {
-    private val client: ExerciseClient = HealthServices.getClient(context).exerciseClient
+    private val client: ExerciseClient? = try {
+        HealthServices.getClient(context).exerciseClient
+    } catch (_: Exception) {
+        null
+    }
     private val mutex = Mutex()
     override var isRunning: Boolean = false
         private set
@@ -28,19 +36,32 @@ class HealthServicesWorkoutManager(
     override suspend fun startWorkout() {
         mutex.withLock {
             if (isRunning) return
+            val client = this.client ?: throw WorkoutSessionError.HealthDataUnavailable
+            if (!WorkoutPermissions.hasActivityRecognition(context)) {
+                throw WorkoutSessionError.AuthorizationDenied
+            }
             try {
-                val capabilities = client.getCapabilitiesAsync().await()
-                val type = when {
-                    ExerciseType.TENNIS in capabilities.supportedExerciseTypes -> ExerciseType.TENNIS
-                    ExerciseType.BADMINTON in capabilities.supportedExerciseTypes -> ExerciseType.BADMINTON
-                    else -> throw WorkoutSessionError.HealthDataUnavailable
+                val capabilities = withContext(Dispatchers.IO) {
+                    client.getCapabilitiesAsync().await()
+                }
+                val type = preferredExerciseType(capabilities.supportedExerciseTypes)
+                    ?: throw WorkoutSessionError.HealthDataUnavailable
+                val typeCaps = try {
+                    capabilities.getExerciseTypeCapabilities(type)
+                } catch (_: Exception) {
+                    throw WorkoutSessionError.HealthDataUnavailable
                 }
                 val config = ExerciseConfig.builder(type)
-                    .setDataTypes(setOf(DataType.HEART_RATE_BPM, DataType.CALORIES_TOTAL))
+                    .setDataTypes(supportedDataTypes(typeCaps))
                     .setIsAutoPauseAndResumeEnabled(false)
+                    .setIsGpsEnabled(false)
                     .build()
-                client.startExerciseAsync(config).await()
+                withContext(Dispatchers.IO) {
+                    client.startExerciseAsync(config).await()
+                }
                 isRunning = true
+            } catch (error: CancellationException) {
+                throw error
             } catch (error: WorkoutSessionError) {
                 throw error
             } catch (error: Exception) {
@@ -59,15 +80,44 @@ class HealthServicesWorkoutManager(
     override suspend fun endWorkout(save: Boolean) {
         mutex.withLock {
             if (!isRunning) return
+            val client = this.client
             try {
-                if (save) {
-                    client.endExerciseAsync().await()
-                } else {
-                    runCatching { client.endExerciseAsync().await() }
+                if (client == null) return
+                withContext(Dispatchers.IO) {
+                    if (save) {
+                        client.endExerciseAsync().await()
+                    } else {
+                        runCatching { client.endExerciseAsync().await() }
+                    }
                 }
             } finally {
                 isRunning = false
             }
         }
+    }
+
+    private fun supportedDataTypes(typeCaps: ExerciseTypeCapabilities): Set<DataType<*, *>> {
+        val supported = typeCaps.supportedDataTypes
+        return buildSet {
+            if (WorkoutPermissions.hasBodySensors(context) && DataType.HEART_RATE_BPM in supported) {
+                add(DataType.HEART_RATE_BPM)
+            }
+            if (DataType.CALORIES_TOTAL in supported) {
+                add(DataType.CALORIES_TOTAL)
+            }
+        }
+    }
+
+    companion object {
+        internal val preferredExerciseTypes: List<ExerciseType> = listOf(
+            ExerciseType.TENNIS,
+            ExerciseType.TABLE_TENNIS,
+            ExerciseType.BADMINTON,
+            ExerciseType.SQUASH,
+            ExerciseType.RACQUETBALL,
+        )
+
+        internal fun preferredExerciseType(supported: Set<ExerciseType>): ExerciseType? =
+            preferredExerciseTypes.firstOrNull { it in supported }
     }
 }

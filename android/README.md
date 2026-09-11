@@ -31,6 +31,29 @@ From `android/`:
 
 Open the `android/` folder in Android Studio, select the **wear** run configuration, and choose a Wear OS emulator or a physical watch (Pixel Watch, Galaxy Watch on Wear OS 4+).
 
+### Wear emulator (command line)
+
+1. Install a Wear OS 4+ system image, for example `system-images;android-34;android-wear;x86_64`.
+2. Create and start a round Wear AVD (KVM required on Linux):
+
+```bash
+avdmanager create avd -n wear_round -k "system-images;android-34;android-wear;x86_64" -d "wearos_small_round"
+emulator -avd wear_round -gpu swiftshader_indirect -no-snapshot
+```
+
+3. Install and launch:
+
+```bash
+./gradlew :wear:installDebug
+adb shell am start -n com.codebrewery.wristrally.wear/.MainActivity
+```
+
+Start Match asks for activity / body-sensor permission so Health Services can own a tennis exercise. Scoring still continues if the emulator (or watch) cannot start a workout. On a physical Galaxy Watch, use Wi-Fi ADB — the charger has no data pin. See the setup notes in the repo README for pairing.
+
+### Galaxy Watch 4
+
+Wear OS 4+ is required. Enable Developer options → ADB debugging → Debug over Wi-Fi, put the watch on the same LAN as the computer, then `adb connect WATCH_IP:5555`.
+
 Typical flow: **Start Match** → warm-up (optional) → who’s serving → swipe Overview / Score / Actions → record points with **Us** / **Them**. Tap the same button again within 3s to cancel.
 
 The app is **standalone**. Scoring never needs a phone.

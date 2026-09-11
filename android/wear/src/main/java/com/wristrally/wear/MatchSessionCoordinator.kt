@@ -9,12 +9,14 @@ import com.wristrally.domain.ServeSelectionPreferenceStoring
 import com.wristrally.domain.WorkoutConflictCopy
 import com.wristrally.domain.WorkoutSessionError
 import com.wristrally.domain.WristRaiseTipStoring
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.Duration
 import java.time.Instant
 import java.util.logging.Logger
@@ -63,6 +65,10 @@ class MatchSessionCoordinator(
 
     fun addListener(listener: () -> Unit) {
         listeners += listener
+    }
+
+    fun removeListener(listener: () -> Unit) {
+        listeners -= listener
     }
 
     fun setUsThemLabels(value: Boolean) {
@@ -205,24 +211,34 @@ class MatchSessionCoordinator(
     private suspend fun startWorkoutSession() {
         try {
             workoutManager.startWorkout()
-            isWorkoutSessionActive = true
-            workoutErrorMessage = null
-            logger.info("Workout session started")
-        } catch (error: WorkoutSessionError) {
-            isWorkoutSessionActive = false
-            if (error == WorkoutSessionError.AnotherWorkoutSessionActive) {
-                showWorkoutConflictPrompt = true
+            withContext(Dispatchers.Main.immediate) {
+                isWorkoutSessionActive = true
                 workoutErrorMessage = null
-            } else {
-                workoutErrorMessage = error.userMessage
+                logger.info("Workout session started")
+                notifyListeners()
             }
-            logger.warning("Workout start failed: ${error.userMessage}")
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: WorkoutSessionError) {
+            withContext(Dispatchers.Main.immediate) {
+                isWorkoutSessionActive = false
+                if (error == WorkoutSessionError.AnotherWorkoutSessionActive) {
+                    showWorkoutConflictPrompt = true
+                    workoutErrorMessage = null
+                } else {
+                    workoutErrorMessage = error.userMessage
+                }
+                logger.warning("Workout start failed: ${error.userMessage}")
+                notifyListeners()
+            }
         } catch (error: Exception) {
-            isWorkoutSessionActive = false
-            workoutErrorMessage = WorkoutConflictCopy.genericFailureMessage
-            logger.warning("Workout start failed: ${error.message}")
+            withContext(Dispatchers.Main.immediate) {
+                isWorkoutSessionActive = false
+                workoutErrorMessage = WorkoutConflictCopy.genericFailureMessage
+                logger.warning("Workout start failed: ${error.message}")
+                notifyListeners()
+            }
         }
-        notifyListeners()
     }
 
     private suspend fun endWorkoutSession(saveWorkout: Boolean) {

@@ -1,6 +1,8 @@
 package com.wristrally.wear
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
@@ -47,11 +49,20 @@ class WearAppModel(activity: MainActivity) {
 fun WearApp(model: WearAppModel) {
     var revision by remember { mutableIntStateOf(0) }
     DisposableEffect(model) {
-        val listener: () -> Unit = { revision += 1 }
+        val mainHandler = Handler(Looper.getMainLooper())
+        fun bumpRevision() {
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                revision += 1
+            } else {
+                mainHandler.post { revision += 1 }
+            }
+        }
+        val listener: () -> Unit = { bumpRevision() }
         model.service.addListener(listener)
         model.session.addListener(listener)
         onDispose {
             model.service.removeListener(listener)
+            model.session.removeListener(listener)
         }
     }
     LifecycleResumeEffect(model) {
