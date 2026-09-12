@@ -316,7 +316,11 @@ class MatchService(
         try {
             store.saveActiveMatch(activeMatch)
             notifySync()
-        } catch (error: Exception) {
+        } catch (error: Throwable) {
+            // LinkageError / NoSuchMethodError are Errors, not Exceptions.
+            // Wear OS 4 ART is missing some JDK 11 nio APIs; scoring should
+            // still continue in memory if a write fails.
+            if (error is VirtualMachineError) throw error
             logger.warning("Persist failed: ${error.message}")
         }
     }

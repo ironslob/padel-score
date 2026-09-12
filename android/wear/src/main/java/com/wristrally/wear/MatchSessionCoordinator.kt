@@ -9,6 +9,7 @@ import com.wristrally.domain.ServeSelectionPreferenceStoring
 import com.wristrally.domain.WorkoutConflictCopy
 import com.wristrally.domain.WorkoutSessionError
 import com.wristrally.domain.WristRaiseTipStoring
+import android.util.Log
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -131,7 +132,8 @@ class MatchSessionCoordinator(
             warmUpMinutes = warmUpMinutes,
         )
         service.startMatch(settings)
-        startWorkoutSession()
+        Log.i(CrashLog.TAG, "Match started, requesting workout")
+        tryStartWorkout()
     }
 
     fun presentFirstLaunchTipIfNeeded() {
@@ -149,6 +151,7 @@ class MatchSessionCoordinator(
     fun handleBecameActive() {
         service.expireInactiveMatchIfNeeded()
         rescheduleInactivityTimer()
+        scope.launch { tryStartWorkout() }
     }
 
     fun dismissWorkoutError() {
@@ -206,6 +209,13 @@ class MatchSessionCoordinator(
             MatchStatus.Discarded ->
                 scope.launch { endWorkoutSession(saveWorkout = false) }
         }
+    }
+
+    private suspend fun tryStartWorkout() {
+        if (isWorkoutSessionActive) return
+        val match = service.activeMatch ?: return
+        if (match.status != MatchStatus.InProgress) return
+        startWorkoutSession()
     }
 
     private suspend fun startWorkoutSession() {

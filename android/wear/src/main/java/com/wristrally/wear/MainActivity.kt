@@ -17,7 +17,7 @@ import com.wristrally.domain.FileMatchStore
 import com.wristrally.domain.MatchService
 
 class MainActivity : ComponentActivity() {
-    private val appModel: WearAppModel by lazy { WearAppModel(this) }
+    private val appModel: WearAppModel by lazy { WearAppModel.fromActivity(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,19 +29,23 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-class WearAppModel(activity: MainActivity) {
-    val service: MatchService
-    val session: MatchSessionCoordinator
-
-    init {
-        val filesDir = activity.filesDir.toPath().resolve("WristRally")
-        service = MatchService(FileMatchStore(filesDir))
-        session = MatchSessionCoordinator(
-            service = service,
-            workoutManager = HealthServicesWorkoutManager(activity.applicationContext),
-            tipStore = SharedPreferencesTipStore.create(activity),
-            serveStore = SharedPreferencesStore.create(activity),
-        )
+class WearAppModel(
+    val service: MatchService,
+    val session: MatchSessionCoordinator,
+) {
+    companion object {
+        fun fromActivity(activity: MainActivity): WearAppModel {
+            val service = MatchService(FileMatchStore(activity.filesDir.toPath().resolve("WristRally")))
+            return WearAppModel(
+                service = service,
+                session = MatchSessionCoordinator(
+                    service = service,
+                    workoutManager = ForegroundWorkoutManager(activity.applicationContext),
+                    tipStore = SharedPreferencesTipStore.create(activity),
+                    serveStore = SharedPreferencesStore.create(activity),
+                ),
+            )
+        }
     }
 }
 
@@ -69,8 +73,13 @@ fun WearApp(model: WearAppModel) {
         model.session.handleBecameActive()
         onPauseOrDispose { }
     }
-    // Read revision so Compose subscribes to service/session updates.
-    @Suppress("UNUSED_VARIABLE")
     val tick = revision
-    WearRoot(service = model.service, session = model.session)
+    WearRoot(
+        service = model.service,
+        session = model.session,
+        showFirstLaunchTip = model.session.showFirstLaunchTip,
+        showWorkoutConflictPrompt = model.session.showWorkoutConflictPrompt,
+        workoutErrorMessage = model.session.workoutErrorMessage,
+        uiTick = tick,
+    )
 }
