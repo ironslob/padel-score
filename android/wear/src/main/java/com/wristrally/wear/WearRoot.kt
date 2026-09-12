@@ -35,7 +35,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.FilledTonalButton
@@ -65,6 +64,10 @@ val UndoOrange = Color(0xFFFF9F0A)
 fun WearRoot(
     service: MatchService,
     session: MatchSessionCoordinator,
+    showFirstLaunchTip: Boolean,
+    showWorkoutConflictPrompt: Boolean,
+    workoutErrorMessage: String?,
+    uiTick: Int,
 ) {
     val match = service.activeMatch
     var showSettings by remember { mutableStateOf(false) }
@@ -73,6 +76,8 @@ fun WearRoot(
     var gameInterstitialCompletedSet by remember { mutableStateOf(false) }
     var gameInterstitialIsTieBreak by remember { mutableStateOf(false) }
     var previousMatch by remember { mutableStateOf<MatchState?>(null) }
+    @Suppress("UNUSED_VARIABLE")
+    val observedTick = uiTick
 
     LaunchedEffect(match) {
         val oldMatch = previousMatch
@@ -101,10 +106,10 @@ fun WearRoot(
     }
 
     when {
-        session.showFirstLaunchTip -> FirstLaunchTipScreen(onDismiss = { session.dismissFirstLaunchTip() })
-        session.showWorkoutConflictPrompt -> WorkoutConflictScreen(session)
-        session.workoutErrorMessage != null -> WorkoutErrorScreen(
-            message = session.workoutErrorMessage.orEmpty(),
+        showFirstLaunchTip -> FirstLaunchTipScreen(onDismiss = { session.dismissFirstLaunchTip() })
+        showWorkoutConflictPrompt -> WorkoutConflictScreen(session)
+        workoutErrorMessage != null -> WorkoutErrorScreen(
+            message = workoutErrorMessage,
             onDismiss = { session.dismissWorkoutError() },
         )
         showTips -> HelpScreen(
@@ -156,6 +161,10 @@ fun StartMatchScreen(session: MatchSessionCoordinator, onSettings: () -> Unit) {
         scope.launch {
             try {
                 session.startMatch()
+            } catch (error: kotlinx.coroutines.CancellationException) {
+                throw error
+            } catch (error: Throwable) {
+                CrashLog.write(context, error)
             } finally {
                 starting = false
             }
@@ -390,7 +399,7 @@ fun SettingsScreen(
     onDone: () -> Unit,
     onTips: () -> Unit,
 ) {
-    ScalingLazyColumn(modifier = Modifier.fillMaxSize()) {
+    PinnedActionColumn(actionLabel = "Done", onAction = onDone) {
         item { Text("Settings", style = MaterialTheme.typography.titleMedium) }
         item {
             FilledTonalButton(onClick = onTips, modifier = Modifier.fillMaxWidth()) { Text("Tips") }
@@ -419,9 +428,6 @@ fun SettingsScreen(
             item { PreferenceCycleButton("Warm-up limit", MatchSettings.warmUpMinutesLabel(session.warmUpMinutes), SettingsCopy.warmUpLimit) {
                 session.setWarmUpMinutes(MatchSettings.nextWarmUpMinutes(session.warmUpMinutes))
             } }
-        }
-        item {
-            Button(onClick = onDone, modifier = Modifier.fillMaxWidth()) { Text("Done") }
         }
     }
 }
@@ -458,7 +464,7 @@ fun HelpScreen(
     onDismiss: () -> Unit,
     confirmLabel: String = "Done",
 ) {
-    ScalingLazyColumn(modifier = Modifier.fillMaxSize()) {
+    PinnedActionColumn(actionLabel = confirmLabel, onAction = onDismiss) {
         item { Text(title, style = MaterialTheme.typography.titleMedium) }
         sections.forEach { (sectionTitle, body) ->
             item {
@@ -468,8 +474,29 @@ fun HelpScreen(
                 }
             }
         }
-        item {
-            Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) { Text(confirmLabel) }
+    }
+}
+
+@Composable
+private fun PinnedActionColumn(
+    actionLabel: String,
+    onAction: () -> Unit,
+    content: androidx.wear.compose.foundation.lazy.ScalingLazyListScope.() -> Unit,
+) {
+    Box(Modifier.fillMaxSize()) {
+        ScalingLazyColumn(
+            modifier = Modifier.fillMaxSize().padding(bottom = 56.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            content = content,
+        )
+        Button(
+            onClick = onAction,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(start = 22.dp, end = 22.dp, bottom = 4.dp),
+        ) {
+            Text(actionLabel)
         }
     }
 }

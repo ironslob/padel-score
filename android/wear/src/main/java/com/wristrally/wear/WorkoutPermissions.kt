@@ -3,14 +3,19 @@ package com.wristrally.wear
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.content.ContextCompat
 
 /** Runtime permissions needed before talking to Wear Health Services. */
 object WorkoutPermissions {
-    val requested: Array<String> = arrayOf(
-        Manifest.permission.ACTIVITY_RECOGNITION,
-        Manifest.permission.BODY_SENSORS,
-    )
+    val requested: Array<String>
+        get() = buildList {
+            add(Manifest.permission.ACTIVITY_RECOGNITION)
+            add(Manifest.permission.BODY_SENSORS)
+            if (Build.VERSION.SDK_INT >= 33) {
+                add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }.toTypedArray()
 
     fun missing(context: Context): Array<String> =
         requested.filter { permission ->

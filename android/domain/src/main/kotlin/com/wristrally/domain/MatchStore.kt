@@ -116,7 +116,9 @@ class FileMatchStore(private val directory: Path) : MatchStore {
 
     private fun atomicWrite(path: Path, data: String) {
         val tmp = path.resolveSibling("${path.fileName}.tmp")
-        Files.writeString(tmp, data)
+        // Files.writeString is Java 11 / API 34+. Wear OS 4 (API 33) ART
+        // does not have it, so Start Match crashed on first persist.
+        Files.write(tmp, data.toByteArray(Charsets.UTF_8))
         try {
             Files.move(
                 tmp,

@@ -1,6 +1,7 @@
 package com.wristrally.wear
 
 import android.content.Context
+import android.util.Log
 import androidx.health.services.client.ExerciseClient
 import androidx.health.services.client.HealthServices
 import androidx.health.services.client.data.DataType
@@ -24,28 +25,32 @@ interface WorkoutSessionManaging {
 class HealthServicesWorkoutManager(
     private val context: Context,
 ) : WorkoutSessionManaging {
-    private val client: ExerciseClient? = try {
-        HealthServices.getClient(context).exerciseClient
-    } catch (_: Exception) {
-        null
-    }
     private val mutex = Mutex()
     override var isRunning: Boolean = false
         private set
 
+    private fun exerciseClient(): ExerciseClient? = try {
+        HealthServices.getClient(context).exerciseClient
+    } catch (error: Exception) {
+        CrashLog.write(context, error)
+        null
+    }
+
     override suspend fun startWorkout() {
         mutex.withLock {
             if (isRunning) return
-            val client = this.client ?: throw WorkoutSessionError.HealthDataUnavailable
+            val client = exerciseClient() ?: throw WorkoutSessionError.HealthDataUnavailable
             if (!WorkoutPermissions.hasActivityRecognition(context)) {
                 throw WorkoutSessionError.AuthorizationDenied
             }
             try {
+                Log.i(CrashLog.TAG, "Querying Health Services capabilities")
                 val capabilities = withContext(Dispatchers.IO) {
                     client.getCapabilitiesAsync().await()
                 }
                 val type = preferredExerciseType(capabilities.supportedExerciseTypes)
                     ?: throw WorkoutSessionError.HealthDataUnavailable
+                Log.i(CrashLog.TAG, "Starting exercise type=$type")
                 val typeCaps = try {
                     capabilities.getExerciseTypeCapabilities(type)
                 } catch (_: Exception) {
@@ -63,8 +68,10 @@ class HealthServicesWorkoutManager(
             } catch (error: CancellationException) {
                 throw error
             } catch (error: WorkoutSessionError) {
+                CrashLog.write(context, error)
                 throw error
             } catch (error: Exception) {
+                CrashLog.write(context, error)
                 val message = error.message.orEmpty().lowercase()
                 if (message.contains("already") || message.contains("active")) {
                     throw WorkoutSessionError.AnotherWorkoutSessionActive
@@ -80,7 +87,7 @@ class HealthServicesWorkoutManager(
     override suspend fun endWorkout(save: Boolean) {
         mutex.withLock {
             if (!isRunning) return
-            val client = this.client
+            val client = exerciseClient()
             try {
                 if (client == null) return
                 withContext(Dispatchers.IO) {

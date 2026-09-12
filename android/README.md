@@ -26,6 +26,7 @@ From `android/`:
 
 ```bash
 ./gradlew :domain:test          # scoring + persistence unit tests (no Android SDK)
+./gradlew :wear:test            # Wear UI/session tests (Robolectric, watch-sized)
 ./gradlew :wear:assembleDebug   # Wear APK (needs Android SDK)
 ```
 
@@ -53,6 +54,13 @@ Start Match asks for activity / body-sensor permission so Health Services can ow
 ### Galaxy Watch 4
 
 Wear OS 4+ is required. Enable Developer options → ADB debugging → Debug over Wi-Fi, put the watch on the same LAN as the computer, then `adb connect WATCH_IP:5555`.
+
+If Start Match still dies, pull the last Java crash (debug builds):
+
+```bash
+adb logcat -s WristRally:D AndroidRuntime:E DEBUG:I
+adb exec-out run-as com.codebrewery.wristrally.wear cat files/last-crash.txt
+```
 
 Typical flow: **Start Match** → warm-up (optional) → who’s serving → swipe Overview / Score / Actions → record points with **Us** / **Them**. Tap the same button again within 3s to cancel.
 

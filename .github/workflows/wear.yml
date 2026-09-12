@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   test:
-    name: Domain tests
+    name: Domain and Wear tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,9 +32,9 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Domain unit tests
+      - name: Domain and Wear unit tests
         working-directory: android
-        run: ./gradlew :domain:test --no-daemon
+        run: ./gradlew :domain:test :wear:testDebugUnitTest --no-daemon
 
   build-wear:
     name: Build Wear APK

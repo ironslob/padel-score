@@ -4,6 +4,8 @@ import java.nio.file.Files
 import java.time.Instant
 import java.util.UUID
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -427,6 +429,38 @@ class MatchServiceTests {
         store.saveMatchNotes(notes)
 
         assertEquals(notes, FileMatchStore(dir).loadMatchNotes())
+    }
+
+    @Test
+    fun testFileMatchStoreDoesNotCallJava11WriteString() {
+        val stream = FileMatchStore::class.java.getResourceAsStream("FileMatchStore.class")
+            ?: error("FileMatchStore.class not on classpath")
+        val haystack = stream.use { String(it.readBytes(), Charsets.ISO_8859_1) }
+        assertFalse(
+            haystack.contains("writeString"),
+            "Files.writeString is missing on Wear OS 4 (API 33). Use Files.write(path, bytes).",
+        )
+    }
+
+    @Test
+    fun testStartMatchSurvivesLinkageErrorFromStore() {
+        val store = object : MatchStore {
+            override fun loadActiveMatch(): MatchState? = null
+            override fun saveActiveMatch(match: MatchState?) {
+                throw NoSuchMethodError("No static method writeString")
+            }
+            override fun loadArchivedMatches(): List<MatchState> = emptyList()
+            override fun archiveMatch(match: MatchState) {}
+            override fun deleteArchivedMatch(id: UUID) {}
+            override fun replaceArchive(matches: List<MatchState>) {}
+            override fun loadDeletedMatchIDs(): Set<UUID> = emptySet()
+            override fun saveDeletedMatchIDs(ids: Set<UUID>) {}
+            override fun loadMatchNotes(): Map<UUID, String> = emptyMap()
+            override fun saveMatchNotes(notes: Map<UUID, String>) {}
+        }
+        val service = MatchService(store, autoRestore = false)
+        service.startMatch()
+        assertNotNull(service.activeMatch)
     }
 
     private fun serviceWithActiveMatch(match: MatchState): MatchService {

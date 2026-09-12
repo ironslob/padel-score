@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Wrist Rally</string>
+    <string name="workout_channel_name">Match workout</string>
+    <string name="workout_notification_text">Tracking this match as a workout</string>
 </resources>
